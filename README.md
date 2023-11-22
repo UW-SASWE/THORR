@@ -8,4 +8,3 @@ The [Data](https://github.com/gdarkwah/THORR/tree/main/Data) folder contains all
 The [Methods](https://github.com/gdarkwah/THORR/tree/main/Methods) folder contains Jupyter Notebooks that were used to obtain and process the data and the code for the model development and evaluation.  
 The results of this study can be found in the [Results](https://github.com/gdarkwah/THORR/tree/main/Results) folder.  
 Finally, the [Webapp](Webapp) folder contains a clone of the [online tool](https://depts.washington.edu/saswe/hydrothermalviewer/) for viewing the spatially continuous thermal profile of the Columbia River and its adjoining tributaries.
-![image](https://github.com/gdarkwah/THORR/assets/61522557/7f34d3e4-841c-4646-b08e-e0c56a9050d1)  
