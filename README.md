@@ -8,3 +8,6 @@ The [Data](https://github.com/UW-SASWE/THORR/tree/main/Data) folder contains all
 The [Methods](https://github.com/UW-SASWE/THORR/tree/main/Methods) folder contains Jupyter Notebooks that were used to obtain and process the data and the code for the model development and evaluation.  
 The results of this study can be found in the [Results](https://github.com/UW-SASWE/THORR/tree/main/Results) folder.  
 Finally, the [Webapp](https://github.com/UW-SASWE/THORR/tree/main/Webapp) folder contains a clone of the [online tool](https://depts.washington.edu/saswe/hydrothermalviewer/) for viewing the spatially continuous thermal profile of the Columbia River and its adjoining tributaries.
+
+Zenodo: [![DOI](https://zenodo.org/badge/721908733.svg)](https://zenodo.org/doi/10.5281/zenodo.10246698)
+
