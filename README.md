@@ -4,7 +4,7 @@ THORR is a data-driven approach to estimating water temperature in regulated riv
 
 This GitHub contains the code and data used in the project as well as a copy of the THORR web app.
 
-The [Data](https://github.com/gdarkwah/THORR/tree/main/Data) folder contains all the GIS shapefiles, in-situ temperature records, and satellite data obtained from Landsat.  
-The [Methods](https://github.com/gdarkwah/THORR/tree/main/Methods) folder contains Jupyter Notebooks that were used to obtain and process the data and the code for the model development and evaluation.  
-The results of this study can be found in the [Results](https://github.com/gdarkwah/THORR/tree/main/Results) folder.  
-Finally, the [Webapp](Webapp) folder contains a clone of the [online tool](https://depts.washington.edu/saswe/hydrothermalviewer/) for viewing the spatially continuous thermal profile of the Columbia River and its adjoining tributaries.
+The [Data](https://github.com/UW-SASWE/THORR/tree/main/Data) folder contains all the GIS shapefiles, in-situ temperature records, and satellite data obtained from Landsat.  
+The [Methods](https://github.com/UW-SASWE/THORR/tree/main/Methods) folder contains Jupyter Notebooks that were used to obtain and process the data and the code for the model development and evaluation.  
+The results of this study can be found in the [Results](https://github.com/UW-SASWE/THORR/tree/main/Results) folder.  
+Finally, the [Webapp](https://github.com/UW-SASWE/THORR/tree/main/Webapp) folder contains a clone of the [online tool](https://depts.washington.edu/saswe/hydrothermalviewer/) for viewing the spatially continuous thermal profile of the Columbia River and its adjoining tributaries.
