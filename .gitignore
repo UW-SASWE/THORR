@@ -170,7 +170,7 @@ bower_components/
 jspm_packages/
 
 # Ignore misc files
-.DS_Store
+*.DS_Store
 Thumbs.db
 .vscode/
 
