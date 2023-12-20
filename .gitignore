@@ -178,6 +178,8 @@ Thumbs.db
 dbConfig.php
 esriAPIKey.php
 geoPHP/
+.env/
+archive/
 
 # specific files
 Webapp/hydrothermalviewer/js/script.js
