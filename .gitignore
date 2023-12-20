@@ -183,3 +183,4 @@ archive/
 
 # specific files
 Webapp/hydrothermalviewer/js/script.js
+Results/2.WaterTempEst/2.RandomForestRegression/*.pkl
