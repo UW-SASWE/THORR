@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A tool for viewing river and reservoir temperature."
+    />
+    <meta name="author" content="George Darkwah and SASWE Group, UW" />
+    <title>Hydrothermal Viewer</title>
+    <!-- Stylesheets -->
+    <!-- Bootstrap core CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <!-- Leaflet CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <!-- ESRI Leaflet Geocoder CSS -->
+    <!-- <link
+      rel="stylesheet"
+      href="https://unpkg.com/esri-leaflet-geocoder@3.1.4/dist/esri-leaflet-geocoder.css"
+    /> -->
+    <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet.markercluster@1.1.0/dist/MarkerCluster.css"
+    crossorigin=""
+  />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <!-- Vertically centered scrollable modal -->
+    <div
+      class="modal fade"
+      id="howToNavigate"
+      aria-labelledby="howToNavigateLabel"
+      tabindex="-1"
+      style="display: none"
+      aria-hidden="false"
+    >
+      <div
+        class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"
+      >
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="howToNavigateLabel">
+              How to use this Water Temperature Tool
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">
+                Hover over a reach (river segment) or dam in the map window for
+                a quick view of the latest water temperature estimate.
+              </li>
+              <li class="list-group-item">
+                Click on a reach or dam to show the historical temperature
+                series and additional details.
+              </li>
+              <li class="list-group-item">
+                Click on the
+                <a
+                  class="link-body-emphasis text-decoration-none btn btn-transparent border btn-sm"
+                >
+                  <i class="bi bi-chevron-double-left"></i>
+                </a>
+                /
+                <a
+                  class="link-body-emphasis text-decoration-none btn btn-transparent border btn-sm"
+                >
+                  <i class="bi bi-chevron-double-right"></i>
+                </a>
+                buttons to show or hide the left sidebar.
+              </li>
+              <li class="list-group-item">
+                In the left sidebar, use the dropdown menus to navigate to a
+                basin/river/reach/dam of choice.
+              </li>
+              <li class="list-group-item">
+                <a
+                  class="ms-1 wlink-body-emphasis text-decoration-none btn btn-transparent border btn-sm"
+                >
+                  <i class="bi bi-graph-up"></i>
+                </a>
+                - Show or hide info panel.
+              </li>
+              <li class="list-group-item">
+                <a
+                  class="ms-1 wlink-body-emphasis text-decoration-none btn btn-transparent border btn-sm"
+                >
+                  <i class="bi bi-arrow-clockwise"></i>
+                </a>
+                - Refresh and reload the tool.
+              </li>
+              <li class="list-group-item">
+                <a
+                  class="ms-1 wlink-body-emphasis text-decoration-none btn btn-transparent border btn-sm"
+                >
+                  <i class="bi bi-info-circle"></i>
+                </a>
+                - Display information about the tool (summary, 
+                vesion, disclaimer etc.)  [Currently disabled]
+              </li>
+              <li class="list-group-item">
+                <a
+                  class="ms-1 wlink-body-emphasis text-decoration-none btn btn-transparent border btn-sm"
+                >
+                  <span>Cite</span>
+                </a>
+                - How to Cite this tool.  [Currently disabled]
+              </li>
+              <li class="list-group-item">
+                <a
+                  class="ms-1 wlink-body-emphasis text-decoration-none btn btn-transparent border btn-sm"
+                >
+                  <i class="bi bi-question-circle"></i>
+                </a>
+                - Help on how to use this tool.  [Currently disabled]
+              </li>
+            </ul>
+          </div>
+          <!-- <div class="modal-footer d-flex justify-content-between"> -->
+          <div class="modal-footer">
+            <!-- <div class="form-check form-check-inline form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                role="switch"
+                id="showHowToOnStartSwitch"
+                onclick="toggleShowHowToOnStart()"
+                checked
+              />
+              <label class="form-check-label" for="showHowToOnStartSwitch"
+                >Always show on startup</label
+              >
+            </div> -->
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex vh-100 flex-nowrap">
+      <div
+        class="sidebar border border-right p-0 bg-body-tertiary collapse collapse-horizontal"
+        id="sidebar"
+      >
+        <div
+          class="d-flex flex-column justify-content-between"
+          style="width: 20rem; height: 100%"
+        >
+          <div>
+            <header class="navbar border-bottom sticky-top bg-body-tertiary">
+              <a
+                href="/"
+                class="d-block px-2 mb-0 link-body-emphasis text-decoration-none h4 text-nowrap"
+                data-bs-toggle="tooltip"
+                data-bs-placement="right"
+                data-bs-original-title="Icon-only"
+              >
+                <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+                <svg
+                  class="me-1"
+                  width="32"
+                  height="32"
+                  fill="currentColor"
+                  viewBox="0 0 16 16"
+                  version="1.1"
+                  id="svg985"
+                  xml:space="preserve"
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:svg="http://www.w3.org/2000/svg"
+                >
+                  <defs id="defs989" />
+                  <path
+                    id="path981"
+                    style="stroke-width: 0.742311"
+                    d="M 7.9638498,0 C 7.0565801,0 6.1497896,0.63215123 6.1497896,1.8974509 v 5.7313102 c -1.5752897,1.6816827 -0.4365653,4.5167599 1.8140602,4.5167599 2.2506272,0 3.3893452,-2.8350771 1.8140598,-4.5167598 V 1.8974509 C 9.7779096,0.63215123 8.8711196,0 7.9638498,0 Z m 0,0.75852204 c 0.6012853,0 1.0888743,0.51000336 1.0888743,1.13892886 v 6.0635934 l 0.1204992,0.1145802 c 1.2418487,1.1615952 0.4563333,3.3113745 -1.2093735,3.3113745 -1.6657037,0 -2.4512228,-2.1497804 -1.2093735,-3.3113745 L 6.8749756,7.9610443 V 1.8974509 c 0,-0.6289255 0.4875894,-1.13892886 1.0888742,-1.13892886 z m 0,0.75852206 A 0.36290811,0.37959068 0 0 0 7.6001614,1.8974509 V 8.4147828 A 1.0887237,1.1387714 0 1 0 9.0527241,9.4895464 1.0887237,1.1387714 0 0 0 8.3253474,8.4147828 V 1.8974509 A 0.36290811,0.37959068 0 0 0 7.9638498,1.5170441 Z m 3.6281202,0 c -0.200428,0 -0.361498,0.170765 -0.361498,0.3804068 v 0.7585222 c 10e-7,0.5061212 0.725187,0.5061212 0.725187,0 V 1.8974509 c 0,-0.2096425 -0.163258,-0.3804079 -0.363689,-0.3804068 z M 1.7570473,2.0509887 A 0.4249204,0.44445363 0 0 0 1.3320139,2.4955605 0.4249204,0.44445363 0 0 0 1.7570473,2.9378409 H 4.4255561 A 0.4249204,0.44445363 0 0 0 4.8505896,2.4955605 0.4249204,0.44445363 0 0 0 4.4255561,2.0509887 Z M 14.416032,2.7407625 c -0.09286,0 -0.185477,0.035905 -0.256334,0.1099972 l -0.51486,0.5385278 c -0.342584,0.3583328 0.172274,0.8945688 0.51486,0.536236 l 0.512669,-0.536236 c 0.141673,-0.14823 0.141673,-0.3902981 0,-0.5385277 -0.07085,-0.074093 -0.163475,-0.1099972 -0.256335,-0.1099973 z M 11.59197,3.794902 c -0.200428,0 -0.361498,0.1707649 -0.361498,0.3804067 0,0.209642 0.16107,0.3781153 0.361498,0.3781153 1.935505,0 1.935505,3.0386715 0,3.0386715 -0.483877,0 -0.483877,0.7585221 0,0.7585221 2.903259,0 2.903259,-4.5557156 0,-4.5557156 z M 3.5360532,3.9094823 A 0.4249204,0.44445363 0 0 0 3.1110197,4.3540541 0.4249204,0.44445363 0 0 0 3.5360532,4.7986259 H 4.4255561 A 0.4249204,0.44445363 0 0 0 4.8505896,4.3540541 0.4249204,0.44445363 0 0 0 4.4255561,3.9094823 Z M 14.858594,5.6923529 c -0.200429,0 -0.363689,0.1707649 -0.363689,0.380407 0,0.2096416 0.16326,0.3804067 0.363689,0.3804067 h 0.725185 c 0.483874,0 0.483874,-0.7608137 0,-0.7608137 z M 1.7570473,5.7702675 A 0.4249204,0.44445363 0 0 0 1.3320139,6.2148394 0.4249204,0.44445363 0 0 0 1.7570473,6.6571197 H 4.4255561 A 0.4249204,0.44445363 0 0 0 4.8505896,6.2148394 0.4249204,0.44445363 0 0 0 4.4255561,5.7702675 Z M 3.5360532,7.6287611 A 0.4249204,0.44445363 0 0 0 3.1110197,8.0733331 0.4249204,0.44445363 0 0 0 3.5360532,8.5179048 H 4.4255561 A 0.4249204,0.44445363 0 0 0 4.8505896,8.0733331 0.4249204,0.44445363 0 0 0 4.4255561,7.6287611 Z M 13.901172,8.1077074 c -0.09303,0 -0.185435,0.037942 -0.256334,0.1122886 -0.142156,0.1483161 -0.142156,0.3879201 0,0.536236 l 0.51486,0.5385278 C 14.501746,9.6403091 15.002731,9.1140064 14.672367,8.756232 L 14.159698,8.2199961 C 14.088805,8.1456497 13.994193,8.1077075 13.901172,8.1077074 Z M 11.59197,9.1091398 c -0.200428,0 -0.361498,0.1707654 -0.361498,0.3804066 v 0.7585226 c 10e-7,0.50612 0.725187,0.50612 0.725187,0 V 9.4895464 c 0,-0.2096423 -0.163258,-0.3804077 -0.363689,-0.3804066 z M 1.7570473,9.4895464 A 0.4249204,0.44445363 0 0 0 1.3320139,9.9341187 0.4249204,0.44445363 0 0 0 1.7570473,10.376399 H 4.4255561 A 0.4249204,0.44445363 0 0 0 4.8505896,9.9341187 0.4249204,0.44445363 0 0 0 4.4255561,9.4895464 Z m 1.695752,2.2801506 c -1.1761509,-0.01103 -2.3484771,0.383118 -3.29291364,1.125178 a 0.40215811,0.42064498 0 0 0 -0.07887225,0.588943 0.40215811,0.42064498 0 0 0 0.56305972,0.08479 c 0.98045577,-0.770364 2.28234047,-1.104605 3.49228497,-0.89602 0.5936032,0.102338 1.1913607,0.33363 1.8228238,0.552278 0.6322735,0.218929 1.3130835,0.42853 2.0419131,0.42853 0.7288293,0 1.40964,-0.209601 2.041914,-0.42853 0.631462,-0.218648 1.227029,-0.449944 1.820633,-0.552278 1.209944,-0.208585 2.511828,0.125656 3.492284,0.89602 a 0.40215811,0.42064498 0 0 0 0.56306,-0.08479 0.40215811,0.42064498 0 0 0 -0.07887,-0.588943 c -1.162383,-0.913306 -2.671281,-1.299136 -4.105736,-1.051846 -0.697632,0.120265 -1.334624,0.372836 -1.9455128,0.584358 -0.61008,0.211245 -1.207943,0.382698 -1.78777,0.382698 -0.579827,0 -1.1798803,-0.171453 -1.7899603,-0.382698 C 5.6002468,12.215865 4.9632565,11.963294 4.265623,11.843029 3.9966627,11.796659 3.7242208,11.772243 3.4528015,11.769697 Z m 0,2.346606 C 2.2766484,14.10583 1.1043222,14.501714 0.15988566,15.243774 a 0.40215811,0.42064498 0 0 0 -0.07887225,0.588943 0.40215811,0.42064498 0 0 0 0.56305972,0.08249 C 1.6245288,15.144849 2.9264136,14.812897 4.1363581,15.021484 4.7299613,15.12382 5.3277188,15.355112 5.9591819,15.573761 6.5914554,15.792691 7.2722655,16 8.001095,16 c 0.7288293,0 1.40964,-0.207309 2.041914,-0.426239 0.631462,-0.218649 1.227029,-0.449943 1.820633,-0.552277 1.209944,-0.208587 2.511828,0.123365 3.492284,0.893727 a 0.40215811,0.42064498 0 0 0 0.56306,-0.08249 0.40215811,0.42064498 0 0 0 -0.07887,-0.588943 c -1.162383,-0.913306 -2.671281,-1.301429 -4.105736,-1.054139 -0.697632,0.120265 -1.334624,0.375126 -1.9455128,0.586652 -0.61008,0.211241 -1.207943,0.382697 -1.78777,0.382697 -0.579827,0 -1.1798804,-0.171456 -1.7899603,-0.382697 C 5.600247,14.564761 4.9632565,14.3099 4.265623,14.189635 3.9966627,14.143265 3.7242208,14.118721 3.4528015,14.116303 Z"
+                  />
+                </svg>
+                THORR
+              </a>
+            </header>
+            <div class="d-flex flex-column">
+              <div class="container">
+                <label for="basin-selector" class="p-3 ps-1 pb-1">Basin</label
+                ><select
+                  class="form-select"
+                  name="basin-selector"
+                  id="basin-selector"
+                  aria-label="basin-selector"
+                  onchange="onBasinSelectorChange()"
+                ></select
+                ><label for="river-selector" class="p-3 ps-1 pb-1">River</label
+                ><select
+                  class="form-select"
+                  name="river-selector"
+                  id="river-selector"
+                  aria-label="river-selector"
+                  onchange="onRiverSelectorChange()"
+                ></select
+                ><label for="reach-selector" class="p-3 ps-1 pb-1">Reach</label
+                ><select
+                  class="form-select"
+                  name="reach-selector"
+                  id="reach-selector"
+                  aria-label="reach-selector"
+                  onchange="onReachSelectorChange()"
+                ></select
+                ><label for="dam-selector" class="p-3 ps-1 pb-1">Dam</label
+                ><select
+                  class="form-select"
+                  name="dam-selector"
+                  id="dam-selector"
+                  aria-label="dam-selector"
+                  onchange="onDamSelectorChange()"
+                ></select>
+              </div>
+              <div class="d-inline p-3 d-flex justify-content-between">
+                <a
+                  class="ms-1 wlink-body-emphasis text-decoration-none btn btn-transparent border"
+                  data-bs-toggle="collapse"
+                  href="#info-panel"
+                  aria-expanded="true"
+                  aria-controls="info-panel"
+                  role="button"
+                  onclick="toggleMapHeight()"
+                >
+                  <i class="bi bi-graph-up fs-3"></i>
+                  <span class="visually-hidden">Graph</span>
+                </a>
+                <a
+                  class="link-body-emphasis text-decoration-none btn btn-transparent border"
+                  href="./"
+                  role="button"
+                >
+                  <i class="bi bi-arrow-clockwise fs-3"></i>
+                  <span class="visually-hidden">Reset</span>
+                </a>
+                <a
+                  class="me-1 link-body-emphasis text-decoration-none btn btn-transparent border"
+                  data-bs-toggle="collapse"
+                  href=".sidebar"
+                  role="button"
+                  aria-expanded="true"
+                  aria-controls="mini-sidebar sidebar"
+                  onclick="invalidateMapSize()"
+                >
+                  <i class="bi bi-chevron-double-left fs-3"></i>
+                  <span class="visually-hidden">Collapse Sidebar</span>
+                </a>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="border-top border-bottom d-inline p-2 d-flex justify-content-between">
+              <a
+                class="ms-1 wlink-body-emphasis text-decoration-none btn btn-transparent border disabled"
+                href="#"
+                role="button"
+              >
+                <i class="bi bi-info-circle fs-4"></i>
+                <span class="visually-hidden">Info</span>
+              </a>
+              <a
+                class="link-body-emphasis text-decoration-none btn btn-transparent border disabled"
+                href="#"
+                role="button"
+              >
+                <span class="fs-4">Cite</span>
+                <span class="visually-hidden">Reset</span>
+              </a>
+              <a
+                class="me-1 link-body-emphasis text-decoration-none btn btn-transparent border"
+                href="#"
+                role="button"
+                data-bs-target="#howToNavigate"
+                data-bs-toggle="modal"
+              >
+                <i class="bi bi-question-circle fs-4"></i>
+                <span class="visually-hidden">Help</span>
+              </a>
+            </div>
+            <div class="container text-center">
+              Developed by
+              <a
+                class="link-primary"
+                href="https://www.linkedin.com/in/george-darkwah/"
+                target="_blank"
+                rel="noopener"
+                >G. K. Darkwah</a
+              >
+              of
+              <a
+                class="link-primary"
+                href="https://saswe.net/"
+                target="_blank"
+                rel="noopener"
+                >SASWE</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="sidebar border border-right p-0 bg-body-tertiary collapse show"
+        id="mini-sidebar"
+        style="width: 3.5rem"
+      >
+        <header class="navbar border-bottom sticky-top bg-body-tertiary">
+          <a
+            href="/"
+            class="d-block px-2 mb-0 link-body-emphasis text-decoration-none h4"
+            data-bs-toggle="tooltip"
+            data-bs-placement="right"
+            data-bs-original-title="Icon-only"
+          >
+            <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+            <svg
+              width="32"
+              height="32"
+              fill="currentColor"
+              viewBox="0 0 16 16"
+              version="1.1"
+              id="svg985"
+              xml:space="preserve"
+              xmlns="http://www.w3.org/2000/svg"
+              xmlns:svg="http://www.w3.org/2000/svg"
+            >
+              <defs id="defs989" />
+              <path
+                id="path981"
+                style="stroke-width: 0.742311"
+                d="M 7.9638498,0 C 7.0565801,0 6.1497896,0.63215123 6.1497896,1.8974509 v 5.7313102 c -1.5752897,1.6816827 -0.4365653,4.5167599 1.8140602,4.5167599 2.2506272,0 3.3893452,-2.8350771 1.8140598,-4.5167598 V 1.8974509 C 9.7779096,0.63215123 8.8711196,0 7.9638498,0 Z m 0,0.75852204 c 0.6012853,0 1.0888743,0.51000336 1.0888743,1.13892886 v 6.0635934 l 0.1204992,0.1145802 c 1.2418487,1.1615952 0.4563333,3.3113745 -1.2093735,3.3113745 -1.6657037,0 -2.4512228,-2.1497804 -1.2093735,-3.3113745 L 6.8749756,7.9610443 V 1.8974509 c 0,-0.6289255 0.4875894,-1.13892886 1.0888742,-1.13892886 z m 0,0.75852206 A 0.36290811,0.37959068 0 0 0 7.6001614,1.8974509 V 8.4147828 A 1.0887237,1.1387714 0 1 0 9.0527241,9.4895464 1.0887237,1.1387714 0 0 0 8.3253474,8.4147828 V 1.8974509 A 0.36290811,0.37959068 0 0 0 7.9638498,1.5170441 Z m 3.6281202,0 c -0.200428,0 -0.361498,0.170765 -0.361498,0.3804068 v 0.7585222 c 10e-7,0.5061212 0.725187,0.5061212 0.725187,0 V 1.8974509 c 0,-0.2096425 -0.163258,-0.3804079 -0.363689,-0.3804068 z M 1.7570473,2.0509887 A 0.4249204,0.44445363 0 0 0 1.3320139,2.4955605 0.4249204,0.44445363 0 0 0 1.7570473,2.9378409 H 4.4255561 A 0.4249204,0.44445363 0 0 0 4.8505896,2.4955605 0.4249204,0.44445363 0 0 0 4.4255561,2.0509887 Z M 14.416032,2.7407625 c -0.09286,0 -0.185477,0.035905 -0.256334,0.1099972 l -0.51486,0.5385278 c -0.342584,0.3583328 0.172274,0.8945688 0.51486,0.536236 l 0.512669,-0.536236 c 0.141673,-0.14823 0.141673,-0.3902981 0,-0.5385277 -0.07085,-0.074093 -0.163475,-0.1099972 -0.256335,-0.1099973 z M 11.59197,3.794902 c -0.200428,0 -0.361498,0.1707649 -0.361498,0.3804067 0,0.209642 0.16107,0.3781153 0.361498,0.3781153 1.935505,0 1.935505,3.0386715 0,3.0386715 -0.483877,0 -0.483877,0.7585221 0,0.7585221 2.903259,0 2.903259,-4.5557156 0,-4.5557156 z M 3.5360532,3.9094823 A 0.4249204,0.44445363 0 0 0 3.1110197,4.3540541 0.4249204,0.44445363 0 0 0 3.5360532,4.7986259 H 4.4255561 A 0.4249204,0.44445363 0 0 0 4.8505896,4.3540541 0.4249204,0.44445363 0 0 0 4.4255561,3.9094823 Z M 14.858594,5.6923529 c -0.200429,0 -0.363689,0.1707649 -0.363689,0.380407 0,0.2096416 0.16326,0.3804067 0.363689,0.3804067 h 0.725185 c 0.483874,0 0.483874,-0.7608137 0,-0.7608137 z M 1.7570473,5.7702675 A 0.4249204,0.44445363 0 0 0 1.3320139,6.2148394 0.4249204,0.44445363 0 0 0 1.7570473,6.6571197 H 4.4255561 A 0.4249204,0.44445363 0 0 0 4.8505896,6.2148394 0.4249204,0.44445363 0 0 0 4.4255561,5.7702675 Z M 3.5360532,7.6287611 A 0.4249204,0.44445363 0 0 0 3.1110197,8.0733331 0.4249204,0.44445363 0 0 0 3.5360532,8.5179048 H 4.4255561 A 0.4249204,0.44445363 0 0 0 4.8505896,8.0733331 0.4249204,0.44445363 0 0 0 4.4255561,7.6287611 Z M 13.901172,8.1077074 c -0.09303,0 -0.185435,0.037942 -0.256334,0.1122886 -0.142156,0.1483161 -0.142156,0.3879201 0,0.536236 l 0.51486,0.5385278 C 14.501746,9.6403091 15.002731,9.1140064 14.672367,8.756232 L 14.159698,8.2199961 C 14.088805,8.1456497 13.994193,8.1077075 13.901172,8.1077074 Z M 11.59197,9.1091398 c -0.200428,0 -0.361498,0.1707654 -0.361498,0.3804066 v 0.7585226 c 10e-7,0.50612 0.725187,0.50612 0.725187,0 V 9.4895464 c 0,-0.2096423 -0.163258,-0.3804077 -0.363689,-0.3804066 z M 1.7570473,9.4895464 A 0.4249204,0.44445363 0 0 0 1.3320139,9.9341187 0.4249204,0.44445363 0 0 0 1.7570473,10.376399 H 4.4255561 A 0.4249204,0.44445363 0 0 0 4.8505896,9.9341187 0.4249204,0.44445363 0 0 0 4.4255561,9.4895464 Z m 1.695752,2.2801506 c -1.1761509,-0.01103 -2.3484771,0.383118 -3.29291364,1.125178 a 0.40215811,0.42064498 0 0 0 -0.07887225,0.588943 0.40215811,0.42064498 0 0 0 0.56305972,0.08479 c 0.98045577,-0.770364 2.28234047,-1.104605 3.49228497,-0.89602 0.5936032,0.102338 1.1913607,0.33363 1.8228238,0.552278 0.6322735,0.218929 1.3130835,0.42853 2.0419131,0.42853 0.7288293,0 1.40964,-0.209601 2.041914,-0.42853 0.631462,-0.218648 1.227029,-0.449944 1.820633,-0.552278 1.209944,-0.208585 2.511828,0.125656 3.492284,0.89602 a 0.40215811,0.42064498 0 0 0 0.56306,-0.08479 0.40215811,0.42064498 0 0 0 -0.07887,-0.588943 c -1.162383,-0.913306 -2.671281,-1.299136 -4.105736,-1.051846 -0.697632,0.120265 -1.334624,0.372836 -1.9455128,0.584358 -0.61008,0.211245 -1.207943,0.382698 -1.78777,0.382698 -0.579827,0 -1.1798803,-0.171453 -1.7899603,-0.382698 C 5.6002468,12.215865 4.9632565,11.963294 4.265623,11.843029 3.9966627,11.796659 3.7242208,11.772243 3.4528015,11.769697 Z m 0,2.346606 C 2.2766484,14.10583 1.1043222,14.501714 0.15988566,15.243774 a 0.40215811,0.42064498 0 0 0 -0.07887225,0.588943 0.40215811,0.42064498 0 0 0 0.56305972,0.08249 C 1.6245288,15.144849 2.9264136,14.812897 4.1363581,15.021484 4.7299613,15.12382 5.3277188,15.355112 5.9591819,15.573761 6.5914554,15.792691 7.2722655,16 8.001095,16 c 0.7288293,0 1.40964,-0.207309 2.041914,-0.426239 0.631462,-0.218649 1.227029,-0.449943 1.820633,-0.552277 1.209944,-0.208587 2.511828,0.123365 3.492284,0.893727 a 0.40215811,0.42064498 0 0 0 0.56306,-0.08249 0.40215811,0.42064498 0 0 0 -0.07887,-0.588943 c -1.162383,-0.913306 -2.671281,-1.301429 -4.105736,-1.054139 -0.697632,0.120265 -1.334624,0.375126 -1.9455128,0.586652 -0.61008,0.211241 -1.207943,0.382697 -1.78777,0.382697 -0.579827,0 -1.1798804,-0.171456 -1.7899603,-0.382697 C 5.600247,14.564761 4.9632565,14.3099 4.265623,14.189635 3.9966627,14.143265 3.7242208,14.118721 3.4528015,14.116303 Z"
+              />
+            </svg>
+          </a>
+        </header>
+        <div class="">
+          <a
+            class="link-body-emphasis text-decoration-none btn btn-transparent border"
+            class="btn btn-primary"
+            data-bs-toggle="collapse"
+            href=".sidebar"
+            role="button"
+            aria-expanded="false"
+            aria-controls="mini-sidebar sidebar"
+            onclick="invalidateMapSize()"
+          >
+            <i class="bi bi-chevron-double-right fs-3"></i>
+            <span class="visually-hidden">Collapse Sidebar</span>
+          </a>
+        </div>
+      </div>
+      <main class="col vh-100 position-relative" style="position: relative">
+        <div id="map" class="col z-0" style="height: 100vh"></div>
+        <div
+          id="info-panel"
+          class="position-absolute bottom-0 start-50 translate-middle-x w-100 z-1 collapse p-2 bg-white"
+          style="height: 40vh"
+        >
+          <div class="d-flex flex-column">
+            <div class="d-flex flex-column">
+              <div class="offcanvas-header flex-shrink-1">
+                <h5 class="offcanvas-title" id="info-panel-title">
+                  Click on a reach or dam
+                </h5>
+                <button
+                  type="button"
+                  class="btn"
+                  aria-label="Hide"
+                  data-bs-toggle="collapse"
+                  href="#info-panel"
+                  aria-expanded="true"
+                  aria-controls="info-panel"
+                  onclick="toggleMapHeight()"
+                >
+                  <i class="bi bi-chevron-down"></i>
+                  <span class="visually-hidden">Hide info-panel</span>
+                </button>
+              </div>
+
+              <div id="plot-panel" class="d-none">
+                <div
+                  class="d-flex justify-content-center d-none"
+                  id="plot-header-buttons"
+                >
+                  <div
+                    class="btn-group btn-group-sm m-2"
+                    role="group"
+                    aria-label="Chart selector toggle button group"
+                  >
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="btnradio"
+                      id="water-temperature-chart-radio"
+                      autocomplete="off"
+                      checked
+                      onchange="plotData()"
+                    />
+                    <label
+                      class="btn btn-outline-primary"
+                      for="water-temperature-chart-radio"
+                      >Water Temperature</label
+                    >
+
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="btnradio"
+                      id="long-term-mean-chart-radio"
+                      autocomplete="off"
+                      onchange="plotData()"
+                    />
+                    <label
+                      class="btn btn-outline-primary"
+                      for="long-term-mean-chart-radio"
+                      >Long-Term Averages</label
+                    >
+
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="btnradio"
+                      id="deviations-chart-radio"
+                      autocomplete="off"
+                      onchange="plotData()"
+                    />
+                    <label
+                      class="btn btn-outline-primary"
+                      for="deviations-chart-radio"
+                      >Deviations</label
+                    >
+                  </div>
+                  <div
+                    class="btn-group btn-group-sm m-2"
+                    role="group"
+                    aria-label="Timescale selector toggle button group"
+                  >
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="timescaleRadio"
+                      id="monthly-scale"
+                      autocomplete="off"
+                      checked
+                      onchange="plotData()"
+                    />
+                    <label class="btn btn-outline-primary" for="monthly-scale"
+                      >Monthly</label
+                    >
+                    <input
+                      type="radio"
+                      class="btn-check"
+                      name="timescaleRadio"
+                      id="semi-monthly-scale"
+                      autocomplete="off"
+                      onchange="plotData()"
+                    />
+                    <label
+                      class="btn btn-outline-primary"
+                      for="semi-monthly-scale"
+                      >Semi-monthly</label
+                    >
+                  </div>
+                </div>
+                <div class="flex-grow-1">
+                  <div id="plotly-chart">
+                    <!-- Plotly chart will be drawn inside this DIV -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <!-- Scripts -->
+    <!-- Bootstrap JS -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+      crossorigin="anonymous"
+    ></script>
+    <!-- Leaflet JS -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin=""
+    ></script>
+    <!-- Esri Leaflet JS -->
+    <script src="https://unpkg.com/esri-leaflet@3.0.10/dist/esri-leaflet.js"></script>
+    <script src="https://unpkg.com/esri-leaflet-vector@4.1.0/dist/esri-leaflet-vector.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.1.0/dist/leaflet.markercluster.js"></script>
+    <!-- <script src="https://unpkg.com/esri-leaflet-geocoder@3.1.4/dist/esri-leaflet-geocoder.js"></script> -->
+    <!-- Plotly JS -->
+    <script
+      src="https://cdn.plot.ly/plotly-2.25.2.min.js"
+      charset="utf-8"
+    ></script>
+    <!-- Automatic light/dark mode -->
+    <script src="js/color-mode.js"></script>
+    <!-- Custom scripts -->
+    <script src="js/utility-functions.js"></script>
+    <script src="js/script.js"></script>
+    <script>
+      // Custon script for development
+    loadDamsPoints(preferredBasinID);
+
+    </script>
+  </body>
+</html>
