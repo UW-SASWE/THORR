@@ -580,10 +580,12 @@ function fetchFeaturePlotData(type, id) {
       if (this.readyState == 4 && this.status == 200) {
         // console.log(this.responseText)
         selectedFeature.data = JSON.parse(this.responseText);
+        // console.log(selectedFeature.data)
         plotData();
       }
     };
     xmlhttp.open("POST", "php/reachPlotData.php", true);
+    // xmlhttp.open("POST", "php/reachPlotData_newDB.php", true);
     xmlhttp.setRequestHeader(
       "Content-type",
       "application/x-www-form-urlencoded"
@@ -595,6 +597,7 @@ function fetchFeaturePlotData(type, id) {
       if (this.readyState == 4 && this.status == 200) {
         // console.log(JSON.parse(this.responseText));
         selectedFeature.data = JSON.parse(this.responseText);
+        // console.log(selectedFeature.data)
         plotData();
       }
     };
@@ -643,14 +646,14 @@ function plotData() {
   // };
 
   if (selectedFeature.type == "reach") {
-    // do this while the dam's long-term mean and deviations are not available
-    document
-      .getElementById("long-term-mean-chart-radio")
-      .removeAttribute("disabled");
-    document
-      .getElementById("deviations-chart-radio")
-      .removeAttribute("disabled");
-    //
+    // // do this while the dam's long-term mean and deviations are not available
+    // document
+    //   .getElementById("long-term-mean-chart-radio")
+    //   .removeAttribute("disabled");
+    // document
+    //   .getElementById("deviations-chart-radio")
+    //   .removeAttribute("disabled");
+    // //
 
     switch (timeScale) {
       case "monthly":
@@ -666,7 +669,7 @@ function plotData() {
             };
 
             var estimatedTempTrace = {
-              x: selectedFeature.data.estimatedTempMDate,
+              x: selectedFeature.data.estimatedTempMDates,
               y: selectedFeature.data.estimatedTempM,
               mode: "lines",
               name: "Estimated Temperature",
@@ -675,6 +678,319 @@ function plotData() {
 
             // data = [observedLandsatTrace, estimatedTempTrace];
             data = [estimatedTempTrace];
+
+            var layout = {
+              height:
+                Math.max(
+                  document.documentElement.clientHeight || 0,
+                  window.innerHeight || 0
+                ) * 0.29,
+              margin: {
+                l: 80,
+                r: 80,
+                b: 20,
+                t: 20,
+              },
+              automargin: true,
+              xaxis: {
+                autorange: true,
+                // rangeselector: xRangeSelector1,
+                rangeslider: {
+                  autorange: true,
+                  range: [
+                    selectedFeature.data.estimatedTempMDates[0],
+                    selectedFeature.data.estimatedTempMDates[
+                      selectedFeature.data.estimatedTempMDates.length - 1
+                    ],
+                  ],
+                },
+                type: "date",
+              },
+              yaxis: {
+                autorange: true,
+                type: "linear",
+              },
+            };
+            var config = { responsive: true };
+            Plotly.newPlot("plotly-chart", data, layout, config);
+            break;
+          case "long-term-mean":
+            Plotly.purge("plotly-chart");
+            var longTermMeanTrace = {
+              x: selectedFeature.data.estimatedLTMMMonth,
+              y: selectedFeature.data.estimatedLTMM,
+              // x: selectedFeature.data.landsatLTMMMonth,
+              // y: selectedFeature.data.landsatLTMM,
+              mode: "lines",
+            };
+
+            data = [longTermMeanTrace];
+
+            var layout = {
+              height:
+                Math.max(
+                  document.documentElement.clientHeight || 0,
+                  window.innerHeight || 0
+                ) * 0.29,
+              margin: {
+                l: 80,
+                r: 80,
+                b: 20,
+                t: 20,
+              },
+              automargin: true,
+              xaxis: {
+                autorange: true,
+                // rangeselector: xRangeSelector1,
+                // rangeslider: {
+                //   autorange: true,
+                //   // range: [
+                //   //   selectedFeature.data.landsatLTMMMonth[0],
+                //   //   selectedFeature.data.landsatLTMMMonth[
+                //   //     selectedFeature.data.landsatLTMMMonth.length - 1
+                //   //   ],
+                //   // ],
+                // },
+                // type: "date",
+              },
+              yaxis: {
+                autorange: true,
+                type: "linear",
+              },
+            };
+            var config = { responsive: true };
+            Plotly.newPlot("plotly-chart", data, layout, config);
+
+            break;
+          case "deviations":
+            Plotly.purge("plotly-chart");
+            var deviation = {
+              x: selectedFeature.data.deviationMDate,
+              y: selectedFeature.data.deviationMDeviation,
+              mode: "line",
+            };
+
+            data = [deviation];
+
+            var layout = {
+              height:
+                Math.max(
+                  document.documentElement.clientHeight || 0,
+                  window.innerHeight || 0
+                ) * 0.29,
+              margin: {
+                l: 80,
+                r: 80,
+                b: 20,
+                t: 20,
+              },
+              automargin: true,
+              xaxis: {
+                autorange: true,
+                // rangeselector: xRangeSelector1,
+                rangeslider: {
+                  autorange: true,
+                  range: [
+                    selectedFeature.data.deviationMDate[0],
+                    selectedFeature.data.deviationMDate[
+                      selectedFeature.data.deviationMDate.length - 1
+                    ],
+                  ],
+                },
+                type: "date",
+              },
+              yaxis: {
+                autorange: true,
+                type: "linear",
+              },
+            };
+            var config = { responsive: true };
+            Plotly.newPlot("plotly-chart", data, layout, config);
+            break;
+        }
+        break;
+      case "semi-monthly":
+        switch (plotType) {
+          case "water-temperature":
+            Plotly.purge("plotly-chart");
+            var observedLandsatTrace = {
+              x: selectedFeature.data.landsatTempSMDates,
+              y: selectedFeature.data.landsatTempSMTemp,
+              mode: "markers",
+              name: "Observed Landsat Temperature",
+              marker: { color: "rgb(255, 0, 0)", size: 8 },
+            };
+
+            var estimatedTempTrace = {
+              x: selectedFeature.data.estimatedTempSMDates,
+              y: selectedFeature.data.estimatedTempSM,
+              mode: "lines",
+              name: "Estimated Temperature",
+              line: { color: "rgb(0, 0, 255)", width: 2 },
+            };
+
+            // data = [observedLandsatTrace, estimatedTempTrace];
+            data = [estimatedTempTrace];
+
+            var layout = {
+              height:
+                Math.max(
+                  document.documentElement.clientHeight || 0,
+                  window.innerHeight || 0
+                ) * 0.29,
+              margin: {
+                l: 80,
+                r: 80,
+                b: 20,
+                t: 20,
+              },
+              automargin: true,
+              xaxis: {
+                autorange: true,
+                // rangeselector: xRangeSelector1,
+                rangeslider: {
+                  autorange: true,
+                  range: [
+                    selectedFeature.data.estimatedTempSMDates[0],
+                    selectedFeature.data.estimatedTempSMDates[
+                      selectedFeature.data.estimatedTempSMDates.length - 1
+                    ],
+                  ],
+                },
+                type: "date",
+              },
+              yaxis: {
+                autorange: true,
+                type: "linear",
+              },
+            };
+            var config = { responsive: true };
+            Plotly.newPlot("plotly-chart", data, layout, config);
+            break;
+          case "long-term-mean":
+            Plotly.purge("plotly-chart");
+
+            var longTermMeanTrace = {
+              x: selectedFeature.data.estimatedLTMSMMonth,
+              y: selectedFeature.data.estimatedLTMSM,
+              // x: selectedFeature.data.landsatLTMSMMonth,
+              // y: selectedFeature.data.landsatLTMSM,
+              mode: "lines",
+            };
+
+            data = [longTermMeanTrace];
+
+            var layout = {
+              height:
+                Math.max(
+                  document.documentElement.clientHeight || 0,
+                  window.innerHeight || 0
+                ) * 0.29,
+              margin: {
+                l: 80,
+                r: 80,
+                b: 20,
+                t: 20,
+              },
+              automargin: true,
+              xaxis: {
+                autorange: true,
+                // rangeselector: xRangeSelector1,
+                // rangeslider: {
+                //   autorange: true,
+                //   // range: [
+                //   //   selectedFeature.data.landsatLTMSMMonth[0],
+                //   //   selectedFeature.data.landsatLTMSMMonth[
+                //   //     selectedFeature.data.landsatLTMSMMonth.length - 1
+                //   //   ],
+                //   // ],
+                // },
+                // type: "date",
+              },
+              yaxis: {
+                autorange: true,
+                type: "linear",
+              },
+            };
+            var config = { responsive: true };
+            Plotly.newPlot("plotly-chart", data, layout, config);
+            break;
+          case "deviations":
+            Plotly.purge("plotly-chart");
+            var deviation = {
+              x: selectedFeature.data.deviationSMDate,
+              y: selectedFeature.data.deviationSMDeviation,
+              mode: "line",
+            };
+
+            data = [deviation];
+
+            var layout = {
+              height:
+                Math.max(
+                  document.documentElement.clientHeight || 0,
+                  window.innerHeight || 0
+                ) * 0.29,
+              margin: {
+                l: 80,
+                r: 80,
+                b: 20,
+                t: 20,
+              },
+              automargin: true,
+              xaxis: {
+                autorange: true,
+                // rangeselector: xRangeSelector1,
+                rangeslider: {
+                  autorange: true,
+                  range: [
+                    selectedFeature.data.deviationSMDate[0],
+                    selectedFeature.data.deviationSMDate[
+                      selectedFeature.data.deviationSMDate.length - 1
+                    ],
+                  ],
+                },
+                type: "date",
+              },
+              yaxis: {
+                autorange: true,
+                type: "linear",
+              },
+            };
+            var config = { responsive: true };
+            Plotly.newPlot("plotly-chart", data, layout, config);
+            break;
+        }
+        break;
+    }
+  } else if (selectedFeature.type == "dam") {
+    // // do this while the dam's long-term mean and deviations are not available
+    // document.getElementById("water-temperature-chart-radio").checked = true;
+    // plotType = "water-temperature";
+    // document
+    //   .getElementById("long-term-mean-chart-radio")
+    //   .removeAttribute("disabled");
+    //   // .setAttribute("disabled", "disabled");
+    // document
+    //   .getElementById("deviations-chart-radio")
+    //   .removeAttribute("disabled");
+    //   // .setAttribute("disabled", "disabled");
+    //
+
+    switch (timeScale) {
+      case "monthly":
+        switch (plotType) {
+          case "water-temperature":
+            Plotly.purge("plotly-chart");
+            var observedLandsatTrace = {
+              x: selectedFeature.data.landsatTempMDates,
+              y: selectedFeature.data.landsatTempMTemp,
+              mode: "lines",
+              name: "Observed Landsat Temperature",
+              marker: { color: "rgb(0, 0, 255)", size: 8 },
+            };
+
+            data = [observedLandsatTrace];
 
             var layout = {
               height:
@@ -811,21 +1127,12 @@ function plotData() {
             var observedLandsatTrace = {
               x: selectedFeature.data.landsatTempSMDates,
               y: selectedFeature.data.landsatTempSMTemp,
-              mode: "markers",
-              name: "Observed Landsat Temperature",
-              marker: { color: "rgb(255, 0, 0)", size: 8 },
-            };
-
-            var estimatedTempTrace = {
-              x: selectedFeature.data.estimatedTempSMDate,
-              y: selectedFeature.data.estimatedTempSM,
               mode: "lines",
-              name: "Estimated Temperature",
-              line: { color: "rgb(0, 0, 255)", width: 2 },
+              name: "Observed Landsat Temperature",
+              marker: { color: "rgb(0, 0, 255)", size: 8 },
             };
 
-            // data = [observedLandsatTrace, estimatedTempTrace];
-            data = [estimatedTempTrace];
+            data = [observedLandsatTrace];
 
             var layout = {
               height:
@@ -862,10 +1169,13 @@ function plotData() {
             var config = { responsive: true };
             Plotly.newPlot("plotly-chart", data, layout, config);
             break;
+
           case "long-term-mean":
             Plotly.purge("plotly-chart");
 
             var longTermMeanTrace = {
+              // x: selectedFeature.data.estimatedLTMSMMonth,
+              // y: selectedFeature.data.estimatedLTMSM,
               x: selectedFeature.data.landsatLTMSMMonth,
               y: selectedFeature.data.landsatLTMSM,
               mode: "lines",
@@ -956,135 +1266,6 @@ function plotData() {
         }
         break;
     }
-  } else if (selectedFeature.type == "dam") {
-    // do this while the dam's long-term mean and deviations are not available
-    document.getElementById("water-temperature-chart-radio").checked = true;
-    plotType = "water-temperature";
-    document
-      .getElementById("long-term-mean-chart-radio")
-      .setAttribute("disabled", "disabled");
-    document
-      .getElementById("deviations-chart-radio")
-      .setAttribute("disabled", "disabled");
-    //
-
-    switch (timeScale) {
-      case "monthly":
-        switch (plotType) {
-          case "water-temperature":
-            Plotly.purge("plotly-chart");
-            var observedLandsatTrace = {
-              x: selectedFeature.data.landsatTempMDates,
-              y: selectedFeature.data.landsatTempMTemp,
-              mode: "lines",
-              name: "Observed Landsat Temperature",
-              marker: { color: "rgb(0, 0, 255)", size: 8 },
-            };
-
-            data = [observedLandsatTrace];
-
-            var layout = {
-              height:
-                Math.max(
-                  document.documentElement.clientHeight || 0,
-                  window.innerHeight || 0
-                ) * 0.29,
-              margin: {
-                l: 80,
-                r: 80,
-                b: 20,
-                t: 20,
-              },
-              automargin: true,
-              xaxis: {
-                autorange: true,
-                // rangeselector: xRangeSelector1,
-                rangeslider: {
-                  autorange: true,
-                  range: [
-                    selectedFeature.data.landsatTempMDates[0],
-                    selectedFeature.data.landsatTempMDates[
-                      selectedFeature.data.landsatTempMDates.length - 1
-                    ],
-                  ],
-                },
-                type: "date",
-              },
-              yaxis: {
-                autorange: true,
-                type: "linear",
-              },
-            };
-            var config = { responsive: true };
-            Plotly.newPlot("plotly-chart", data, layout, config);
-            break;
-          case "long-term-mean":
-            Plotly.purge("plotly-chart");
-            break;
-          case "deviations":
-            Plotly.purge("plotly-chart");
-            break;
-        }
-        break;
-      case "semi-monthly":
-        switch (plotType) {
-          case "water-temperature":
-            Plotly.purge("plotly-chart");
-            var observedLandsatTrace = {
-              x: selectedFeature.data.landsatTempSMDates,
-              y: selectedFeature.data.landsatTempSMTemp,
-              mode: "lines",
-              name: "Observed Landsat Temperature",
-              marker: { color: "rgb(0, 0, 255)", size: 8 },
-            };
-
-            data = [observedLandsatTrace];
-
-            var layout = {
-              height:
-                Math.max(
-                  document.documentElement.clientHeight || 0,
-                  window.innerHeight || 0
-                ) * 0.29,
-              margin: {
-                l: 80,
-                r: 80,
-                b: 20,
-                t: 20,
-              },
-              automargin: true,
-              xaxis: {
-                autorange: true,
-                // rangeselector: xRangeSelector1,
-                rangeslider: {
-                  autorange: true,
-                  range: [
-                    selectedFeature.data.landsatTempSMDates[0],
-                    selectedFeature.data.landsatTempSMDates[
-                      selectedFeature.data.landsatTempSMDates.length - 1
-                    ],
-                  ],
-                },
-                type: "date",
-              },
-              yaxis: {
-                autorange: true,
-                type: "linear",
-              },
-            };
-            var config = { responsive: true };
-            Plotly.newPlot("plotly-chart", data, layout, config);
-            break;
-
-          case "long-term-mean":
-            Plotly.purge("plotly-chart");
-            break;
-          case "deviations":
-            Plotly.purge("plotly-chart");
-            break;
-        }
-        break;
-    }
     // console.log(timeScale, plotType);
   }
   document.getElementById("plot-panel").classList.remove("d-none");
@@ -1113,7 +1294,7 @@ function getEsriAPIKey() {
   xmlhttp.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
       // console.log(this.responseText);
-      console.log("two")
+      // console.log("two")
     }
   };
 
@@ -1122,4 +1303,4 @@ function getEsriAPIKey() {
 }
 
 // getEsriAPIKey();
-console.log("one")
+// console.log("one")
