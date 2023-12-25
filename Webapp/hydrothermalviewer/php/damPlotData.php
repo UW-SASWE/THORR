@@ -39,17 +39,25 @@ $plotData = array(
 // query for actual landsat observations semi-monthly
 $landsatTempQuerySM = <<<QUERY
     SELECT 
-        STR_TO_DATE(CONCAT(Year,'-',LPAD(Month,2,'00'),'-',LPAD(DayOfMonth,2,'00')), '%Y-%m-%d') AS Date,
-        Round(WaterTemp, 2) as watertemp
-    FROM (SELECT
+        STR_TO_DATE(CONCAT(Year,
+                        '-',
+                        LPAD(Month, 2, '00'),
+                        '-',
+                        LPAD(DayOfMonth, 2, '00')),
+                '%Y-%m-%d') AS Date,
+        ROUND(WaterTemp, 2) AS watertemp
+    FROM
+        (SELECT 
             IF(DAY(DamLandsatWaterTemp.date) < 15, 1, 15) AS DayOfMonth,
-            MONTH(DamLandsatWaterTemp.date) AS Month,
-            YEAR(DamLandsatWaterTemp.date) AS Year,
-            AVG(DamLandsatWaterTemp.Value) as WaterTemp
+                MONTH(DamLandsatWaterTemp.date) AS Month,
+                YEAR(DamLandsatWaterTemp.date) AS Year,
+                AVG(DamLandsatWaterTemp.Value) AS WaterTemp
         FROM
             DamLandsatWaterTemp
-        WHERE DamID={$_POST['DamID']} AND DamLandsatWaterTemp.Value > 0
-        GROUP BY DayOfMonth, Month, Year, DamID) AS T
+        WHERE
+            DamID = {$_POST['DamID']}
+                AND DamLandsatWaterTemp.Value > 0
+        GROUP BY DayOfMonth , Month , Year , DamID) AS T
     ORDER BY Date;
     QUERY;
 
@@ -69,17 +77,25 @@ while ($row = $result->fetch_assoc()) {
 // query for actual landsat observations monthly
 $landsatTempQueryM = <<<QUERY
     SELECT 
-    STR_TO_DATE(CONCAT(Year,'-',LPAD(Month,2,'00'),'-',LPAD(DayOfMonth,2,'00')), '%Y-%m-%d') AS Date,
-    Round(WaterTemp, 2) as watertemp
-    FROM (SELECT
-        1 AS DayOfMonth,
-        MONTH(DamLandsatWaterTemp.date) AS Month,
-        YEAR(DamLandsatWaterTemp.date) AS Year,
-        AVG(DamLandsatWaterTemp.Value) as WaterTemp
+    STR_TO_DATE(CONCAT(Year,
+                    '-',
+                    LPAD(Month, 2, '00'),
+                    '-',
+                    LPAD(DayOfMonth, 2, '00')),
+            '%Y-%m-%d') AS Date,
+    ROUND(WaterTemp, 2) AS watertemp
     FROM
-    DamLandsatWaterTemp
-    WHERE DamID={$_POST['DamID']} AND DamLandsatWaterTemp.Value > 0
-    GROUP BY DayOfMonth, Month, Year, DamID) AS T
+    (SELECT 
+        1 AS DayOfMonth,
+            MONTH(DamLandsatWaterTemp.date) AS Month,
+            YEAR(DamLandsatWaterTemp.date) AS Year,
+            AVG(DamLandsatWaterTemp.Value) AS WaterTemp
+    FROM
+        DamLandsatWaterTemp
+    WHERE
+        DamID = {$_POST['DamID']}
+            AND DamLandsatWaterTemp.Value > 0
+    GROUP BY DayOfMonth , Month , Year , DamID) AS T
     ORDER BY Date;
     QUERY;
 
@@ -95,120 +111,168 @@ while ($row = $result->fetch_assoc()) {
     array_push($plotData['landsatTempMTemp'], $row['watertemp']);
 }
 
-// // query for actual landsat observations monthly
-// $landsatLTMQueryM = <<<QUERY
-//     SELECT
-//         Month,
-//         1 AS DayOfMonth,
-//         ROUND(WaterTemperature, 2) AS WaterTemperature,
-//         ROUND(WaterTemperature5, 2) AS WaterTemperature5,
-//         ROUND(WaterTemperature95, 2) AS WaterTemperature95,
-//         ReachID
-//     FROM
-//         ReachLandsatLTMMonthly
-//     WHERE ReachID = {$_POST['ReachID']}
-//     ORDER BY Month, DayOfMonth;
-//     QUERY;
+// query for actual landsat observations monthly
+$landsatLTMQueryM = <<<QUERY
+    SELECT 
+        MONTH(Date) AS Month,
+        DamID,
+        ROUND(AVG(VALUE), 2) AS WaterTemperature
+    FROM
+        DamLandsatWaterTemp
+    WHERE
+        DamID = {$_POST['DamID']} AND Date < CURRENT_DATE()
+            AND Date > DATE_SUB(CURRENT_DATE(),
+            INTERVAL 30 YEAR)
+    GROUP BY Month , DamID
+    ORDER BY DamID , Month;
+    QUERY;
 
-// // echo $landsatTempQueryM;
+// echo $landsatTempQueryM;
 
-// $result = $mysqli_connection->query($landsatLTMQueryM);
+$result = $mysqli_connection->query($landsatLTMQueryM);
 
-// # Loop through rows to build feature arrays
-// while ($row = $result->fetch_assoc()) {
-//     # Add feature arrays to feature collection array
+# Loop through rows to build feature arrays
+while ($row = $result->fetch_assoc()) {
+    # Add feature arrays to feature collection array
 
-//     array_push($plotData['landsatLTMMMonth'], $row['Month']);
-//     array_push($plotData['landsatLTMM'], $row['WaterTemperature']);
-//     array_push($plotData['landsatLTMM5'], $row['WaterTemperature5']);
-//     array_push($plotData['landsatLTMM95'], $row['WaterTemperature95']);
-// }
+    array_push($plotData['landsatLTMMMonth'], $row['Month']);
+    array_push($plotData['landsatLTMM'], $row['WaterTemperature']);
+    // array_push($plotData['landsatLTMM5'], $row['WaterTemperature5']);
+    // array_push($plotData['landsatLTMM95'], $row['WaterTemperature95']);
+}
 
-// // query for actual landsat observations monthly
-// $landsatLTMQuerySM = <<<QUERY
-//     SELECT
-//         Month,
-//         DayOfMonth,
-//         ROUND(WaterTemperature, 2) AS WaterTemperature,
-//         ROUND(WaterTemperature5, 2) AS WaterTemperature5,
-//         ROUND(WaterTemperature95, 2) AS WaterTemperature95,
-//         ReachID
-//     FROM
-//         ReachLandsatLTMSemiMonthly
-//     WHERE ReachID = {$_POST['ReachID']}
-//     ORDER BY Month, DayOfMonth;
-//     QUERY;
+// query for actual landsat observations monthly
+$landsatLTMQuerySM = <<<QUERY
+    SELECT 
+        MONTH(DATE) + IF(DAY(DATE) = 1, 0, 0.5) AS Month,
+        DamID,
+        ROUND(AVG(VALUE), 2) AS WaterTemperature
+    FROM
+        DamLandsatWaterTemp
+    WHERE
+        DamID = {$_POST['DamID']} AND Date < CURRENT_DATE()
+            AND Date > DATE_SUB(CURRENT_DATE(),
+            INTERVAL 30 YEAR)
+    GROUP BY Month , DamID
+    ORDER BY DamID , Month
+    QUERY;
 
-// // echo $landsatLTMQuerySM;i
+// echo $landsatLTMQuerySM;
 
-// $result = $mysqli_connection->query($landsatLTMQuerySM);
+$result = $mysqli_connection->query($landsatLTMQuerySM);
 
-// # Loop through rows to build feature arrays
-// while ($row = $result->fetch_assoc()) {
-//     # Add feature arrays to feature collection array
+# Loop through rows to build feature arrays
+while ($row = $result->fetch_assoc()) {
+    # Add feature arrays to feature collection array
 
-//     array_push($plotData['landsatLTMSMMonth'], $row['Month']);
-//     array_push($plotData['landsatLTMSMDay'], $row['DayOfMonth']);
-//     array_push($plotData['landsatLTMSM'], $row['WaterTemperature']);
-//     array_push($plotData['landsatLTMSM5'], $row['WaterTemperature5']);
-//     array_push($plotData['landsatLTMSM95'], $row['WaterTemperature95']);
-// }
+    array_push($plotData['landsatLTMSMMonth'], $row['Month']);
+    // array_push($plotData['landsatLTMSMDay'], $row['DayOfMonth']);
+    array_push($plotData['landsatLTMSM'], $row['WaterTemperature']);
+    // array_push($plotData['landsatLTMSM5'], $row['WaterTemperature5']);
+    // array_push($plotData['landsatLTMSM95'], $row['WaterTemperature95']);
+}
 
-// // query for monthly deviations
-// $deviationQueryM = <<<QUERY
-//     SELECT
-//         Date,
-//         ROUND(Value - WaterTemperature, 2) as Deviation
-//     FROM
-//         ReachEstimatedWaterTemp
-//     INNER JOIN ReachLandsatLTMMonthly ON 
-//         (ReachEstimatedWaterTemp.ReachID = ReachLandsatLTMMonthly.ReachID
-//         AND
-//         MONTH(ReachEstimatedWaterTemp.Date) = ReachLandsatLTMMonthly.Month)
-//     WHERE ReachEstimatedWaterTemp.ReachID = {$_POST['ReachID']} AND ReachEstimatedWaterTemp.Tag = 'M'
-//     ORDER BY Date;
-//     QUERY;
+// query for monthly deviations
+$deviationQueryM = <<<QUERY
+    SELECT 
+        STR_TO_DATE(CONCAT(Year,
+                        '-',
+                        LPAD(T.Month, 2, '00'),
+                        '-',
+                        LPAD(T.DayOfMonth, 2, '00')),
+                '%Y-%m-%d') AS Date,
+        ROUND(LTM.Value - T.Value, 2) AS Deviation
+    FROM
+        (SELECT 
+            YEAR(Date) AS Year,
+                AVG(VALUE) AS Value,
+                1 AS DayOfMonth,
+                DamID,
+                MONTH(Date) AS Month
+        FROM
+            DamLandsatWaterTemp
+        GROUP BY Year , DayOfMonth , DamID , Month) AS T
+            INNER JOIN
+        (SELECT 
+            1 AS DayOfMonth,
+                MONTH(DATE) AS Month,
+                DamID,
+                ROUND(AVG(VALUE), 2) AS Value
+        FROM
+            DamLandsatWaterTemp
+        WHERE
+            DamID = {$_POST['DamID']}
+        GROUP BY Month , DamID , DayOfMonth
+        ORDER BY DamID , Month , DayOfMonth) AS LTM ON (T.DamID = LTM.DamID
+            AND T.Month = LTM.Month
+            AND T.DayOfMonth = LTM.DayOfMonth)
+    WHERE
+        T.DamID = {$_POST['DamID']}
+    ORDER BY Date;
+    QUERY;
 
-// // echo $landsatLTMQuerySM;i
+// echo $landsatLTMQuerySM;i
 
-// $result = $mysqli_connection->query($deviationQueryM);
+$result = $mysqli_connection->query($deviationQueryM);
 
-// # Loop through rows to build feature arrays
-// while ($row = $result->fetch_assoc()) {
-//     # Add feature arrays to feature collection array
+# Loop through rows to build feature arrays
+while ($row = $result->fetch_assoc()) {
+    # Add feature arrays to feature collection array
 
-//     array_push($plotData['deviationMDate'], $row['Date']);
-//     array_push($plotData['deviationMDeviation'], $row['Deviation']);
-// }
+    array_push($plotData['deviationMDate'], $row['Date']);
+    array_push($plotData['deviationMDeviation'], $row['Deviation']);
+}
 
-// // query for semi-monthly deviations
-// $deviationQuerySM = <<<QUERY
-//     SELECT
-//         Date,
-//         ROUND(Value - WaterTemperature, 2) as Deviation
-//     FROM
-//         ReachEstimatedWaterTemp
-//     INNER JOIN ReachLandsatLTMSemiMonthly ON 
-//         (ReachEstimatedWaterTemp.ReachID = ReachLandsatLTMSemiMonthly.ReachID
-//         AND
-//         MONTH(ReachEstimatedWaterTemp.Date) = ReachLandsatLTMSemiMonthly.Month
-//         AND
-//         DAY(ReachEstimatedWaterTemp.Date) = ReachLandsatLTMSemiMonthly.DayOfMonth)
-//     WHERE ReachEstimatedWaterTemp.ReachID = {$_POST['ReachID']} AND ReachEstimatedWaterTemp.Tag = 'SM'
-//     ORDER BY Date;
-//     QUERY;
+// query for semi-monthly deviations
+$deviationQuerySM = <<<QUERY
+    SELECT 
+        STR_TO_DATE(CONCAT(Year,
+                        '-',
+                        LPAD(T.Month, 2, '00'),
+                        '-',
+                        LPAD(T.DayOfMonth, 2, '00')),
+                '%Y-%m-%d') AS Date,
+        ROUND(LTM.Value - T.Value, 2) AS Deviation
+    FROM
+        (SELECT 
+            YEAR(Date) AS Year,
+                AVG(VALUE) AS Value,
+                IF(DAY(Date) < 15, 1, 15) AS DayOfMonth,
+                DamID,
+                MONTH(Date) AS Month
+        FROM
+            DamLandsatWaterTemp
+        GROUP BY Year , DayOfMonth , DamID , Month) AS T
+            INNER JOIN
+        (SELECT 
+            IF(DAY(Date) < 15, 1, 15) AS DayOfMonth,
+                MONTH(DATE) AS Month,
+                DamID,
+                ROUND(AVG(VALUE), 2) AS Value
+        FROM
+            DamLandsatWaterTemp
+        WHERE
+            DamID = {$_POST['DamID']}
+        GROUP BY Month , DamID , DayOfMonth
+        ORDER BY DamID , Month , DayOfMonth) AS LTM ON (T.DamID = LTM.DamID
+            AND T.Month = LTM.Month
+            AND T.DayOfMonth = LTM.DayOfMonth)
+    WHERE
+        T.DamID = {$_POST['DamID']}
+    ORDER BY Date;
+    QUERY;
 
-// // echo $landsatLTMQuerySM;i
+// echo $landsatLTMQuerySM;i
 
-// $result = $mysqli_connection->query($deviationQuerySM);
+$result = $mysqli_connection->query($deviationQuerySM);
 
-// # Loop through rows to build feature arrays
-// while ($row = $result->fetch_assoc()) {
-//     # Add feature arrays to feature collection array
+# Loop through rows to build feature arrays
+while ($row = $result->fetch_assoc()) {
+    # Add feature arrays to feature collection array
 
-//     array_push($plotData['deviationSMDate'], $row['Date']);
-//     array_push($plotData['deviationSMDeviation'], $row['Deviation']);
-// }
+    array_push($plotData['deviationSMDate'], $row['Date']);
+    array_push($plotData['deviationSMDeviation'], $row['Deviation']);
+}
 
 // // query for semi-monthly estimated temperatures
 // $estimatedTempQuerySM = <<<QUERY
