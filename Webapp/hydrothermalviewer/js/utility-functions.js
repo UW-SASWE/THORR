@@ -709,6 +709,7 @@ function plotData() {
               yaxis: {
                 autorange: true,
                 type: "linear",
+                title: "Temperature (&deg;C)",
               },
             };
             var config = { responsive: true };
@@ -740,6 +741,7 @@ function plotData() {
               },
               automargin: true,
               xaxis: {
+                title: "Month",
                 autorange: true,
                 // rangeselector: xRangeSelector1,
                 // rangeslider: {
@@ -756,6 +758,7 @@ function plotData() {
               yaxis: {
                 autorange: true,
                 type: "linear",
+                title: "Temperature (&deg;C)",
               },
             };
             var config = { responsive: true };
@@ -802,6 +805,7 @@ function plotData() {
               yaxis: {
                 autorange: true,
                 type: "linear",
+                title: "Temperature Deviation (&deg;C)",
               },
             };
             var config = { responsive: true };
@@ -862,6 +866,7 @@ function plotData() {
               yaxis: {
                 autorange: true,
                 type: "linear",
+                title: "Temperature (&deg;C)",
               },
             };
             var config = { responsive: true };
@@ -894,6 +899,7 @@ function plotData() {
               },
               automargin: true,
               xaxis: {
+                title: "Month",
                 autorange: true,
                 // rangeselector: xRangeSelector1,
                 // rangeslider: {
@@ -910,6 +916,7 @@ function plotData() {
               yaxis: {
                 autorange: true,
                 type: "linear",
+                title: "Temperature (&deg;C)",
               },
             };
             var config = { responsive: true };
@@ -955,6 +962,7 @@ function plotData() {
               yaxis: {
                 autorange: true,
                 type: "linear",
+                title: "Temperature Deviation (&deg;C)",
               },
             };
             var config = { responsive: true };
@@ -1022,6 +1030,8 @@ function plotData() {
               yaxis: {
                 autorange: true,
                 type: "linear",
+                title: "Temperature (&deg;C)",
+                
               },
             };
             var config = { responsive: true };
@@ -1051,6 +1061,7 @@ function plotData() {
               },
               automargin: true,
               xaxis: {
+                title: "Month",
                 autorange: true,
                 // rangeselector: xRangeSelector1,
                 // rangeslider: {
@@ -1067,6 +1078,7 @@ function plotData() {
               yaxis: {
                 autorange: true,
                 type: "linear",
+                title: "Temperature (&deg;C)",
               },
             };
             var config = { responsive: true };
@@ -1113,6 +1125,7 @@ function plotData() {
               yaxis: {
                 autorange: true,
                 type: "linear",
+                title: "Temperature Deviation (&deg;C)",
               },
             };
             var config = { responsive: true };
@@ -1164,6 +1177,7 @@ function plotData() {
               yaxis: {
                 autorange: true,
                 type: "linear",
+                title: "Temperature (&deg;C)",
               },
             };
             var config = { responsive: true };
@@ -1197,6 +1211,7 @@ function plotData() {
               },
               automargin: true,
               xaxis: {
+                title: "Month",
                 autorange: true,
                 // rangeselector: xRangeSelector1,
                 // rangeslider: {
@@ -1213,6 +1228,7 @@ function plotData() {
               yaxis: {
                 autorange: true,
                 type: "linear",
+                title: "Temperature (&deg;C)",
               },
             };
             var config = { responsive: true };
@@ -1258,6 +1274,7 @@ function plotData() {
               yaxis: {
                 autorange: true,
                 type: "linear",
+                title: "Temperature Deviation (&deg;C)",
               },
             };
             var config = { responsive: true };
