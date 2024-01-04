@@ -161,6 +161,7 @@ cython_debug/
 
 # Ignore log files
 *.log
+logs/
 
 # Ignore build output
 build/
@@ -180,6 +181,8 @@ esriAPIKey.php
 geoPHP/
 .env/
 archive/
+
+cronjobs/
 
 # specific files
 Webapp/hydrothermalviewer/js/script.js

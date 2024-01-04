@@ -1,4 +1,4 @@
-from mysql.connector import MySQLConnection, Error
+from mysql.connector import MySQLConnection, Error, connect
 # import sqlalchemy
 import pandas as pd
 
@@ -41,7 +41,13 @@ class Connect:
         conn = None
         try:
             print("Connecting to MySQL database...")
-            conn = MySQLConnection(**db_config)
+            # conn = MySQLConnection(**db_config)
+            conn = connect(user=db_config["user"],
+                                database=db_config["database"],
+                                password=db_config["password"],
+                                host=db_config["host"],
+                                port=db_config["port"],
+                                )
 
             if conn.is_connected():
                 print("Connection established.")
