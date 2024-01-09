@@ -15,8 +15,9 @@ from random import randint
 import json
 import datetime
 
-
 # TODO: use the utils package to read the configuration file
+from configparser import ConfigParser
+
 
 def read_config(config_path, required_sections=[]):
     """
@@ -124,6 +125,52 @@ def validate_start_end_dates(start_date, end_date):
 
     return start_date, end_date
 
+def divideDates(startDate, endDate):
+    """
+    Divide the timeframe into years
+
+    Parameters:
+    -----------
+    startDate: str
+        start date
+    endDate: str
+        end date
+
+    Returns:
+    --------
+    list
+        list of tuples of start and end dates
+    """
+
+    # convert start and end dates to datetime objects
+    startDate_ = datetime.datetime.strptime(startDate, "%Y-%m-%d")
+    endDate_ = datetime.datetime.strptime(endDate, "%Y-%m-%d")
+
+    # get years from start and end dates
+    # startYear = pd.to_datetime(startDate).year
+    # endYear = pd.to_datetime(endDate).year
+    startYear = startDate_.year
+    endYear = endDate_.year
+
+    # divide the timeframe into years
+    dates = []
+    for year in range(startYear, endYear+1):
+        if year == startYear and year == endYear:
+            dates.append([startDate, endDate])
+        elif year == startYear:
+            dates.append([startDate, f"{year}-12-31"])
+        elif year == endYear:
+            # if the difference end date and start of the year is less than 30 days, then replace the end date of the previous append with the end date
+            # the purpose of this is to avoid having a date range of less than 30 days (especially at the beginning of the last year)
+            if (endDate_ - datetime.datetime(year, 1, 1)).days < 45:
+                dates[-1][1] = endDate
+            else:
+                dates.append([f"{year}-01-01", endDate])
+        else:
+            dates.append([f"{year}-01-01", f"{year}-12-31"])
+
+    return dates
+
 def get_reservoir_data(
     reservoirs_shp,
     # temperature_gauges_shp,
@@ -137,8 +184,6 @@ def get_reservoir_data(
     reservoirs = geemap.shp_to_ee(reservoirs_shp)
 
     print("Test okay")
-
-
 
 def main(args):
     config_path = Path(args.cfg)
