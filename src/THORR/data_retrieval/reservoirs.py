@@ -124,6 +124,21 @@ def validate_start_end_dates(start_date, end_date):
 
     return start_date, end_date
 
+def get_reservoir_data(
+    reservoirs_shp,
+    # temperature_gauges_shp,
+    # startDate,
+    # endDate,
+    # ndwi_threshold=0.2,
+    # imageCollection="LANDSAT/LC08/C02/T1_L2",
+):
+    ee.Initialize()
+
+    reservoirs = geemap.shp_to_ee(reservoirs_shp)
+
+    print("Test okay")
+
+
 
 def main(args):
     config_path = Path(args.cfg)
@@ -141,6 +156,10 @@ def main(args):
         ),  # base directory for the package
         db_config_path=db_config_path,  # db_config_path
     )
+
+    reservoirs_shp = Path(project_dir, config_dict["data"]["reservoirs_shp"])
+    data_dir = Path(project_dir, "Data/GEE")
+    os.makedirs(data_dir / "reservoirs", exist_ok=True)
 
     # get start date from config file
     if "start_date" not in config_dict["project"] or not config_dict["project"][
@@ -162,6 +181,21 @@ def main(args):
     
     # validate start and end dates
     start_date, end_date = validate_start_end_dates(start_date, end_date)
+
+    print(start_date, end_date)
+
+    # start_date = config_dict["project"]["start_date"]
+    # print(start_date)
+
+    get_reservoir_data(
+        reservoirs_shp=reservoirs_shp,
+        # temperature_gauges_shp=temperature_gauges_shp,
+        # startDate=startDate,
+        # endDate=endDate,
+        # ndwi_threshold=ndwi_threshold,
+        # imageCollection=imageCollection,
+    )
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
