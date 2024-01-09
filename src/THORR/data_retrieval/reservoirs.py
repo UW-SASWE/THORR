@@ -306,6 +306,116 @@ def extractTempSeries(
 
     return tempSeries
 
+
+def runExtraction(data_dir, uniq_ids, dam_names, start_date, end_date, reservoirs, checkpoint_path=None, connection=None):
+    if checkpoint_path is None:
+        checkpoint = {"reservoir_index": 0}
+    else:
+        with open(checkpoint_path, "r") as f:
+            checkpoint = json.load(f)
+
+    uniq_ids_ = uniq_ids[checkpoint["reservoir_index"] :]
+    dam_names_ = dam_names[checkpoint["reservoir_index"] :]
+
+    for dam_name, uniq_id in zip(dam_names_, uniq_ids_):
+        tempSeriesList = []
+
+        # check if file exists
+        if os.path.isfile(data_dir / "reservoirs" / f"{uniq_id}.csv"):
+            existing_df = pd.read_csv(data_dir / "reservoirs" / f"{uniq_id}.csv")
+            existing_df["date"] = pd.to_datetime(existing_df["date"])
+            tempSeriesList.append(existing_df)
+            # print("File exists!")
+
+        # for landsat8
+        dates = divideDates(start_date, end_date)
+        # dates = divideDates(L8startDate, L8endDate)
+        for date in dates:
+            startDate_ = date[0]
+            endDate_ = date[1]
+
+            reservoir = reservoirs.filter(ee.Filter.eq("DAM_NAME", ee.String(dam_name)))
+            tempSeries = extractTempSeries(
+                reservoir,
+                startDate_,
+                endDate_,
+                # ndwi_threshold,
+                imageCollection="LANDSAT/LC08/C02/T1_L2",
+            )
+            tempSeries = geemap.ee_to_pandas(tempSeries)
+
+            # convert date column to datetime
+            tempSeries["date"] = pd.to_datetime(tempSeries["date"])
+            tempSeries["temp(C)"] = (
+                tempSeries["temp(C)"].apply(lambda x: x["Celcius_mean"]).astype(float)
+            )
+
+            # append time series to list
+            tempSeriesList.append(tempSeries)
+
+        # for landsat9
+        # dates = divideDates(startDate, endDate)
+        # dates = divideDates(L9startDate, L9endDate)
+        for date in dates:
+            startDate_ = date[0]
+            endDate_ = date[1]
+
+            reservoir = reservoirs.filter(ee.Filter.eq("DAM_NAME", ee.String(dam_name)))
+            tempSeries = extractTempSeries(
+                reservoir,
+                startDate_,
+                endDate_,
+                # ndwi_threshold,
+                imageCollection="LANDSAT/LC09/C02/T1_L2",
+            )
+            tempSeries = geemap.ee_to_pandas(tempSeries)
+
+            # convert date column to datetime
+            tempSeries["date"] = pd.to_datetime(tempSeries["date"])
+            tempSeries["temp(C)"] = (
+                tempSeries["temp(C)"].apply(lambda x: x["Celcius_mean"]).astype(float)
+            )
+
+            # append time series to list
+            tempSeriesList.append(tempSeries)
+
+        # concatenate all time series
+        tempSeries_df = pd.concat(tempSeriesList, ignore_index=True)
+
+        # sort by date
+        tempSeries_df.sort_values(by="date", inplace=True)
+        # remove duplicates
+        tempSeries_df.drop_duplicates(subset="date", inplace=True)
+
+        # save time series to csv
+        tempSeries_df.to_csv(data_dir / "reservoirs" / f"{uniq_id}.csv", index=False)
+
+        cursor = connection.cursor()
+
+        data = tempSeries_df.dropna().copy()
+        # convert the date column to datetime YYYY-MM-DD
+        data["date"] = pd.to_datetime(data["date"])
+        data["date"] = data["date"].dt.date
+
+        for i, row in data.iterrows():
+            query = f"""
+            INSERT INTO DamLandsatWaterTemp (Date, DamID, Value)
+            SELECT '{row['date']}', (SELECT DamID FROM Dams WHERE Name = "{dam_name}"), {row['temp(C)']}
+            WHERE NOT EXISTS (SELECT * FROM DamLandsatWaterTemp WHERE Date = '{row['date']}' AND DamID = (SELECT DamID FROM Dams WHERE Name = "{dam_name}"))
+            """
+            try:
+                cursor.execute(query)
+                connection.commit()
+            except:
+                print(query)
+                raise Exception("Error!")
+
+        checkpoint["reservoir_index"] += 1
+        json.dump(checkpoint, open(checkpoint_path, "w"))
+
+        print(f"{dam_name} done!")
+
+
 def get_reservoir_data(
     reservoirs_shp,
     # temperature_gauges_shp,
