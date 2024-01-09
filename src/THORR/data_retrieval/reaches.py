@@ -72,7 +72,6 @@ def get_db_connection(package_dir, db_config_path):
 def get_logger(package_dir, project_title, log_dir):
     utils = str(package_dir / "utils")
     sys.path.insert(0, utils)
-    print(utils)
     import logger
 
     logger = logger.Logger(project_title=project_title, log_dir=log_dir).get_logger()
@@ -80,7 +79,7 @@ def get_logger(package_dir, project_title, log_dir):
     return logger
 
 
-def validate_start_end_dates(start_date, end_date):
+def validate_start_end_dates(start_date, end_date, logger=None):
     """
     Validate start and end dates
 
@@ -103,31 +102,51 @@ def validate_start_end_dates(start_date, end_date):
     # convert start and end dates to datetime objects
     if end_date is None:
         end_date_ = today
-        print(f"End date is set to {end_date_}")
+        if logger is not None:
+            logger.info(f"End date is set to {end_date_}")
+        else:
+            print(f"End date is set to {end_date_}")
     else:
         end_date_ = datetime.datetime.strptime(end_date, "%Y-%m-%d")
         if end_date_ > today:
             end_date_ = today
-            print(f"End date is set to {end_date_}")
+            if logger is not None:
+                logger.info(f"End date is set to {end_date_}")
+            else:
+                print(f"End date is set to {end_date_}")
 
     if start_date is None:
         start_date_ = end_date_ - datetime.timedelta(days=90)
-        print(f"Start date is set to {start_date_}")
+        if logger is not None:
+            logger.info(f"Start date is set to {start_date_}")
+        else:
+            print(f"Start date is set to {start_date_}")
     else:
         start_date_ = datetime.datetime.strptime(start_date, "%Y-%m-%d")
 
     # check if start date is greater than end date
     if start_date_ > end_date_:
         start_date_ = end_date_ - datetime.timedelta(days=90)
-        print(f"Start date is set to {start_date_}")
+        if logger is not None:
+            logger.info(f"Start date is set to {start_date_}")
+        else:
+            print(f"Start date is set to {start_date_}")
         # raise Exception("Start date cannot be greater than end date!")
 
     # check if start date is greater than today's date
     if start_date_ > today:
+        if logger is not None:
+            logger.error("Start date cannot be greater than today's date!")
+        else:
+            print("Start date cannot be greater than today's date!")
         raise Exception("Start date cannot be greater than today's date!")
 
     # check if end date is greater than today's date
     if end_date_ > today:
+        if logger is not None:
+            logger.error("End date cannot be greater than today's date!")
+        else:
+            print("End date cannot be greater than today's date!")
         raise Exception("End date cannot be greater than today's date!")
 
     # format dates as strings
@@ -744,6 +763,15 @@ def main(args):
         db_config_path=db_config_path,  # db_config_path
     )
 
+    logger = get_logger(
+        package_dir=Path(
+            config_dict["project"]["package_dir"]
+        ),  # base directory for the package
+        project_title=config_dict["project"]["title"],
+        log_dir=Path(project_dir, "logs"),
+    )
+
+
     reaches_shp = Path(project_dir, config_dict["data"]["reaches_shp"])
     data_dir = Path(project_dir, "Data/GEE")
     os.makedirs(data_dir / "reaches", exist_ok=True)
@@ -769,20 +797,12 @@ def main(args):
     # TODO: check the validity of the start and end dates. For example, if the start date is greater than the end date, then raise an exception. if the start date is greater than today's date, then raise an exception. If the end date is greater than today's date, then make it today's date.
 
     # validate start and end dates
-    start_date, end_date = validate_start_end_dates(start_date, end_date)
+    start_date, end_date = validate_start_end_dates(start_date, end_date, logger=logger)
 
     # print(start_date, end_date)
 
     # start_date = config_dict["project"]["start_date"]
     # print(start_date)
-
-    logger = get_logger(
-        package_dir=Path(
-            config_dict["project"]["package_dir"]
-        ),  # base directory for the package
-        project_title=config_dict["project"]["title"],
-        log_dir=Path(project_dir, "logs"),
-    )
 
     # logger.info("Getting reservoir data...")
 
