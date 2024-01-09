@@ -67,6 +67,16 @@ def get_db_connection(package_dir, db_config_path):
 
     return connection
 
+def get_logger(package_dir, project_title, log_dir):
+    utils = str(package_dir / "utils")
+    sys.path.insert(0, utils)
+    print(utils)
+    import logger
+    
+    logger = logger.Logger(project_title=project_title, log_dir=log_dir).get_logger()
+
+    return logger
+
 
 def validate_start_end_dates(start_date, end_date):
     """
@@ -314,6 +324,7 @@ def runExtraction(
     reservoirs,
     checkpoint_path=None,
     connection=None,
+    logger=None,
 ):
     if checkpoint_path is None:
         checkpoint = {"reservoir_index": 0}
@@ -413,14 +424,29 @@ def runExtraction(
             try:
                 cursor.execute(query)
                 connection.commit()
-            except:
-                print(query)
-                raise Exception("Error!")
+            except Exception as e:
+                if logger is not None:
+                    logger.error(f"Error: {e}")
+                else:
+                    print(f"Error: {e}")
+
+                raise
+                # raise Exception("Error!")
+
+    
+                # if logger is not None:
+                #     logger.exception(f"Error: {query}")
+                # else:
+                #     print(query)
+                #     raise Exception("Error!")
 
         checkpoint["reservoir_index"] += 1
         json.dump(checkpoint, open(checkpoint_path, "w"))
 
-        print(f"{dam_name} done!")
+        if logger is not None:
+            logger.info(f"{dam_name} done!")
+        else:
+            print(f"{dam_name} done!")
 
 
 def get_reservoir_data(
@@ -432,6 +458,7 @@ def get_reservoir_data(
     end_date,
     # ndwi_threshold=0.2,
     # imageCollection="LANDSAT/LC08/C02/T1_L2",
+    logger=None,
 ):
     ee.Initialize()
 
@@ -446,8 +473,13 @@ def get_reservoir_data(
         with open(data_dir / "reservoirs" / "checkpoint.json", "r") as f:
             checkpoint = json.load(f)
     except Exception as e:
-        print(f"Error: {e}")
-        print("Creating new checkpoint...")
+        if logger is not None:
+            logger.error(f"Error: {e}")
+            logger.info("Creating new checkpoint...") 
+        else:
+            print(f"Error: {e}")
+            print("Creating new checkpoint...")
+
         checkpoint = {"reservoir_index": 0}
         # save checkpoint
         json.dump(checkpoint, open(data_dir / "reservoirs" / "checkpoint.json", "w"))
@@ -466,18 +498,27 @@ def get_reservoir_data(
                 reservoirs=reservoirs,
                 checkpoint_path=data_dir / "reservoirs" / "checkpoint.json",
                 connection=connection,
-                
+                logger=logger,
             )
             repeated_tries = 0  # reset repeated_tries
 
         except Exception as e:
-            print(f"Error: {e}")
+            if logger is not None:
+                logger.error(f"Error: {e}")
+            else:
+                print(f"Error: {e}")
 
             # sleep for 0.5 - 3 minutes
             s_time = randint(30, 120)
-            print(f"Sleeping for {s_time} seconds...")
+            if logger is not None:
+                logger.info(f"Sleeping for {s_time} seconds...")
+            else:
+                print(f"Sleeping for {s_time} seconds...")
             time.sleep(s_time)
-            print("Restarting from checkpoint...")  # restart from checkpoint
+            if logger is not None:
+                logger.info("Restarting from checkpoint...")
+            else:
+                print("Restarting from checkpoint...")  # restart from checkpoint
 
             repeated_tries += 1
 
@@ -499,7 +540,10 @@ def get_reservoir_data(
         checkpoint["reservoir_index"] = 0
         json.dump(checkpoint, open(data_dir / "reservoirs" / "checkpoint.json", "w"))
 
-    print("All done!")
+    if logger is not None:
+        logger.info("All done!")
+    else:
+        print("All done!")
 
     print("Test okay")
 
@@ -548,10 +592,20 @@ def main(args):
     # validate start and end dates
     start_date, end_date = validate_start_end_dates(start_date, end_date)
 
-    print(start_date, end_date)
+    # print(start_date, end_date)
 
     # start_date = config_dict["project"]["start_date"]
     # print(start_date)
+
+    logger = get_logger(
+        package_dir=Path(
+            config_dict["project"]["package_dir"]
+        ),  # base directory for the package
+        project_title=config_dict["project"]["title"],
+        log_dir=Path(project_dir, "logs"),
+    )
+
+    # logger.info("Getting reservoir data...")
 
     get_reservoir_data(
         reservoirs_shp=reservoirs_shp,
@@ -559,6 +613,7 @@ def main(args):
         connection=connection,
         start_date=start_date,
         end_date=end_date,
+        logger=logger,
         # temperature_gauges_shp=temperature_gauges_shp,
         # startDate=startDate,
         # endDate=endDate,
