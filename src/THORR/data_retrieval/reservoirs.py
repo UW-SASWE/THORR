@@ -206,6 +206,24 @@ def prepL8(image):
         .updateMask(saturation_mask)
     )
 
+def addCelcius(image):
+    """
+    Add Celcius band to image
+
+    Parameters:
+    -----------
+    image: ee.Image
+        Landsat 8 image
+
+    Returns:
+    --------
+    ee.Image
+        Landsat 8 image with Celcius band
+    """
+    celcius = image.select("ST_B10").subtract(273.15).rename("Celcius")
+
+    return image.addBands(celcius)
+
 def get_reservoir_data(
     reservoirs_shp,
     # temperature_gauges_shp,
