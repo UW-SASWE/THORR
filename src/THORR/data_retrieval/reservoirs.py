@@ -307,7 +307,16 @@ def extractTempSeries(
     return tempSeries
 
 
-def runExtraction(data_dir, uniq_ids, dam_names, start_date, end_date, reservoirs, checkpoint_path=None, connection=None):
+def runExtraction(
+    data_dir,
+    uniq_ids,
+    dam_names,
+    start_date,
+    end_date,
+    reservoirs,
+    checkpoint_path=None,
+    connection=None,
+):
     if checkpoint_path is None:
         checkpoint = {"reservoir_index": 0}
     else:
@@ -418,9 +427,11 @@ def runExtraction(data_dir, uniq_ids, dam_names, start_date, end_date, reservoir
 
 def get_reservoir_data(
     reservoirs_shp,
+    data_dir,
+    connection,
     # temperature_gauges_shp,
-    # startDate,
-    # endDate,
+    start_date,
+    end_date,
     # ndwi_threshold=0.2,
     # imageCollection="LANDSAT/LC08/C02/T1_L2",
 ):
@@ -432,6 +443,65 @@ def get_reservoir_data(
     ee_uniq_ids = reservoirs.select("uniq_id", retainGeometry=False).getInfo()
     dam_names = [i["properties"]["DAM_NAME"] for i in ee_dam_names["features"]]
     uniq_ids = [i["properties"]["uniq_id"] for i in ee_uniq_ids["features"]]
+
+    try:
+        with open(data_dir / "reservoirs" / "checkpoint.json", "r") as f:
+            checkpoint = json.load(f)
+    except Exception as e:
+        print(f"Error: {e}")
+        print("Creating new checkpoint...")
+        checkpoint = {"reservoir_index": 0}
+        # save checkpoint
+        json.dump(checkpoint, open(data_dir / "reservoirs" / "checkpoint.json", "w"))
+
+    repeated_tries = 0
+
+    while checkpoint["reservoir_index"] < len(dam_names):
+        try:
+            # extract temperature time series for each reservoir
+            runExtraction(
+                data_dir=data_dir,
+                uniq_ids=uniq_ids,
+                dam_names=dam_names,
+                start_date=start_date,
+                end_date=end_date,
+                reservoirs=reservoirs,
+                checkpoint_path=data_dir / "reservoirs" / "checkpoint.json",
+                connection=connection,
+                
+            )
+            repeated_tries = 0  # reset repeated_tries
+
+        except Exception as e:
+            print(f"Error: {e}")
+
+            # sleep for 0.5 - 3 minutes
+            s_time = randint(30, 120)
+            print(f"Sleeping for {s_time} seconds...")
+            time.sleep(s_time)
+            print("Restarting from checkpoint...")  # restart from checkpoint
+
+            repeated_tries += 1
+
+            if repeated_tries > 3:
+                checkpoint["reservoir_index"] += 1
+
+                repeated_tries = 0
+
+                json.dump(
+                    checkpoint, open(data_dir / "reservoirs" / "checkpoint.json", "w")
+                )
+
+        finally:
+            # load checkpoint
+            with open(data_dir / "reservoirs" / "checkpoint.json", "r") as f:
+                checkpoint = json.load(f)
+
+    if checkpoint["reservoir_index"] >= len(dam_names):
+        checkpoint["reservoir_index"] = 0
+        json.dump(checkpoint, open(data_dir / "reservoirs" / "checkpoint.json", "w"))
+
+    print("All done!")
 
     print("Test okay")
 
@@ -487,6 +557,10 @@ def main(args):
 
     get_reservoir_data(
         reservoirs_shp=reservoirs_shp,
+        data_dir=data_dir,
+        connection=connection,
+        start_date=start_date,
+        end_date=end_date,
         # temperature_gauges_shp=temperature_gauges_shp,
         # startDate=startDate,
         # endDate=endDate,
