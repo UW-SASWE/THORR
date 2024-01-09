@@ -171,6 +171,41 @@ def divideDates(startDate, endDate):
 
     return dates
 
+def prepL8(image):
+    """
+    Prepare Landsat 8 image for analysis
+
+    Parameters:
+    -----------
+    image: ee.Image
+        Landsat 8 image
+
+    Returns:
+    --------
+    ee.Image
+        prepared Landsat 8 image
+    """
+
+    # develop masks for unwanted pixels (fill, cloud, shadow)
+    qa_mask = image.select("QA_PIXEL").bitwiseAnd(int("11111", 2)).eq(0)
+    saturation_mask = image.select("QA_RADSAT").eq(0)
+
+    # apply scaling factors to the appropriate bands
+    def getFactorImage(factorNames):
+        factorList = image.toDictionary().select(factorNames).values()
+        return ee.Image.constant(factorList)
+
+    scaleImg = getFactorImage(["REFLECTANCE_MULT_BAND_.|TEMPERATURE_MULT_BAND_ST_B10"])
+    offsetImg = getFactorImage(["REFLECTANCE_ADD_BAND_.|TEMPERATURE_ADD_BAND_ST_B10"])
+    scaled = image.select("SR_B.|ST_B10").multiply(scaleImg).add(offsetImg)
+
+    # replace original bands with scaled bands and apply masks
+    return (
+        image.addBands(scaled, overwrite=True)
+        .updateMask(qa_mask)
+        .updateMask(saturation_mask)
+    )
+
 def get_reservoir_data(
     reservoirs_shp,
     # temperature_gauges_shp,
