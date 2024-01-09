@@ -67,6 +67,64 @@ def get_db_connection(package_dir, db_config_path):
 
     return connection
 
+def validate_start_end_dates(start_date, end_date):
+    """
+    Validate start and end dates
+
+    Parameters:
+    -----------
+    start_date: str
+        start date
+    end_date: str
+        end date
+
+    Returns:
+    --------
+    tuple
+        start and end dates
+    """
+    
+    # get today's date
+    today = datetime.datetime.today()
+
+
+    # convert start and end dates to datetime objects
+    if end_date is None:
+        end_date_ = today
+        print(f"End date is set to {end_date_}")
+    else:
+        end_date_ = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+        if end_date_ > today:
+            end_date_ = today
+            print(f"End date is set to {end_date_}")    
+
+    if start_date is None:
+        start_date_ = end_date_ - datetime.timedelta(days=90)
+        print(f"Start date is set to {start_date_}")
+    else:
+        start_date_ = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+
+    # check if start date is greater than end date
+    if start_date_ > end_date_:
+        start_date_ = end_date_ - datetime.timedelta(days=90)
+        print(f"Start date is set to {start_date_}")
+        # raise Exception("Start date cannot be greater than end date!")
+
+    # check if start date is greater than today's date
+    if start_date_ > today:
+        raise Exception("Start date cannot be greater than today's date!")
+
+    # check if end date is greater than today's date
+    if end_date_ > today:
+        raise Exception("End date cannot be greater than today's date!")
+
+    # format dates as strings
+    start_date = start_date_.strftime("%Y-%m-%d")
+    end_date = end_date_.strftime("%Y-%m-%d")
+
+    return start_date, end_date
+
+
 def main(args):
     config_path = Path(args.cfg)
     config_dict = read_config(
@@ -83,6 +141,27 @@ def main(args):
         ),  # base directory for the package
         db_config_path=db_config_path,  # db_config_path
     )
+
+    # get start date from config file
+    if "start_date" not in config_dict["project"] or not config_dict["project"][
+        "start_date"
+    ]:
+        start_date = None
+    else:
+        start_date = config_dict["project"]["start_date"]
+
+    # get end date from config file
+    if "end_date" not in config_dict["project"] or not config_dict["project"][
+        "end_date"
+    ]:
+        end_date = None
+    else:
+        end_date = config_dict["project"]["end_date"]
+
+    # TODO: check the validity of the start and end dates. For example, if the start date is greater than the end date, then raise an exception. if the start date is greater than today's date, then raise an exception. If the end date is greater than today's date, then make it today's date.
+    
+    # validate start and end dates
+    start_date, end_date = validate_start_end_dates(start_date, end_date)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
