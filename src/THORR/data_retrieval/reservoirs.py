@@ -56,6 +56,7 @@ def read_config(config_path, required_sections=[]):
 
     return config_dict
 
+
 # import connect
 # TODO: convert this to a function in the utils package
 def get_db_connection(package_dir, db_config_path):
@@ -67,6 +68,7 @@ def get_db_connection(package_dir, db_config_path):
     connection = conn.conn
 
     return connection
+
 
 def validate_start_end_dates(start_date, end_date):
     """
@@ -84,10 +86,9 @@ def validate_start_end_dates(start_date, end_date):
     tuple
         start and end dates
     """
-    
+
     # get today's date
     today = datetime.datetime.today()
-
 
     # convert start and end dates to datetime objects
     if end_date is None:
@@ -97,7 +98,7 @@ def validate_start_end_dates(start_date, end_date):
         end_date_ = datetime.datetime.strptime(end_date, "%Y-%m-%d")
         if end_date_ > today:
             end_date_ = today
-            print(f"End date is set to {end_date_}")    
+            print(f"End date is set to {end_date_}")
 
     if start_date is None:
         start_date_ = end_date_ - datetime.timedelta(days=90)
@@ -124,6 +125,7 @@ def validate_start_end_dates(start_date, end_date):
     end_date = end_date_.strftime("%Y-%m-%d")
 
     return start_date, end_date
+
 
 def divideDates(startDate, endDate):
     """
@@ -154,7 +156,7 @@ def divideDates(startDate, endDate):
 
     # divide the timeframe into years
     dates = []
-    for year in range(startYear, endYear+1):
+    for year in range(startYear, endYear + 1):
         if year == startYear and year == endYear:
             dates.append([startDate, endDate])
         elif year == startYear:
@@ -170,6 +172,7 @@ def divideDates(startDate, endDate):
             dates.append([f"{year}-01-01", f"{year}-12-31"])
 
     return dates
+
 
 def prepL8(image):
     """
@@ -206,6 +209,7 @@ def prepL8(image):
         .updateMask(saturation_mask)
     )
 
+
 def addCelcius(image):
     """
     Add Celcius band to image
@@ -224,6 +228,84 @@ def addCelcius(image):
 
     return image.addBands(celcius)
 
+
+def extractTempSeries(
+    reservoir,
+    startDate,
+    endDate,
+    # ndwi_threshold=0.2,
+    imageCollection="LANDSAT/LC08/C02/T1_L2",
+):
+    """
+    Extract temperature time series for a reservoir
+
+    Parameters:
+    -----------
+    reservoir: ee.Feature
+        reservoir
+    startDate: str
+        start date
+    endDate: str
+        end date
+
+    Returns:
+    --------
+    ee.ImageCollection
+        temperature time series
+    """
+
+    L8 = (
+        ee.ImageCollection(imageCollection)
+        .filterDate(startDate, endDate)
+        .filterBounds(reservoir)
+    )
+
+    def extractTemp(date):
+        date = ee.Date(date)
+        # prepare Landsat 8 image and add the NDWI band, and Celcius band
+        processedL8 = (
+            L8.filterDate(date, date.advance(1, "day"))
+            .map(prepL8)
+            .map(addCelcius)
+            # .map(addNDWI)
+        )
+
+        # get quality NDWI and use it as the water mask
+        # ndwi = processedL8.qualityMosaic("NDWI").select("NDWI")
+        # waterMaskNdwi = ndwi.gte(ndwi_threshold)
+        # nonWaterMask = ndwi.lt(ndwi_threshold)
+
+        mosaic = processedL8.mosaic()
+        waterMask = mosaic.select("QA_PIXEL").bitwiseAnd(int("10000000", 2)).neq(0)
+        nonWaterMask = mosaic.select("QA_PIXEL").bitwiseAnd(int("10000000", 2)).eq(0)
+
+        # find the mean of the images in the collection
+        meanL8 = (
+            processedL8.reduce(ee.Reducer.mean())
+            .updateMask(waterMask)
+            .set("system:time_start", date)
+        )
+
+        # get the mean temperature of the reservoir
+        temp = meanL8.select(["Celcius_mean"]).reduceRegion(
+            reducer=ee.Reducer.mean(), geometry=reservoir.geometry(), scale=30
+        )
+
+        return ee.Feature(None, {"date": date.format("YYYY-MM-dd"), "temp(C)": temp})
+
+    dates = ee.List(
+        L8.map(
+            lambda image: ee.Feature(None, {"date": image.date().format("YYYY-MM-dd")})
+        )
+        .distinct("date")
+        .aggregate_array("date")
+        .getInfo()
+    )
+
+    tempSeries = ee.FeatureCollection(dates.map(extractTemp))
+
+    return tempSeries
+
 def get_reservoir_data(
     reservoirs_shp,
     # temperature_gauges_shp,
@@ -237,6 +319,7 @@ def get_reservoir_data(
     reservoirs = geemap.shp_to_ee(reservoirs_shp)
 
     print("Test okay")
+
 
 def main(args):
     config_path = Path(args.cfg)
@@ -260,23 +343,25 @@ def main(args):
     os.makedirs(data_dir / "reservoirs", exist_ok=True)
 
     # get start date from config file
-    if "start_date" not in config_dict["project"] or not config_dict["project"][
-        "start_date"
-    ]:
+    if (
+        "start_date" not in config_dict["project"]
+        or not config_dict["project"]["start_date"]
+    ):
         start_date = None
     else:
         start_date = config_dict["project"]["start_date"]
 
     # get end date from config file
-    if "end_date" not in config_dict["project"] or not config_dict["project"][
-        "end_date"
-    ]:
+    if (
+        "end_date" not in config_dict["project"]
+        or not config_dict["project"]["end_date"]
+    ):
         end_date = None
     else:
         end_date = config_dict["project"]["end_date"]
 
     # TODO: check the validity of the start and end dates. For example, if the start date is greater than the end date, then raise an exception. if the start date is greater than today's date, then raise an exception. If the end date is greater than today's date, then make it today's date.
-    
+
     # validate start and end dates
     start_date, end_date = validate_start_end_dates(start_date, end_date)
 
