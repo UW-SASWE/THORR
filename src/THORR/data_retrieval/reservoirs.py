@@ -379,7 +379,7 @@ def runExtraction(
                 # ndwi_threshold,
                 imageCollection="LANDSAT/LC08/C02/T1_L2",
             )
-            tempSeries = geemap.ee_to_pandas(tempSeries)
+            tempSeries = geemap.ee_to_gdf(tempSeries)
 
             # convert date column to datetime
             tempSeries["date"] = pd.to_datetime(tempSeries["date"])
@@ -405,7 +405,7 @@ def runExtraction(
                 # ndwi_threshold,
                 imageCollection="LANDSAT/LC09/C02/T1_L2",
             )
-            tempSeries = geemap.ee_to_pandas(tempSeries)
+            tempSeries = geemap.ee_to_gdf(tempSeries)
 
             # convert date column to datetime
             tempSeries["date"] = pd.to_datetime(tempSeries["date"])
@@ -472,6 +472,7 @@ def get_reservoir_data(
     reservoirs_shp,
     data_dir,
     connection,
+    ee_credentials,
     # temperature_gauges_shp,
     start_date,
     end_date,
@@ -479,7 +480,11 @@ def get_reservoir_data(
     # imageCollection="LANDSAT/LC08/C02/T1_L2",
     logger=None,
 ):
-    ee.Initialize()
+    
+
+    service_account = ee_credentials["service_account"]
+    credentials = ee.ServiceAccountCredentials(service_account, ee_credentials["private_key_path"])
+    ee.Initialize(credentials)
 
     reservoirs = geemap.shp_to_ee(reservoirs_shp)
 
@@ -574,6 +579,8 @@ def main(args):
     project_dir = Path(config_dict["project"]["project_dir"])
     db_config_path = project_dir / config_dict["mysql"]["db_config_path"]
 
+    ee_credentials = {"service_account": config_dict["ee"]["service_account"], "private_key_path": config_dict["ee"]["private_key_path"]}
+
     # get database connection
     connection = get_db_connection(
         package_dir=Path(
@@ -629,6 +636,7 @@ def main(args):
     get_reservoir_data(
         reservoirs_shp=reservoirs_shp,
         data_dir=data_dir,
+        ee_credentials=ee_credentials,
         connection=connection,
         start_date=start_date,
         end_date=end_date,

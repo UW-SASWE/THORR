@@ -490,7 +490,7 @@ def reachwiseExtraction(
             # ndwi_threshold, 
             imageCollection
         )
-        dataSeries = geemap.ee_to_pandas(dataSeries)
+        dataSeries = geemap.ee_to_gdf(dataSeries)
 
         # convert date column to datetime
         # waterTempSeries["date"] = pd.to_datetime(waterTempSeries["date"])
@@ -661,6 +661,7 @@ def get_reach_data(
     reaches_shp,
     data_dir,
     connection,
+    ee_credentials,
     # temperature_gauges_shp,
     start_date,
     end_date,
@@ -668,7 +669,11 @@ def get_reach_data(
     # imageCollection="LANDSAT/LC08/C02/T1_L2",
     logger=None,
 ):
-    ee.Initialize()
+    
+
+    service_account = ee_credentials["service_account"]
+    credentials = ee.ServiceAccountCredentials(service_account, ee_credentials["private_key_path"])
+    ee.Initialize(credentials)
 
     reaches_gdf = gpd.read_file(reaches_shp)
     reaches_gdf = reaches_gdf.to_crs(epsg=4326)
@@ -749,11 +754,13 @@ def get_reach_data(
 def main(args):
     config_path = Path(args.cfg)
     config_dict = read_config(
-        config_path, required_sections=["project", "mysql", "data"]
+        config_path, required_sections=["project", "mysql", "data", "ee"]
     )
 
     project_dir = Path(config_dict["project"]["project_dir"])
     db_config_path = project_dir / config_dict["mysql"]["db_config_path"]
+
+    ee_credentials = {"service_account": config_dict["ee"]["service_account"], "private_key_path": config_dict["ee"]["private_key_path"]}
 
     # get database connection
     connection = get_db_connection(
@@ -809,6 +816,7 @@ def main(args):
     get_reach_data(
         reaches_shp=reaches_shp,
         data_dir=data_dir,
+        ee_credentials=ee_credentials,
         connection=connection,
         start_date=start_date,
         end_date=end_date,
