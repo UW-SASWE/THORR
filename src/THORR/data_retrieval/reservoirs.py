@@ -318,6 +318,11 @@ def get_reservoir_data(
 
     reservoirs = geemap.shp_to_ee(reservoirs_shp)
 
+    ee_dam_names = reservoirs.select("DAM_NAME", retainGeometry=False).getInfo()
+    ee_uniq_ids = reservoirs.select("uniq_id", retainGeometry=False).getInfo()
+    dam_names = [i["properties"]["DAM_NAME"] for i in ee_dam_names["features"]]
+    uniq_ids = [i["properties"]["uniq_id"] for i in ee_uniq_ids["features"]]
+
     print("Test okay")
 
 
