@@ -545,8 +545,6 @@ def get_reservoir_data(
     else:
         print("All done!")
 
-    print("Test okay")
-
 
 def main(args):
     config_path = Path(args.cfg)
