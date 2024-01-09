@@ -6,8 +6,6 @@ import geemap
 import ee
 from pathlib import Path
 import pandas as pd
-import geopandas as gpd
-import numpy as np
 import os
 from pathlib import Path
 import time
