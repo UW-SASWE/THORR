@@ -67,12 +67,20 @@ def get_db_connection(package_dir, db_config_path):
 
     return connection
 
-def get_logger(package_dir, project_title, log_dir):
+
+def get_logger(
+    package_dir,
+    project_title,
+    log_dir,
+    logger_format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+):
     utils = str(package_dir / "utils")
     sys.path.insert(0, utils)
     import logger
-    
-    logger = logger.Logger(project_title=project_title, log_dir=log_dir).get_logger()
+
+    logger = logger.Logger(
+        project_title=project_title, log_dir=log_dir, logger_format=logger_format
+    ).get_logger()
 
     return logger
 
@@ -452,7 +460,6 @@ def runExtraction(
                 raise
                 # raise Exception("Error!")
 
-    
                 # if logger is not None:
                 #     logger.exception(f"Error: {query}")
                 # else:
@@ -480,10 +487,10 @@ def get_reservoir_data(
     # imageCollection="LANDSAT/LC08/C02/T1_L2",
     logger=None,
 ):
-    
-
     service_account = ee_credentials["service_account"]
-    credentials = ee.ServiceAccountCredentials(service_account, ee_credentials["private_key_path"])
+    credentials = ee.ServiceAccountCredentials(
+        service_account, ee_credentials["private_key_path"]
+    )
     ee.Initialize(credentials)
 
     reservoirs = geemap.shp_to_ee(reservoirs_shp)
@@ -499,7 +506,7 @@ def get_reservoir_data(
     except Exception as e:
         if logger is not None:
             logger.error(f"Error: {e}")
-            logger.info("Creating new checkpoint...") 
+            logger.info("Creating new checkpoint...")
         else:
             print(f"Error: {e}")
             print("Creating new checkpoint...")
@@ -573,13 +580,17 @@ def get_reservoir_data(
 def main(args):
     config_path = Path(args.cfg)
     config_dict = read_config(
-        config_path, required_sections=["project", "mysql", "data"]
+        config_path,
+        # required_sections=["project", "mysql", "data"]
     )
 
     project_dir = Path(config_dict["project"]["project_dir"])
     db_config_path = project_dir / config_dict["mysql"]["db_config_path"]
 
-    ee_credentials = {"service_account": config_dict["ee"]["service_account"], "private_key_path": config_dict["ee"]["private_key_path"]}
+    ee_credentials = {
+        "service_account": config_dict["ee"]["service_account"],
+        "private_key_path": config_dict["ee"]["private_key_path"],
+    }
 
     # get database connection
     connection = get_db_connection(
@@ -589,15 +600,14 @@ def main(args):
         db_config_path=db_config_path,  # db_config_path
     )
 
-
     logger = get_logger(
         package_dir=Path(
             config_dict["project"]["package_dir"]
         ),  # base directory for the package
         project_title=config_dict["project"]["title"],
         log_dir=Path(project_dir, "logs"),
+        logger_format="%(asctime)s - %(name)s - reservoirs - %(levelname)s - %(message)s",
     )
-
 
     reservoirs_shp = Path(project_dir, config_dict["data"]["reservoirs_shp"])
     data_dir = Path(project_dir, "Data/GEE")
