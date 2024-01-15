@@ -42,7 +42,11 @@ class Connect:
         db_config = read_db_config(self.config_file, self.section)
         conn = None
         try:
-            print("Connecting to MySQL database...")
+            if self.logger is not None:
+                self.logger.info("Connecting to MySQL database...")
+            else:
+                print("Connecting to MySQL database...")
+            self.conn = conn
             # conn = MySQLConnection(**db_config)
             conn = connect(
                 user=db_config["user"],
