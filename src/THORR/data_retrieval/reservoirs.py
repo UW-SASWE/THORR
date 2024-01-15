@@ -432,8 +432,8 @@ def runExtraction(
         # remove duplicates
         tempSeries_df.drop_duplicates(subset="date", inplace=True)
 
-        # save time series to csv
-        tempSeries_df.to_csv(data_dir / "reservoirs" / f"{uniq_id}.csv", index=False)
+        # # save time series to csv
+        # tempSeries_df.to_csv(data_dir / "reservoirs" / f"{uniq_id}.csv", index=False)
 
         cursor = connection.cursor()
 
