@@ -1,4 +1,5 @@
 from mysql.connector import MySQLConnection, Error, connect
+
 # import sqlalchemy
 import pandas as pd
 
@@ -28,9 +29,10 @@ def read_db_config(filename="config.ini", section="mysql"):
 
 
 class Connect:
-    def __init__(self, config_file, section="mysql"):
+    def __init__(self, config_file, section="mysql", logger=None):
         self.config_file = config_file
         self.section = section
+        self.logger = logger
         self.createConnection()
         # self.createEngine()s
 
@@ -42,21 +44,31 @@ class Connect:
         try:
             print("Connecting to MySQL database...")
             # conn = MySQLConnection(**db_config)
-            conn = connect(user=db_config["user"],
-                                database=db_config["database"],
-                                password=db_config["password"],
-                                host=db_config["host"],
-                                port=db_config["port"],
-                                )
+            conn = connect(
+                user=db_config["user"],
+                database=db_config["database"],
+                password=db_config["password"],
+                host=db_config["host"],
+                port=db_config["port"],
+            )
 
             if conn.is_connected():
-                print("Connection established.")
+                if self.logger is not None:
+                    self.logger.info("MySQL connection established.")
+                else:
+                    print("MySQL connection established.")
                 self.conn = conn
             else:
-                print("Connection failed.")
+                if self.logger is not None:
+                    self.logger.info("MySQL connection failed.")
+                else:
+                    print("MySQL connection failed.")
 
         except Error as error:
-            print(error)
+            if self.logger is not None:
+                self.logger.error(error)
+            else:
+                print(error)
 
     # def createEngine(self):
     #     """Create a SQLAlchemy engine"""
@@ -99,16 +111,25 @@ class Connect:
 
             return df
 
-        except Error as e:
-            print(e)
-    
+        except Error as error:
+            if self.logger is not None:
+                self.logger.error(error)
+            else:
+                print(error)
+
     def close(self):
         """Close MySQL database connection"""
         try:
             self.conn.close()
-            print("Connection closed.")
+            if self.logger is not None:
+                self.logger.info("Connection closed.")
+            else:
+                print("Connection closed.")
         except Error as error:
-            print(error)
+            if self.logger is not None:
+                self.logger.error(error)
+            else:
+                print(error)
 
 
 # if __name__ == '__main__':
