@@ -69,12 +69,13 @@ def get_db_connection(package_dir, db_config_path):
     return connection
 
 
-def get_logger(package_dir, project_title, log_dir):
+def get_logger(package_dir, project_title, log_dir,
+        logger_format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"):
     utils = str(package_dir / "utils")
     sys.path.insert(0, utils)
     import logger
-
-    logger = logger.Logger(project_title=project_title, log_dir=log_dir).get_logger()
+    
+    logger = logger.Logger(project_title=project_title, log_dir=log_dir, logger_format=logger_format).get_logger()
 
     return logger
 
@@ -486,9 +487,11 @@ def reachwiseExtraction(
         # waterTempSeries = geemap.ee_to_pandas(waterTempSeries)
         # landTempSeries = geemap.ee_to_pandas(landTempSeries)
         dataSeries = extractTempSeries(
-            reach, startDate_, endDate_, 
-            # ndwi_threshold, 
-            imageCollection
+            reach,
+            startDate_,
+            endDate_,
+            # ndwi_threshold,
+            imageCollection,
         )
         dataSeries = geemap.ee_to_gdf(dataSeries)
 
@@ -645,7 +648,10 @@ def runExtraction(
 
             checkpoint["reach_index"] += 1
             json.dump(checkpoint, open(checkpoint_path, "w"))
-            print(f"Reach {reach_id} done!")
+            if logger is not None:
+                logger.info(f"Reach {reach_id} done!")
+            else:
+                print(f"Reach {reach_id} done!")
 
         checkpoint["reach_index"] = 0
         checkpoint["river_index"] += 1
@@ -653,8 +659,10 @@ def runExtraction(
 
         # s_time = randint(30,120)
         # time.sleep(s_time)
-
-        print(f"{river} done!")
+        if logger is not None:
+            logger.info(f"{river} done!")
+        else:
+            print(f"{river} done!")
 
 
 def get_reach_data(
@@ -669,10 +677,10 @@ def get_reach_data(
     # imageCollection="LANDSAT/LC08/C02/T1_L2",
     logger=None,
 ):
-    
-
     service_account = ee_credentials["service_account"]
-    credentials = ee.ServiceAccountCredentials(service_account, ee_credentials["private_key_path"])
+    credentials = ee.ServiceAccountCredentials(
+        service_account, ee_credentials["private_key_path"]
+    )
     ee.Initialize(credentials)
 
     reaches_gdf = gpd.read_file(reaches_shp)
@@ -684,8 +692,15 @@ def get_reach_data(
         with open(data_dir / "reaches" / "checkpoint.json", "r") as f:
             checkpoint = json.load(f)
     except Exception as e:
-        print(f"Error: {e}")
-        print("Creating new checkpoint...")
+        if logger is not None:
+            logger.error(f"Error: {e}")
+        else:
+            print(f"Error: {e}")
+
+        if logger is not None:
+            logger.info("Creating new checkpoint...")
+        else:
+            print("Creating new checkpoint...")
         checkpoint = {"river_index": 0, "reach_index": 0}
         # save checkpoint
         json.dump(checkpoint, open(data_dir / "reaches" / "checkpoint.json", "w"))
@@ -708,21 +723,31 @@ def get_reach_data(
             repeated_tries = 0  # reset repeated_tries
 
         except Exception as e:
-            print(f"Error: {e}")
+            if logger is not None:
+                logger.error(f"Error: {e}")
+            else:
+                print(f"Error: {e}")
             # sleep for 0.5 - 3 minutes
             s_time = randint(30, 120)
-            print(f"Sleeping for {s_time} seconds...")
+            if logger is not None:
+                logger.info(f"Sleeping for {s_time} seconds...")
+            else:
+                print(f"Sleeping for {s_time} seconds...")
             time.sleep(s_time)
-            print("Restarting from checkpoint...")  # restart from checkpoint
+
+            if logger is not None:
+                logger.info("Restarting from checkpoint...")
+            else:
+                print("Restarting from checkpoint...")  # restart from checkpoint
 
             repeated_tries += 1  # increment repeated_tries
 
             # if repeated_tries > 3, increment river_index and reset reach_index
             if repeated_tries > 3:
                 checkpoint["reach_index"] += 1
-                current_river = gdf["GNIS_Name"].unique()[checkpoint["river_index"]]
+                current_river = reaches_gdf["GNIS_Name"].unique()[checkpoint["river_index"]]
                 if checkpoint["reach_index"] >= len(
-                    gdf[gdf["GNIS_Name"] == current_river]["reach_id"].tolist()
+                    reaches_gdf[reaches_gdf["GNIS_Name"] == current_river]["reach_id"].tolist()
                 ):
                     checkpoint["reach_index"] = 0
                     checkpoint["river_index"] += 1
@@ -748,7 +773,7 @@ def get_reach_data(
     else:
         print("All done!")
 
-    print("Test okay")
+    # print("Test okay")
 
 
 def main(args):
@@ -760,7 +785,10 @@ def main(args):
     project_dir = Path(config_dict["project"]["project_dir"])
     db_config_path = project_dir / config_dict["mysql"]["db_config_path"]
 
-    ee_credentials = {"service_account": config_dict["ee"]["service_account"], "private_key_path": config_dict["ee"]["private_key_path"]}
+    ee_credentials = {
+        "service_account": config_dict["ee"]["service_account"],
+        "private_key_path": config_dict["ee"]["private_key_path"],
+    }
 
     # get database connection
     connection = get_db_connection(
@@ -776,8 +804,8 @@ def main(args):
         ),  # base directory for the package
         project_title=config_dict["project"]["title"],
         log_dir=Path(project_dir, "logs"),
+        logger_format="%(asctime)s - %(name)s - reaches - %(levelname)s - %(message)s"
     )
-
 
     reaches_shp = Path(project_dir, config_dict["data"]["reaches_shp"])
     data_dir = Path(project_dir, "Data/GEE")
