@@ -58,24 +58,30 @@ def read_config(config_path, required_sections=[]):
 
 # import connect
 # TODO: convert this to a function in the utils package
-def get_db_connection(package_dir, db_config_path):
+def get_db_connection(package_dir, db_config_path, logger=None):
     utils = str(package_dir / "utils")
     sys.path.insert(0, utils)
     from sql import connect  # utility functions for connecting to MySQL
 
-    conn = connect.Connect(Path(db_config_path))
+    conn = connect.Connect(Path(db_config_path), logger=logger)
     connection = conn.conn
 
     return connection
 
 
-def get_logger(package_dir, project_title, log_dir,
-        logger_format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"):
+def get_logger(
+    package_dir,
+    project_title,
+    log_dir,
+    logger_format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+):
     utils = str(package_dir / "utils")
     sys.path.insert(0, utils)
     import logger
-    
-    logger = logger.Logger(project_title=project_title, log_dir=log_dir, logger_format=logger_format).get_logger()
+
+    logger = logger.Logger(
+        project_title=project_title, log_dir=log_dir, logger_format=logger_format
+    ).get_logger()
 
     return logger
 
@@ -648,10 +654,10 @@ def runExtraction(
 
             checkpoint["reach_index"] += 1
             json.dump(checkpoint, open(checkpoint_path, "w"))
-            if logger is not None:
-                logger.info(f"Reach {reach_id} done!")
-            else:
-                print(f"Reach {reach_id} done!")
+            # if logger is not None:
+            #     logger.info(f"Reach {reach_id} done!")
+            # else:
+            #     print(f"Reach {reach_id} done!")
 
         checkpoint["reach_index"] = 0
         checkpoint["river_index"] += 1
@@ -745,9 +751,13 @@ def get_reach_data(
             # if repeated_tries > 3, increment river_index and reset reach_index
             if repeated_tries > 3:
                 checkpoint["reach_index"] += 1
-                current_river = reaches_gdf["GNIS_Name"].unique()[checkpoint["river_index"]]
+                current_river = reaches_gdf["GNIS_Name"].unique()[
+                    checkpoint["river_index"]
+                ]
                 if checkpoint["reach_index"] >= len(
-                    reaches_gdf[reaches_gdf["GNIS_Name"] == current_river]["reach_id"].tolist()
+                    reaches_gdf[reaches_gdf["GNIS_Name"] == current_river][
+                        "reach_id"
+                    ].tolist()
                 ):
                     checkpoint["reach_index"] = 0
                     checkpoint["river_index"] += 1
@@ -779,7 +789,8 @@ def get_reach_data(
 def main(args):
     config_path = Path(args.cfg)
     config_dict = read_config(
-        config_path, required_sections=["project", "mysql", "data", "ee"]
+        config_path,
+        # required_sections=["project", "mysql", "data", "ee"]
     )
 
     project_dir = Path(config_dict["project"]["project_dir"])
@@ -790,21 +801,22 @@ def main(args):
         "private_key_path": config_dict["ee"]["private_key_path"],
     }
 
-    # get database connection
-    connection = get_db_connection(
-        package_dir=Path(
-            config_dict["project"]["package_dir"]
-        ),  # base directory for the package
-        db_config_path=db_config_path,  # db_config_path
-    )
-
     logger = get_logger(
         package_dir=Path(
             config_dict["project"]["package_dir"]
         ),  # base directory for the package
         project_title=config_dict["project"]["title"],
         log_dir=Path(project_dir, "logs"),
-        logger_format="%(asctime)s - %(name)s - reaches - %(levelname)s - %(message)s"
+        logger_format="%(asctime)s - %(name)s - reaches - %(levelname)s - %(message)s",
+    )
+
+    # get database connection
+    connection = get_db_connection(
+        package_dir=Path(
+            config_dict["project"]["package_dir"]
+        ),  # base directory for the package
+        db_config_path=db_config_path,  # db_config_path
+        logger=logger,
     )
 
     reaches_shp = Path(project_dir, config_dict["data"]["reaches_shp"])
