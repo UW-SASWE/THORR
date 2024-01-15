@@ -57,12 +57,12 @@ def read_config(config_path, required_sections=[]):
 
 # import connect
 # TODO: convert this to a function in the utils package
-def get_db_connection(package_dir, db_config_path):
+def get_db_connection(package_dir, db_config_path, logger=None):
     utils = str(package_dir / "utils")
     sys.path.insert(0, utils)
     from sql import connect  # utility functions for connecting to MySQL
 
-    conn = connect.Connect(Path(db_config_path))
+    conn = connect.Connect(Path(db_config_path), logger=logger)
     connection = conn.conn
 
     return connection
@@ -592,14 +592,6 @@ def main(args):
         "private_key_path": config_dict["ee"]["private_key_path"],
     }
 
-    # get database connection
-    connection = get_db_connection(
-        package_dir=Path(
-            config_dict["project"]["package_dir"]
-        ),  # base directory for the package
-        db_config_path=db_config_path,  # db_config_path
-    )
-
     logger = get_logger(
         package_dir=Path(
             config_dict["project"]["package_dir"]
@@ -607,6 +599,15 @@ def main(args):
         project_title=config_dict["project"]["title"],
         log_dir=Path(project_dir, "logs"),
         logger_format="%(asctime)s - %(name)s - reservoirs - %(levelname)s - %(message)s",
+    )
+
+    # get database connection
+    connection = get_db_connection(
+        package_dir=Path(
+            config_dict["project"]["package_dir"]
+        ),  # base directory for the package
+        db_config_path=db_config_path,  # db_config_path
+        logger=logger,
     )
 
     reservoirs_shp = Path(project_dir, config_dict["data"]["reservoirs_shp"])
