@@ -787,7 +787,7 @@ def get_reach_data(
 
 
 def main(args):
-    config_path = Path(args.cfg)
+    config_path = Path(args.config)
     config_dict = read_config(
         config_path,
         # required_sections=["project", "mysql", "data", "ee"]
