@@ -431,13 +431,16 @@ def runExtraction(
         tempSeries_df.sort_values(by="date", inplace=True)
         # remove duplicates
         tempSeries_df.drop_duplicates(subset="date", inplace=True)
+        # drop geometry column
+        tempSeries_df.drop(columns=["geometry"], inplace=True)
 
         # # save time series to csv
         # tempSeries_df.to_csv(data_dir / "reservoirs" / f"{uniq_id}.csv", index=False)
 
         cursor = connection.cursor()
 
-        data = tempSeries_df.dropna().copy()
+        data = tempSeries_df.dropna(subset=["temp(C)"]).copy()
+
         # convert the date column to datetime YYYY-MM-DD
         data["date"] = pd.to_datetime(data["date"])
         data["date"] = data["date"].dt.date
