@@ -16,7 +16,7 @@ if ($_POST['BasinID']) {
         FROM (SELECT
         Dams.BasinID, Dams.RiverID, Dams.Name as Name, Dams.DamID as DamID
         FROM
-        hydrothermal_history.Dams
+        thorr.Dams
         INNER JOIN Basins USING (BasinID)
         INNER JOIN Rivers USING (RiverID)
         WHERE Basins.BasinID = {$_POST['BasinID']} AND RiverID = {$_POST['RiverID']}
@@ -29,7 +29,7 @@ if ($_POST['BasinID']) {
         FROM (SELECT
         Dams.BasinID, Dams.RiverID, Dams.Name as Name, Dams.DamID as DamID
         FROM
-        hydrothermal_history.Dams
+        thorr.Dams
         INNER JOIN Basins USING (BasinID)
         INNER JOIN Rivers USING (RiverID)
         WHERE Basins.BasinID = {$_POST['BasinID']}
@@ -43,7 +43,7 @@ if ($_POST['BasinID']) {
     FROM (SELECT
     Dams.BasinID, Dams.DamID, Dams.RiverID, Dams.Name
     FROM
-    hydrothermal_history.Dams
+    thorr.Dams
     INNER JOIN Basins USING (BasinID)
     INNER JOIN Rivers USING (RiverID)) as T
     ORDER BY Name ASC;

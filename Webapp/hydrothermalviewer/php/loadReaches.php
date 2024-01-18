@@ -16,7 +16,7 @@ if ($_POST['BasinID']) {
         FROM (SELECT
         ReachID, RiverID, Reaches.Name
         FROM
-        hydrothermal_history.Rivers
+        thorr.Rivers
         INNER JOIN Basins USING (BasinID)
         INNER JOIN Reaches USING (RiverID)
         WHERE Basins.BasinID = {$_POST['BasinID']} AND RiverID = {$_POST['RiverID']}
@@ -29,7 +29,7 @@ if ($_POST['BasinID']) {
         FROM (SELECT
         ReachID, RiverID, Reaches.Name
         FROM
-        hydrothermal_history.Rivers
+        thorr.Rivers
         INNER JOIN Basins USING (BasinID)
         INNER JOIN Reaches USING (RiverID)
         WHERE Basins.BasinID = {$_POST['BasinID']}
@@ -43,7 +43,7 @@ if ($_POST['BasinID']) {
     FROM (SELECT
     ReachID, RiverID, Reaches.Name as Name
     FROM
-    hydrothermal_history.Rivers
+    thorr.Rivers
     INNER JOIN Basins USING (BasinID)
     INNER JOIN Reaches USING (RiverID)
     ) as T

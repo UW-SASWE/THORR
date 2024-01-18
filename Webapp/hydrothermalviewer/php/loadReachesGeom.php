@@ -26,7 +26,7 @@ if ($_POST['offset'] || $_POST['row_count']) {
                     Rivers.Name AS Name,
                     ST_ASGEOJSON(Reaches.geometry) AS geometry
             FROM
-                hydrothermal_history.Rivers
+                thorr.Rivers
             INNER JOIN Basins USING (BasinID)
             INNER JOIN Reaches USING (RiverID)
             WHERE
@@ -70,7 +70,7 @@ if ($_POST['offset'] || $_POST['row_count']) {
                     Rivers.Name AS Name,
                     ST_ASGEOJSON(Reaches.geometry) AS geometry
             FROM
-                hydrothermal_history.Rivers
+                thorr.Rivers
             INNER JOIN Basins USING (BasinID)
             INNER JOIN Reaches USING (RiverID)
             WHERE

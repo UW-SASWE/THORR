@@ -13,7 +13,7 @@ SELECT *
 FROM (SELECT
 RiverID, Rivers.Name, ST_AsGeoJSON(Rivers.geometry, 4) AS geometry
 FROM
-hydrothermal_history.Rivers
+thorr.Rivers
 INNER JOIN Basins USING (BasinID)
 WHERE Basins.BasinID = {$_POST['BasinID']}
 ) as T;
