@@ -7,12 +7,34 @@ import ee
 from pathlib import Path
 import pandas as pd
 import geopandas as gpd
+import numpy as np
 import os
 from pathlib import Path
 import time
 from random import randint
 import json
+
+
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+from sklearn.model_selection import (
+    KFold,
+    ShuffleSplit,
+    RepeatedKFold,
+    train_test_split,
+    GridSearchCV,
+)
+from sklearn.linear_model import ElasticNetCV, ElasticNet
+from sklearn.ensemble import RandomForestRegressor
+
+import numpy as np
+# from datetime import datetime, date, timedelta
 import datetime
+
+# import matplotlib.pyplot as plt
+
+# import tensorflow as tf
+import HydroErr as he
+import pickle
 
 # TODO: use the utils package to read the configuration file
 from configparser import ConfigParser
@@ -55,6 +77,7 @@ def read_config(config_path, required_sections=[]):
 
     return config_dict
 
+
 # import connect
 # TODO: convert this to a function in the utils package
 def get_db_connection(package_dir, db_config_path, logger=None):
@@ -66,6 +89,7 @@ def get_db_connection(package_dir, db_config_path, logger=None):
     connection = conn.conn
 
     return connection
+
 
 def get_logger(
     package_dir,
@@ -82,7 +106,6 @@ def get_logger(
     ).get_logger()
 
     return logger
-
 
 def validate_start_end_dates(start_date, end_date, logger=None):
     """
@@ -153,12 +176,89 @@ def validate_start_end_dates(start_date, end_date, logger=None):
         else:
             print("End date cannot be greater than today's date!")
         raise Exception("End date cannot be greater than today's date!")
+    
+    # convert the start date to the first day of the month
+    start_date_ = start_date_.replace(day=1)
+
+    # convert the end date to the last day of the month
+    first_day_of_next_month = end_date_.replace(day=28) + datetime.timedelta(days=4)
+    end_date_ = first_day_of_next_month - datetime.timedelta(days=first_day_of_next_month.day)
 
     # format dates as strings
     start_date = start_date_.strftime("%Y-%m-%d")
     end_date = end_date_.strftime("%Y-%m-%d")
 
     return start_date, end_date
+
+
+def estimate_temperature(
+        connection,
+):
+    query = f"""
+    SELECT 
+        STR_TO_DATE(CONCAT(Year,
+                        '-',
+                        LPAD(Month, 2, '00'),
+                        '-',
+                        LPAD(DayOfMonth, 2, '00')),
+                '%Y-%m-%d') AS Date,
+        Month,
+        DayOfMonth,
+        ROUND(WaterTemp, 2) as WaterTemp,
+        ROUND(LandTemp, 2) as LandTemp,
+        ROUND(NDVI, 2) as NDVI,
+        ClimateClass,
+        --     ROUND(((watertemp - WaterTemperature) / WaterTemperature),
+        --             2) AS PercentDeviation,
+        --     ROUND((watertemp - WaterTemperature), 2) AS Deviation,
+        Width,
+        ReachID,
+        ReachName
+        -- ROUND(InsituTemp, 2) AS InsituTemp
+    FROM
+        (SELECT 
+            IF(DAY(ReachLandsatWaterTemp.date) < 15, 1, 15) AS DayOfMonth,
+                MONTH(ReachLandsatWaterTemp.date) AS Month,
+                YEAR(ReachLandsatWaterTemp.date) AS Year,
+                AVG(ReachLandsatWaterTemp.Value) AS WaterTemp,
+                AVG(ReachLandsatLandTemp.Value) AS LandTemp,
+                AVG(ReachNDVI.Value) AS NDVI,
+                IFNULL(Reaches.WidthMean, 30) AS Width,
+                Reaches.ClimateClass AS ClimateClass,
+                ReachLandsatWaterTemp.ReachID AS ReachID,
+                Reaches.Name AS ReachName
+        FROM
+            ReachLandsatWaterTemp
+        INNER JOIN ReachLandsatLandTemp USING (date , ReachID)
+        INNER JOIN ReachNDVI USING (date , ReachID)
+        INNER JOIN Reaches USING (ReachID)
+        -- WHERE
+        --        AND ReachLandsatWaterTemp.Value > 0
+        GROUP BY DayOfMonth , Month , Year , ClimateClass , ReachID , Width) AS T
+    --     --         INNER JOIN
+    --     --     ReachLandsatLTMSemiMonthly USING (DayOfMonth , Month , ReachID)
+    --         LEFT JOIN
+    --     (SELECT 
+    --         IF(DAY(ReachInsituWaterTemp.date) < 15, 1, 15) AS DayOfMonth,
+    --             MONTH(ReachInsituWaterTemp.date) AS Month,
+    --             YEAR(ReachInsituWaterTemp.date) AS Year,
+    --             AVG(ReachInsituWaterTemp.Value) AS InsituTemp,
+    --             ReachInsituWaterTemp.ReachID AS ReachID
+    --     FROM
+    --         ReachInsituWaterTemp
+    --     INNER JOIN Reaches USING (ReachID)
+    --     WHERE
+    --         ReachInsituWaterTemp.Value > 0
+    --     GROUP BY DayOfMonth , Month , Year , ReachID) AS I USING (DayOfMonth , Month , Year , ReachID)
+    -- ORDER BY RAND();
+    """
+
+
+
+    df = connection.query_with_fetchmany(query, chunksize=100)
+
+    pass
+
 
 def main(args):
     config_path = Path(args.config)
@@ -230,6 +330,8 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--config", type=str, help="path to config file", required=True)
+    parser.add_argument(
+        "-c", "--config", type=str, help="path to config file", required=True
+    )
 
     main(args=parser.parse_args())

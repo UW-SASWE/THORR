@@ -155,6 +155,13 @@ def validate_start_end_dates(start_date, end_date, logger=None):
         else:
             print("End date cannot be greater than today's date!")
         raise Exception("End date cannot be greater than today's date!")
+    
+    # convert the start date to the first day of the month
+    start_date_ = start_date_.replace(day=1)
+
+    # convert the end date to the last day of the month
+    first_day_of_next_month = end_date_.replace(day=28) + datetime.timedelta(days=4)
+    end_date_ = first_day_of_next_month - datetime.timedelta(days=first_day_of_next_month.day)
 
     # format dates as strings
     start_date = start_date_.strftime("%Y-%m-%d")
