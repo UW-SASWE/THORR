@@ -190,8 +190,9 @@ def validate_start_end_dates(start_date, end_date, logger=None):
 
     return start_date, end_date
 
-
 def estimate_temperature(
+        start_date,
+        end_date,
         connection,
 ):
     query = f"""
@@ -232,8 +233,7 @@ def estimate_temperature(
         INNER JOIN ReachLandsatLandTemp USING (date , ReachID)
         INNER JOIN ReachNDVI USING (date , ReachID)
         INNER JOIN Reaches USING (ReachID)
-        -- WHERE
-        --        AND ReachLandsatWaterTemp.Value > 0
+        WHERE ReachLandsatWaterTemp.Date > {start_date} and ReachLandsatWaterTemp.Date < {end_date}
         GROUP BY DayOfMonth , Month , Year , ClimateClass , ReachID , Width) AS T
     --     --         INNER JOIN
     --     --     ReachLandsatLTMSemiMonthly USING (DayOfMonth , Month , ReachID)
