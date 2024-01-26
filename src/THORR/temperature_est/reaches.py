@@ -27,13 +27,14 @@ from sklearn.linear_model import ElasticNetCV, ElasticNet
 from sklearn.ensemble import RandomForestRegressor
 
 import numpy as np
+
 # from datetime import datetime, date, timedelta
 import datetime
 
 # import matplotlib.pyplot as plt
 
 # import tensorflow as tf
-import HydroErr as he
+# import HydroErr as he
 import pickle
 
 # TODO: use the utils package to read the configuration file
@@ -80,7 +81,7 @@ def read_config(config_path, required_sections=[]):
 
 # import connect
 # TODO: convert this to a function in the utils package
-def get_db_connection(package_dir, db_config_path, logger=None):
+def get_db_connection(package_dir, db_config_path, logger=None, return_conn=False):
     utils = str(package_dir / "utils")
     sys.path.insert(0, utils)
     from sql import connect  # utility functions for connecting to MySQL
@@ -88,7 +89,10 @@ def get_db_connection(package_dir, db_config_path, logger=None):
     conn = connect.Connect(Path(db_config_path), logger=logger)
     connection = conn.conn
 
-    return connection
+    if return_conn:
+        return conn
+    else:
+        return connection
 
 
 def get_logger(
@@ -106,6 +110,7 @@ def get_logger(
     ).get_logger()
 
     return logger
+
 
 def validate_start_end_dates(start_date, end_date, logger=None):
     """
@@ -176,13 +181,15 @@ def validate_start_end_dates(start_date, end_date, logger=None):
         else:
             print("End date cannot be greater than today's date!")
         raise Exception("End date cannot be greater than today's date!")
-    
+
     # convert the start date to the first day of the month
     start_date_ = start_date_.replace(day=1)
 
     # convert the end date to the last day of the month
     first_day_of_next_month = end_date_.replace(day=28) + datetime.timedelta(days=4)
-    end_date_ = first_day_of_next_month - datetime.timedelta(days=first_day_of_next_month.day)
+    end_date_ = first_day_of_next_month - datetime.timedelta(
+        days=first_day_of_next_month.day
+    )
 
     # format dates as strings
     start_date = start_date_.strftime("%Y-%m-%d")
@@ -190,10 +197,15 @@ def validate_start_end_dates(start_date, end_date, logger=None):
 
     return start_date, end_date
 
+
 def estimate_temperature(
-        start_date,
-        end_date,
-        connection,
+    start_date,
+    end_date,
+    connection,
+    scalers,  # path to scaler
+    model_var1,  # path to model variation 1
+    model_var2,  # path to model variation 2
+    reaches_and_dams,  # path to reaches and dams csv file
 ):
     query = f"""
     SELECT 
@@ -233,7 +245,7 @@ def estimate_temperature(
         INNER JOIN ReachLandsatLandTemp USING (date , ReachID)
         INNER JOIN ReachNDVI USING (date , ReachID)
         INNER JOIN Reaches USING (ReachID)
-        WHERE ReachLandsatWaterTemp.Date > {start_date} and ReachLandsatWaterTemp.Date < {end_date}
+        WHERE ReachLandsatWaterTemp.Date > "{start_date}" and ReachLandsatWaterTemp.Date < "{end_date}"
         GROUP BY DayOfMonth , Month , Year , ClimateClass , ReachID , Width) AS T
     --     --         INNER JOIN
     --     --     ReachLandsatLTMSemiMonthly USING (DayOfMonth , Month , ReachID)
@@ -253,12 +265,105 @@ def estimate_temperature(
     -- ORDER BY RAND();
     """
 
-
-
     df = connection.query_with_fetchmany(query, chunksize=100)
 
-    pass
+    df["Date"] = pd.to_datetime(df["Date"])
+    df["DayOfYear"] = df["Date"].dt.dayofyear
 
+    # TODO: add reservoir dynamics data. This will require a join with the reservoir dynamics table. Generate data from RAT.
+
+    # dels = pd.read_csv(proj_dir / "Methods/3.WaterTempEst/rat_dels.csv")
+    # dels["Date"] = pd.to_datetime(dels["Date"])
+    # sarea = pd.read_csv(proj_dir / "Methods/3.WaterTempEst/rat_sarea.csv")
+    # sarea["Date"] = pd.to_datetime(sarea["Date"])
+    reaches_and_dams = pd.read_csv(reaches_and_dams)
+
+    # load scalers and model variation 1
+    with open(scalers, "rb") as f:
+        scalers = pickle.load(f)
+
+        dayofmonth_scaler = scalers["dayofmonth_scaler"]
+        month_scaler = scalers["month_scaler"]
+        watertemp_scaler = scalers["watertemp_scaler"]
+        landtemp_scaler = scalers["landtemp_scaler"]
+        width_scaler = scalers["width_scaler"]
+        NDVI_scaler = scalers["NDVI_scaler"]
+        climate_scaler = scalers["climate_scaler"]
+        dels_scaler = scalers["dels_scaler"]
+        sarea_scaler = scalers["sarea_scaler"]
+        rel_dist_scaler = scalers["rel_dist_scaler"]
+
+    with open(model_var1, "rb") as f:
+        model_var1_trained = pickle.load(f)  # trained model variation 1
+
+    # replace missing values for dels, sarea, and rel_dist with the 0
+    # df["dels"].fillna(0, inplace=True)
+    # df["sarea"].fillna(0, inplace=True)
+    # df["rel_dist"].fillna(0, inplace=True)
+
+    # Scale values
+    df["DayOfMonth_scaled"] = dayofmonth_scaler.transform(df[["DayOfMonth"]])
+    df["Month_scaled"] = month_scaler.transform(df[["Month"]])
+    df["LandTemp_scaled"] = landtemp_scaler.transform(df[["LandTemp"]])
+    df["WaterTemp_scaled"] = watertemp_scaler.transform(df[["WaterTemp"]])
+    df["Width_scaled"] = width_scaler.transform(df[["Width"]])
+    df["NDVI_scaled"] = NDVI_scaler.transform(df[["NDVI"]])
+    df["ClimateClass_scaled"] = climate_scaler.transform(df[["ClimateClass"]])
+    # df["dels_scaled"] = dels_scaler.transform(df[["dels"]])
+    # df["sarea_scaled"] = sarea_scaler.transform(df[["sarea"]])
+    # df["rel_dist_scaled"] = rel_dist_scaler.transform(df[["rel_dist"]])
+
+    # X and y to be used for prediction
+    X = df[
+        [
+            "DayOfMonth_scaled",
+            "Month_scaled",
+            "LandTemp_scaled",
+            "Width_scaled",
+            "NDVI_scaled",
+            "ClimateClass_scaled",
+            # "dels_scaled",
+            # "sarea_scaled",
+            # "rel_dist_scaled",
+        ]
+    ]
+    df["est1"] = model_var1_trained.predict(X)
+    df.sort_values(by=['ReachID', 'Date'], inplace=True)
+
+    # insert estimates into database
+    cursor = connection.conn.cursor()
+
+    # done = []
+    for i, row in df.iterrows():
+        query = f"""
+        INSERT INTO ReachEstimatedWaterTemp (Date, ReachID, Value, Tag)
+        SELECT '{row['Date'].date()}', (SELECT ReachID FROM Reaches WHERE ReachID = {row['ReachID']}), {row['est1']}, "SM"
+        WHERE NOT EXISTS (SELECT * FROM ReachEstimatedWaterTemp WHERE Date = '{row['Date'].date()}' AND ReachID = {row['ReachID']}  AND Tag = "SM");
+        """
+
+        # print(query)
+        # break
+
+        cursor.execute(query)
+        connection.conn.commit()
+
+        query = f"""
+        UPDATE ReachEstimatedWaterTemp
+        SET Value = {row['est1']}
+        WHERE Date = '{row['Date']}' AND ReachID = {row['ReachID']} AND Tag = "SM";
+        """
+
+        cursor.execute(query)
+        connection.conn.commit()
+
+        # print(row['ReachID'], row['Date'])
+        # if i not in done:
+        #     done.append(i)
+        #     print(row['ReachID'], "complete")
+
+        # break
+
+    #TODO: add model variation 2
 
 def main(args):
     config_path = Path(args.config)
@@ -281,7 +386,7 @@ def main(args):
         ),  # base directory for the package
         project_title=config_dict["project"]["title"],
         log_dir=Path(project_dir, "logs"),
-        logger_format="%(asctime)s - %(name)s - reaches - %(levelname)s - %(message)s",
+        logger_format="%(asctime)s - %(name)s - reach-temperature-est - %(levelname)s - %(message)s",
     )
 
     # get database connection
@@ -291,6 +396,7 @@ def main(args):
         ),  # base directory for the package
         db_config_path=db_config_path,  # db_config_path
         logger=logger,
+        return_conn=True,
     )
 
     reaches_shp = Path(project_dir, config_dict["data"]["reaches_shp"])
@@ -326,6 +432,16 @@ def main(args):
     # print(start_date)
 
     # logger.info("Getting reservoir data...")
+
+    estimate_temperature(
+        start_date=start_date,
+        end_date=end_date,
+        connection=connection,
+        scalers=Path(project_dir, config_dict["ml"]["scalers"]),
+        model_var1=Path(project_dir, config_dict["ml"]["model_var1"]),
+        model_var2=Path(project_dir, config_dict["ml"]["model_var2"]),
+        reaches_and_dams=Path(project_dir, config_dict["data"]["reaches_and_dams"]),
+    )
 
 
 if __name__ == "__main__":
