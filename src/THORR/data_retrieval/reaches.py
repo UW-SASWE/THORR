@@ -58,7 +58,7 @@ def read_config(config_path, required_sections=[]):
 
 # import connect
 # TODO: convert this to a function in the utils package
-def get_db_connection(package_dir, db_config_path, logger=None):
+def get_db_connection(package_dir, db_config_path, logger=None, return_conn=False):
     utils = str(package_dir / "utils")
     sys.path.insert(0, utils)
     from sql import connect  # utility functions for connecting to MySQL
@@ -66,7 +66,10 @@ def get_db_connection(package_dir, db_config_path, logger=None):
     conn = connect.Connect(Path(db_config_path), logger=logger)
     connection = conn.conn
 
-    return connection
+    if return_conn:
+        return conn
+    else:
+        return connection
 
 
 def get_logger(
