@@ -653,7 +653,12 @@ def runExtraction(
             reachwiseExtraction(
                 reaches,
                 reach_id,
-                start_date,
+                max(
+                    datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                    datetime.datetime.strptime("2013-03-01", "%Y-%m-%d"),
+                ).strftime(
+                    "%Y-%m-%d"
+                ),  # clip the start date to 2021-10-01
                 end_date,
                 # ndwi_threshold,
                 imageCollection="LANDSAT/LC08/C02/T1_L2",
@@ -665,7 +670,12 @@ def runExtraction(
             reachwiseExtraction(
                 reaches,
                 reach_id,
-                start_date,
+                max(
+                    datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                    datetime.datetime.strptime("2021-10-01", "%Y-%m-%d"),
+                ).strftime(
+                    "%Y-%m-%d"
+                ),  # clip the start date to 2021-10-01
                 end_date,
                 # ndwi_threshold,
                 imageCollection="LANDSAT/LC09/C02/T1_L2",
