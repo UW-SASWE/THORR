@@ -459,22 +459,27 @@ def download_ee_csv(downloadUrl):
 
 
 def entryToDB(
-    data, table_name, reach_name, connection, date_col="date", value_col="value"
+    data, table_name, reach_name, connection, date_col="date", value_col="value", entry_key={'Date': None, 'ReachID': None, 'LandTempC': None, 'WaterTempC': None, 'NDVI': None}
 ):
     data = data.copy()
-    data[date_col] = pd.to_datetime(data[date_col])
-    data = data[[date_col, value_col]]
-    data = data.dropna()
+    data[entry_key['Date']] = pd.to_datetime(data[entry_key['Date']])
+    data = data[[value for value in entry_key.values() if value]]
+    data = data.dropna(how='all', subset=[value for value in entry_key.values() if value!=entry_key['Date']])
     # data = data[data[value_col] != -9999]
-    data = data.sort_values(by=date_col)
+    data = data.sort_values(by=entry_key['Date'])
+    data = data.fillna('NULL')
+
+    # data.to_csv('data.csv')
+    # print(', '.join([str(value) for value in entry_key.values() if value!=entry_key['Date']]))
 
     cursor = connection.cursor()
 
     for i, row in data.iterrows():
+        # print(', '.join([str(row[value]) for value in entry_key.values() if value!=entry_key['Date']]))
         query = f"""
-        INSERT INTO {table_name} (Date, ReachID, Value)
-        SELECT '{row[date_col]}', (SELECT ReachID FROM Reaches WHERE Name = "{reach_name}"), {row[value_col]}
-        WHERE NOT EXISTS (SELECT * FROM {table_name} WHERE Date = '{row[date_col]}' AND ReachID = (SELECT ReachID FROM Reaches WHERE Name = "{reach_name}"))
+        INSERT INTO {table_name} (Date, ReachID, {', '.join([str(key) for key in entry_key.keys() if key!='Date'])})
+        SELECT '{row[entry_key['Date']]}', (SELECT ReachID FROM Reaches WHERE Name = "{reach_name}"), {', '.join([str(row[value]) for value in entry_key.values() if value!=entry_key['Date']])}
+        WHERE NOT EXISTS (SELECT * FROM {table_name} WHERE Date = '{row[entry_key['Date']]}' AND ReachID = (SELECT ReachID FROM Reaches WHERE Name = "{reach_name}"))
         """
 
         cursor.execute(query)
@@ -585,32 +590,39 @@ def reachwiseExtraction(
     #     data_dir / "reaches" / f"{reach_id}.csv", index=False
     # )
 
-    # land temp
+    # # land temp
+    # entryToDB(
+    #     dataSeries_df,
+    #     "ReachLandsatLandTemp",
+    #     reach_id,
+    #     connection,
+    #     date_col="date",
+    #     value_col="landtemp(C)",
+    # )
+    # # water temp
+    # entryToDB(
+    #     dataSeries_df,
+    #     "ReachLandsatWaterTemp",
+    #     reach_id,
+    #     connection,
+    #     date_col="date",
+    #     value_col="watertemp(C)",
+    # )
+    # # NDVI
+    # entryToDB(
+    #     dataSeries_df,
+    #     "ReachNDVI",
+    #     reach_id,
+    #     connection,
+    #     date_col="date",
+    #     value_col="NDVI",
+    # )
     entryToDB(
         dataSeries_df,
-        "ReachLandsatLandTemp",
+        "ReachLandsatData",
         reach_id,
         connection,
-        date_col="date",
-        value_col="landtemp(C)",
-    )
-    # water temp
-    entryToDB(
-        dataSeries_df,
-        "ReachLandsatWaterTemp",
-        reach_id,
-        connection,
-        date_col="date",
-        value_col="watertemp(C)",
-    )
-    # NDVI
-    entryToDB(
-        dataSeries_df,
-        "ReachNDVI",
-        reach_id,
-        connection,
-        date_col="date",
-        value_col="NDVI",
+        entry_key={'Date': 'date', 'LandTempC': 'landtemp(C)', 'WaterTempC': 'watertemp(C)', 'NDVI': 'NDVI'}
     )
 
 
