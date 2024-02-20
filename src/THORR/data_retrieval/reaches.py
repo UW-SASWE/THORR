@@ -158,13 +158,15 @@ def validate_start_end_dates(start_date, end_date, logger=None):
         else:
             print("End date cannot be greater than today's date!")
         raise Exception("End date cannot be greater than today's date!")
-    
+
     # convert the start date to the first day of the month
     start_date_ = start_date_.replace(day=1)
 
     # convert the end date to the last day of the month
     first_day_of_next_month = end_date_.replace(day=28) + datetime.timedelta(days=4)
-    end_date_ = first_day_of_next_month - datetime.timedelta(days=first_day_of_next_month.day)
+    end_date_ = first_day_of_next_month - datetime.timedelta(
+        days=first_day_of_next_month.day
+    )
 
     # format dates as strings
     start_date = start_date_.strftime("%Y-%m-%d")
@@ -365,13 +367,22 @@ def extractTempSeries(
 
         # get the mean temperature of the reache
         watertemp = meanL8water.select(["Celcius_mean"]).reduceRegion(
-            reducer=ee.Reducer.mean(), geometry=reach.geometry(), scale=30
+            reducer=ee.Reducer.median(),
+            # reducer=ee.Reducer.mean(),
+            geometry=reach.geometry(),
+            scale=30,
         )
         landtemp = meanL8nonwater.select(["Celcius_mean"]).reduceRegion(
-            reducer=ee.Reducer.mean(), geometry=reach.geometry(), scale=30
+            reducer=ee.Reducer.median(),
+            # reducer=ee.Reducer.mean(),
+            geometry=reach.geometry(),
+            scale=30,
         )
         ndvi = meanL8nonwater.select(["NDVI_mean"]).reduceRegion(
-            reducer=ee.Reducer.mean(), geometry=reach.geometry(), scale=30
+            reducer=ee.Reducer.median(),
+            # reducer=ee.Reducer.mean(),
+            geometry=reach.geometry(),
+            scale=30,
         )
 
         return ee.Feature(
@@ -881,6 +892,8 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--config", type=str, help="path to config file", required=True)
+    parser.add_argument(
+        "-c", "--config", type=str, help="path to config file", required=True
+    )
 
     main(args=parser.parse_args())
