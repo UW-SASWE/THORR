@@ -558,7 +558,7 @@ def reachwiseExtraction(
         # landTempSeriesList.append(landTempSeries)
         dataSeriesList.append(dataSeries)
 
-        s_time = randint(5, 10)
+        s_time = randint(3, 8)
         time.sleep(s_time)
 
     # concatenate all time series
@@ -777,7 +777,7 @@ def get_reach_data(
             else:
                 print(f"Error: {e}")
             # sleep for 0.5 - 3 minutes
-            s_time = randint(30, 120)
+            s_time = randint(15, 45)
             if logger is not None:
                 logger.info(f"Sleeping for {s_time} seconds...")
             else:
@@ -792,7 +792,7 @@ def get_reach_data(
             repeated_tries += 1  # increment repeated_tries
 
             # if repeated_tries > 3, increment river_index and reset reach_index
-            if repeated_tries > 3:
+            if repeated_tries > 5:
                 checkpoint["reach_index"] += 1
                 current_river = reaches_gdf["GNIS_Name"].unique()[
                     checkpoint["river_index"]
