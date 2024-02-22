@@ -301,6 +301,41 @@ def addCelcius(image):
 
     return image.addBands(celcius)
 
+def prepL4(image):
+
+    # develop masks for unwanted pixels (fill, cloud, shadow)
+    qa_mask = image.select("QA_PIXEL").bitwiseAnd(int("11111", 2)).eq(0)
+    saturation_mask = image.select("QA_RADSAT").eq(0)
+
+    # apply scaling factors to the appropriate bands
+    opticalBands = image.select('SR_B.').multiply(0.0000275).add(-0.2)
+    thermalBand = image.select('ST_B6').multiply(0.00341802).add(149.0)
+
+
+    # replace original bands with scaled bands and apply masks
+    return (
+        image.addBands(opticalBands, overwrite=True)
+        .addBands(thermalBand, overwrite=True)
+        .updateMask(qa_mask)
+        .updateMask(saturation_mask)
+    )
+
+def addL4NDVI(image):
+
+    # ndvi = image.expression(
+    #     "NDVI = (NIR - red)/(NIR + red)",
+    #     {"red": image.select("SR_B4"), "NIR": image.select("SR_B5")},
+    # ).rename("NDVI")
+
+    ndvi = image.normalizedDifference(["SR_B4", "SR_B3"]).rename("NDVI")
+
+    return image.addBands(ndvi)
+
+def addL4Celcius(image):
+    celcius = image.select("ST_B6").subtract(273.15).rename("Celcius")
+
+    return image.addBands(celcius)
+
 
 def extractTempSeries(
     reach,
@@ -407,6 +442,87 @@ def extractTempSeries(
 
     return dataSeries
 
+def extractL4TempSeries(
+    reach,
+    startDate,
+    endDate,
+    # ndwi_threshold=0.2,
+    imageCollection="LANDSAT/LT04/C02/T1_L2",
+):
+    L4 = (
+        ee.ImageCollection(imageCollection)
+        .filterDate(startDate, endDate)
+        .filterBounds(reach)
+        .filter(ee.Filter.eq("PROCESSING_LEVEL", "L2SP"))
+    )
+
+    def extractData(date):
+        date = ee.Date(date)
+
+        processedL4 = (
+            L4.filterDate(date, date.advance(1, "day"))
+            .map(prepL4)
+            .map(addL4Celcius)
+            .map(addL4NDVI)
+        )
+
+        mosaic = processedL4.mosaic()
+        waterMask = mosaic.select("QA_PIXEL").bitwiseAnd(int("10000000", 2)).neq(0)
+        nonWaterMask = mosaic.select("QA_PIXEL").bitwiseAnd(int("10000000", 2)).eq(0)
+
+        # find the mean of the images in the collection
+        meanL4water = (
+            processedL4.reduce(ee.Reducer.mean())
+            # .addBands(ndwi, ["NDWI"], True)
+            .updateMask(waterMask).set("system:time_start", date)
+        )
+        meanL4nonwater = (
+            processedL4.reduce(ee.Reducer.mean())
+            # .addBands(ndwi, ["NDWI"], True)
+            .updateMask(nonWaterMask).set("system:time_start", date)
+        )
+
+        # get the mean temperature of the reache
+        watertemp = meanL4water.select(["Celcius_mean"]).reduceRegion(
+            reducer=ee.Reducer.median(),
+            # reducer=ee.Reducer.mean(),
+            geometry=reach.geometry(),
+            scale=30,
+        )
+        landtemp = meanL4nonwater.select(["Celcius_mean"]).reduceRegion(
+            reducer=ee.Reducer.median(),
+            # reducer=ee.Reducer.mean(),
+            geometry=reach.geometry(),
+            scale=30,
+        )
+        ndvi = meanL4nonwater.select(["NDVI_mean"]).reduceRegion(
+            reducer=ee.Reducer.median(),
+            # reducer=ee.Reducer.mean(),
+            geometry=reach.geometry(),
+            scale=30,
+        )
+
+        return ee.Feature(
+            None,
+            {
+                "date": date.format("YYYY-MM-dd"),
+                "watertemp(C)": watertemp,
+                "landtemp(C)": landtemp,
+                "NDVI": ndvi,
+            },
+        )
+
+    dates = ee.List(
+        L4.map(
+            lambda image: ee.Feature(None, {"date": image.date().format("YYYY-MM-dd")})
+        )
+        .distinct("date")
+        .aggregate_array("date")
+    )
+
+    dataSeries = ee.FeatureCollection(dates.map(extractData))
+
+    return dataSeries
 
 def ee_to_df(featureCollection):
     """
@@ -518,45 +634,69 @@ def reachwiseExtraction(
         # )
         # waterTempSeries = geemap.ee_to_pandas(waterTempSeries)
         # landTempSeries = geemap.ee_to_pandas(landTempSeries)
-        dataSeries = extractTempSeries(
-            reach,
-            startDate_,
-            endDate_,
-            # ndwi_threshold,
-            imageCollection,
-        )
+        
+        match imageCollection:
+            case "LANDSAT/LC09/C02/T1_L2" | "LANDSAT/LC08/C02/T1_L2":
+                dataSeries = extractTempSeries(
+                    reach,
+                    startDate_,
+                    endDate_,
+                    # ndwi_threshold,
+                    imageCollection,
+                )
+            case "LANDSAT/LT04/C02/T1_L2" | "LANDSAT/LT05/C02/T1_L2" | "LANDSAT/LE07/C02/T1_L2":
+                dataSeries = extractL4TempSeries(
+                    reach,
+                    startDate_,
+                    endDate_,
+                    # ndwi_threshold,
+                    imageCollection,
+                )
+            case _:
+                pass
+
+
+        # dataSeries = extractTempSeries(
+        #     reach,
+        #     startDate_,
+        #     endDate_,
+        #     # ndwi_threshold,
+        #     imageCollection,
+        # )
         dataSeries = geemap.ee_to_gdf(dataSeries)
+        if not dataSeries.empty:
+            # print(dataSeries.head())
 
-        # convert date column to datetime
-        # waterTempSeries["date"] = pd.to_datetime(waterTempSeries["date"])
-        # landTempSeries["date"] = pd.to_datetime(landTempSeries["date"])
-        dataSeries["date"] = pd.to_datetime(dataSeries["date"])
+            # convert date column to datetime
+            # waterTempSeries["date"] = pd.to_datetime(waterTempSeries["date"])
+            # landTempSeries["date"] = pd.to_datetime(landTempSeries["date"])
+            dataSeries["date"] = pd.to_datetime(dataSeries["date"])
 
-        # waterTempSeries["temp(C)"] = (
-        #     waterTempSeries["temp(C)"]
-        #     .apply(lambda x: x["Celcius_mean"])
-        #     .astype(float)
-        # )
-        # landTempSeries["temp(C)"] = (
-        #     landTempSeries["temp(C)"]
-        #     .apply(lambda x: x["Celcius_mean"])
-        #     .astype(float)
-        # )
+            # waterTempSeries["temp(C)"] = (
+            #     waterTempSeries["temp(C)"]
+            #     .apply(lambda x: x["Celcius_mean"])
+            #     .astype(float)
+            # )
+            # landTempSeries["temp(C)"] = (
+            #     landTempSeries["temp(C)"]
+            #     .apply(lambda x: x["Celcius_mean"])
+            #     .astype(float)
+            # )
 
-        dataSeries["watertemp(C)"] = (
-            dataSeries["watertemp(C)"].apply(lambda x: x["Celcius_mean"]).astype(float)
-        )
-        dataSeries["landtemp(C)"] = (
-            dataSeries["landtemp(C)"].apply(lambda x: x["Celcius_mean"]).astype(float)
-        )
-        dataSeries["NDVI"] = (
-            dataSeries["NDVI"].apply(lambda x: x["NDVI_mean"]).astype(float)
-        )
+            dataSeries["watertemp(C)"] = (
+                dataSeries["watertemp(C)"].apply(lambda x: x["Celcius_mean"]).astype(float)
+            )
+            dataSeries["landtemp(C)"] = (
+                dataSeries["landtemp(C)"].apply(lambda x: x["Celcius_mean"]).astype(float)
+            )
+            dataSeries["NDVI"] = (
+                dataSeries["NDVI"].apply(lambda x: x["NDVI_mean"]).astype(float)
+            )
 
-        # append time series to list
-        # waterTempSeriesList.append(waterTempSeries)
-        # landTempSeriesList.append(landTempSeries)
-        dataSeriesList.append(dataSeries)
+            # append time series to list
+            # waterTempSeriesList.append(waterTempSeries)
+            # landTempSeriesList.append(landTempSeries)
+            dataSeriesList.append(dataSeries)
 
         s_time = randint(3, 8)
         time.sleep(s_time)
@@ -617,6 +757,7 @@ def reachwiseExtraction(
     #     date_col="date",
     #     value_col="NDVI",
     # )
+    
     entryToDB(
         dataSeries_df,
         "ReachLandsatData",
@@ -636,6 +777,7 @@ def runExtraction(
     connection=None,
     logger=None,
 ):
+    # print(start_date, end_date)
     if checkpoint_path is None:
         checkpoint = {"river_index": 0, "reach_index": 0}
     else:
@@ -661,39 +803,118 @@ def runExtraction(
             # reach_ids = gdf["reach_id"].tolist()
 
         for reach_id in reach_ids:
-            # Landsat8 Data
-            reachwiseExtraction(
-                reaches,
-                reach_id,
-                max(
-                    datetime.datetime.strptime(start_date, "%Y-%m-%d"),
-                    datetime.datetime.strptime("2013-03-01", "%Y-%m-%d"),
-                ).strftime(
-                    "%Y-%m-%d"
-                ),  # clip the start date to 2021-10-01
-                end_date,
-                # ndwi_threshold,
-                imageCollection="LANDSAT/LC08/C02/T1_L2",
-                checkpoint_path=checkpoint_path,
-                connection=connection,
-            )
-
             # Landsat9 Data
-            reachwiseExtraction(
-                reaches,
-                reach_id,
-                max(
-                    datetime.datetime.strptime(start_date, "%Y-%m-%d"),
-                    datetime.datetime.strptime("2021-10-01", "%Y-%m-%d"),
-                ).strftime(
-                    "%Y-%m-%d"
-                ),  # clip the start date to 2021-10-01
-                end_date,
-                # ndwi_threshold,
-                imageCollection="LANDSAT/LC09/C02/T1_L2",
-                checkpoint_path=checkpoint_path,
-                connection=connection,
-            )
+            if datetime.datetime.strptime(end_date, "%Y-%m-%d") >= datetime.datetime.strptime("2021-10-01", "%Y-%m-%d"):
+                # print("Landsat9")
+                reachwiseExtraction(
+                    reaches,
+                    reach_id,
+                    max(
+                        datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                        datetime.datetime.strptime("2021-10-01", "%Y-%m-%d"),
+                    ).strftime(
+                        "%Y-%m-%d"
+                    ),  # clip the start date to 2021-10-01
+                    end_date,
+                    # ndwi_threshold,
+                    imageCollection="LANDSAT/LC09/C02/T1_L2",
+                    checkpoint_path=checkpoint_path,
+                    connection=connection,
+                )
+
+            # Landsat8 Data
+            if datetime.datetime.strptime(end_date, "%Y-%m-%d") >= datetime.datetime.strptime("2013-03-01", "%Y-%m-%d"):
+                # print("Landsat8")
+                reachwiseExtraction(
+                    reaches,
+                    reach_id,
+                    max(
+                        datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                        datetime.datetime.strptime("2013-03-01", "%Y-%m-%d"),
+                    ).strftime(
+                        "%Y-%m-%d"
+                    ),  # clip the start date to 2021-10-01
+                    end_date,
+                    # ndwi_threshold,
+                    imageCollection="LANDSAT/LC08/C02/T1_L2",
+                    checkpoint_path=checkpoint_path,
+                    connection=connection,
+                )
+
+            # Landsat7 Data
+            # if datetime.datetime.strptime(start_date, "%Y-%m-%d") >= datetime.datetime.strptime("1999-03-01", "%Y-%m-%d") and datetime.datetime.strptime(end_date, "%Y-%m-%d") <= datetime.datetime.strptime("2012-05-31", "%Y-%m-%d"):
+            if datetime.datetime.strptime(start_date, "%Y-%m-%d") < datetime.datetime.strptime("2012-05-31", "%Y-%m-%d") and datetime.datetime.strptime(end_date, "%Y-%m-%d") > datetime.datetime.strptime("1999-03-01", "%Y-%m-%d"):
+                # print("Landsat7")
+                reachwiseExtraction(
+                    reaches,
+                    reach_id,
+                    max(
+                        datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                        datetime.datetime.strptime("1999-03-01", "%Y-%m-%d"),
+                    ).strftime(
+                        "%Y-%m-%d"
+                    ),
+                    min(
+                        datetime.datetime.strptime(end_date, "%Y-%m-%d"),
+                        datetime.datetime.strptime("2012-05-31", "%Y-%m-%d"),
+                    ).strftime(
+                        "%Y-%m-%d"
+                    ),
+                    # ndwi_threshold,
+                    imageCollection="LANDSAT/LE07/C02/T1_L2",
+                    checkpoint_path=checkpoint_path,
+                    connection=connection,
+                )
+
+            # Landsat5 Data
+            # if datetime.datetime.strptime(start_date, "%Y-%m-%d") >= datetime.datetime.strptime("1984-03-01", "%Y-%m-%d") and datetime.datetime.strptime(end_date, "%Y-%m-%d") <= datetime.datetime.strptime("2012-05-31", "%Y-%m-%d"):
+            if datetime.datetime.strptime(start_date, "%Y-%m-%d") < datetime.datetime.strptime("2012-05-31", "%Y-%m-%d") and datetime.datetime.strptime(end_date, "%Y-%m-%d") > datetime.datetime.strptime("1984-03-01", "%Y-%m-%d"):
+                # print("Landsat5")
+                reachwiseExtraction(
+                    reaches,
+                    reach_id,
+                    max(
+                        datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                        datetime.datetime.strptime("1984-03-01", "%Y-%m-%d"),
+                    ).strftime(
+                        "%Y-%m-%d"
+                    ),
+                    min(
+                        datetime.datetime.strptime(end_date, "%Y-%m-%d"),
+                        datetime.datetime.strptime("2012-05-31", "%Y-%m-%d"),
+                    ).strftime(
+                        "%Y-%m-%d"
+                    ),
+                    # ndwi_threshold,
+                    imageCollection="LANDSAT/LT05/C02/T1_L2",
+                    checkpoint_path=checkpoint_path,
+                    connection=connection,
+                )
+
+            # Landsat4 Data
+            # if datetime.datetime.strptime(start_date, "%Y-%m-%d") >= datetime.datetime.strptime("1982-08-01", "%Y-%m-%d") and datetime.datetime.strptime(end_date, "%Y-%m-%d") <= datetime.datetime.strptime("1993-06-30", "%Y-%m-%d"):
+            if datetime.datetime.strptime(start_date, "%Y-%m-%d") < datetime.datetime.strptime("1993-06-30", "%Y-%m-%d") and datetime.datetime.strptime(end_date, "%Y-%m-%d") > datetime.datetime.strptime("1982-08-01", "%Y-%m-%d"):
+                # print("Landsat4")
+                reachwiseExtraction(
+                    reaches,
+                    reach_id,
+                    max(
+                        datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                        datetime.datetime.strptime("1982-08-01", "%Y-%m-%d"),
+                    ).strftime(
+                        "%Y-%m-%d"
+                    ),
+                    min(
+                        datetime.datetime.strptime(end_date, "%Y-%m-%d"),
+                        datetime.datetime.strptime("1993-06-30", "%Y-%m-%d"),
+                    ).strftime(
+                        "%Y-%m-%d"
+                    ),
+                    # ndwi_threshold,
+                    imageCollection="LANDSAT/LT04/C02/T1_L2",
+                    checkpoint_path=checkpoint_path,
+                    connection=connection,
+                )
 
             checkpoint["reach_index"] += 1
             json.dump(checkpoint, open(checkpoint_path, "w"))
