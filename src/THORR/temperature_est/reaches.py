@@ -9,7 +9,6 @@ import pandas as pd
 import geopandas as gpd
 import numpy as np
 import os
-from pathlib import Path
 import time
 from random import randint
 import json
@@ -35,7 +34,7 @@ import datetime
 
 # import tensorflow as tf
 # import HydroErr as he
-import pickle
+from joblib import dump, load
 
 # TODO: use the utils package to read the configuration file
 from configparser import ConfigParser
@@ -199,171 +198,79 @@ def validate_start_end_dates(start_date, end_date, logger=None):
 
 
 def estimate_temperature(
-    start_date,
-    end_date,
+    # start_date,
+    # end_date,
     connection,
-    scalers,  # path to scaler
-    model_var1,  # path to model variation 1
-    model_var2,  # path to model variation 2
-    reaches_and_dams,  # path to reaches and dams csv file
+    model_fn,
 ):
     query = f"""
     SELECT 
-        STR_TO_DATE(CONCAT(Year,
-                        '-',
-                        LPAD(Month, 2, '00'),
-                        '-',
-                        LPAD(DayOfMonth, 2, '00')),
-                '%Y-%m-%d') AS Date,
-        Month,
-        DayOfMonth,
-        ROUND(WaterTemp, 2) as WaterTemp,
-        ROUND(LandTemp, 2) as LandTemp,
-        ROUND(NDVI, 2) as NDVI,
-        ClimateClass,
-        --     ROUND(((watertemp - WaterTemperature) / WaterTemperature),
-        --             2) AS PercentDeviation,
-        --     ROUND((watertemp - WaterTemperature), 2) AS Deviation,
-        Width,
         ReachID,
-        ReachName
-        -- ROUND(InsituTemp, 2) AS InsituTemp
+        Date,
+        LandTempC,
+        WaterTempC,
+        NDVI,
+        Mission,
+        WidthMean,
+        Name,
+        ClimateClass,
+        EstTempC
     FROM
-        (SELECT 
-            IF(DAY(ReachLandsatWaterTemp.date) < 15, 1, 15) AS DayOfMonth,
-                MONTH(ReachLandsatWaterTemp.date) AS Month,
-                YEAR(ReachLandsatWaterTemp.date) AS Year,
-                AVG(ReachLandsatWaterTemp.Value) AS WaterTemp,
-                AVG(ReachLandsatLandTemp.Value) AS LandTemp,
-                AVG(ReachNDVI.Value) AS NDVI,
-                IFNULL(Reaches.WidthMean, 30) AS Width,
-                Reaches.ClimateClass AS ClimateClass,
-                ReachLandsatWaterTemp.ReachID AS ReachID,
-                Reaches.Name AS ReachName
-        FROM
-            ReachLandsatWaterTemp
-        INNER JOIN ReachLandsatLandTemp USING (date , ReachID)
-        INNER JOIN ReachNDVI USING (date , ReachID)
-        INNER JOIN Reaches USING (ReachID)
-        WHERE ReachLandsatWaterTemp.Date > "{start_date}" and ReachLandsatWaterTemp.Date < "{end_date}"
-        GROUP BY DayOfMonth , Month , Year , ClimateClass , ReachID , Width) AS T
-    --     --         INNER JOIN
-    --     --     ReachLandsatLTMSemiMonthly USING (DayOfMonth , Month , ReachID)
-    --         LEFT JOIN
-    --     (SELECT 
-    --         IF(DAY(ReachInsituWaterTemp.date) < 15, 1, 15) AS DayOfMonth,
-    --             MONTH(ReachInsituWaterTemp.date) AS Month,
-    --             YEAR(ReachInsituWaterTemp.date) AS Year,
-    --             AVG(ReachInsituWaterTemp.Value) AS InsituTemp,
-    --             ReachInsituWaterTemp.ReachID AS ReachID
-    --     FROM
-    --         ReachInsituWaterTemp
-    --     INNER JOIN Reaches USING (ReachID)
-    --     WHERE
-    --         ReachInsituWaterTemp.Value > 0
-    --     GROUP BY DayOfMonth , Month , Year , ReachID) AS I USING (DayOfMonth , Month , Year , ReachID)
-    -- ORDER BY RAND();
+        ReachData
+            LEFT JOIN
+        Reaches USING (ReachID)
+    WHERE
+        LandTempC IS NOT NULL
+            AND NDVI IS NOT NULL
+            AND EstTempC IS NULL;
     """
 
     df = connection.query_with_fetchmany(query, chunksize=100)
 
     df["Date"] = pd.to_datetime(df["Date"])
-    df["DayOfYear"] = df["Date"].dt.dayofyear
+    df["DOY"] = df["Date"].dt.dayofyear
+    df[["WidthMean"]] = df[["WidthMean"]].fillna(15)
 
-    # TODO: add reservoir dynamics data. This will require a join with the reservoir dynamics table. Generate data from RAT.
-
-    # dels = pd.read_csv(proj_dir / "Methods/3.WaterTempEst/rat_dels.csv")
-    # dels["Date"] = pd.to_datetime(dels["Date"])
-    # sarea = pd.read_csv(proj_dir / "Methods/3.WaterTempEst/rat_sarea.csv")
-    # sarea["Date"] = pd.to_datetime(sarea["Date"])
-    reaches_and_dams = pd.read_csv(reaches_and_dams)
-
-    # load scalers and model variation 1
-    with open(scalers, "rb") as f:
-        scalers = pickle.load(f)
-
-        dayofmonth_scaler = scalers["dayofmonth_scaler"]
-        month_scaler = scalers["month_scaler"]
-        watertemp_scaler = scalers["watertemp_scaler"]
-        landtemp_scaler = scalers["landtemp_scaler"]
-        width_scaler = scalers["width_scaler"]
-        NDVI_scaler = scalers["NDVI_scaler"]
-        climate_scaler = scalers["climate_scaler"]
-        dels_scaler = scalers["dels_scaler"]
-        sarea_scaler = scalers["sarea_scaler"]
-        rel_dist_scaler = scalers["rel_dist_scaler"]
-
-    with open(model_var1, "rb") as f:
-        model_var1_trained = pickle.load(f)  # trained model variation 1
-
-    # replace missing values for dels, sarea, and rel_dist with the 0
-    # df["dels"].fillna(0, inplace=True)
-    # df["sarea"].fillna(0, inplace=True)
-    # df["rel_dist"].fillna(0, inplace=True)
-
-    # Scale values
-    df["DayOfMonth_scaled"] = dayofmonth_scaler.transform(df[["DayOfMonth"]])
-    df["Month_scaled"] = month_scaler.transform(df[["Month"]])
-    df["LandTemp_scaled"] = landtemp_scaler.transform(df[["LandTemp"]])
-    df["WaterTemp_scaled"] = watertemp_scaler.transform(df[["WaterTemp"]])
-    df["Width_scaled"] = width_scaler.transform(df[["Width"]])
-    df["NDVI_scaled"] = NDVI_scaler.transform(df[["NDVI"]])
-    df["ClimateClass_scaled"] = climate_scaler.transform(df[["ClimateClass"]])
-    # df["dels_scaled"] = dels_scaler.transform(df[["dels"]])
-    # df["sarea_scaled"] = sarea_scaler.transform(df[["sarea"]])
-    # df["rel_dist_scaled"] = rel_dist_scaler.transform(df[["rel_dist"]])
-
-    # X and y to be used for prediction
-    X = df[
-        [
-            "DayOfMonth_scaled",
-            "Month_scaled",
-            "LandTemp_scaled",
-            "Width_scaled",
-            "NDVI_scaled",
-            "ClimateClass_scaled",
-            # "dels_scaled",
-            # "sarea_scaled",
-            # "rel_dist_scaled",
-        ]
+    features = [
+        "NDVI",
+        "LandTempC",
+        "ClimateClass",
+        "DOY",
+        "WidthMean",
     ]
-    df["est1"] = model_var1_trained.predict(X)
-    df.sort_values(by=['ReachID', 'Date'], inplace=True)
+
+    rfr = load(model_fn)
+
+
+    df['EstTempC'] = rfr.predict(df[features])
+
 
     # insert estimates into database
     cursor = connection.conn.cursor()
 
-    # done = []
+    # Insert basin data into the table if the entry doesn't already exist
     for i, row in df.iterrows():
+        
         query = f"""
-        INSERT INTO ReachEstimatedWaterTemp (Date, ReachID, Value, Tag)
-        SELECT '{row['Date'].date()}', (SELECT ReachID FROM Reaches WHERE ReachID = {row['ReachID']}), {row['est1']}, "SM"
-        WHERE NOT EXISTS (SELECT * FROM ReachEstimatedWaterTemp WHERE Date = '{row['Date'].date()}' AND ReachID = {row['ReachID']}  AND Tag = "SM");
+        UPDATE `ReachData` 
+        SET 
+            `EstTempC` = {round(row['EstTempC'], 2)}
+        WHERE
+            (`ReachID` = (SELECT 
+            ReachID
+        FROM
+            Reaches
+        WHERE
+            Name = '{row['Name']}'))
+                AND (`Date` = '{row['Date']}');
         """
+
+        cursor.execute(query)
+        connection.conn.commit()
 
         # print(query)
         # break
 
-        cursor.execute(query)
-        connection.conn.commit()
-
-        query = f"""
-        UPDATE ReachEstimatedWaterTemp
-        SET Value = {row['est1']}
-        WHERE Date = '{row['Date']}' AND ReachID = {row['ReachID']} AND Tag = "SM";
-        """
-
-        cursor.execute(query)
-        connection.conn.commit()
-
-        # print(row['ReachID'], row['Date'])
-        # if i not in done:
-        #     done.append(i)
-        #     print(row['ReachID'], "complete")
-
-        # break
-
-    #TODO: add model variation 2
 
 def main(args):
     config_path = Path(args.config)
@@ -434,13 +341,8 @@ def main(args):
     # logger.info("Getting reservoir data...")
 
     estimate_temperature(
-        start_date=start_date,
-        end_date=end_date,
         connection=connection,
-        scalers=Path(project_dir, config_dict["ml"]["scalers"]),
-        model_var1=Path(project_dir, config_dict["ml"]["model_var1"]),
-        model_var2=Path(project_dir, config_dict["ml"]["model_var2"]),
-        reaches_and_dams=Path(project_dir, config_dict["data"]["reaches_and_dams"]),
+        model_fn=Path(project_dir, config_dict["ml"]["model_fn"])
     )
 
 
