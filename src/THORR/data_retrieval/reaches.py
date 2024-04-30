@@ -798,7 +798,8 @@ def reachwiseExtraction(
 
     entryToDB(
         dataSeries_df,
-        "ReachLandsatData",
+        # "ReachLandsatData",
+        "ReachData",
         reach_id,
         connection,
         entry_key={
