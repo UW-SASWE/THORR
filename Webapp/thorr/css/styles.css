@@ -1,0 +1,57 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css");
+
+#mini-sidebar.collapsing {
+  -webkit-transition: height 0.3s ease;
+  -o-transition: height 0.3s ease;
+  transition: None;
+}
+
+.collapse.width {
+  height: auto;
+  -webkit-transition: width 0.35s ease;
+  -moz-transition: width 0.35s ease;
+  -o-transition: width 0.35s ease;
+  transition: width 0.35s ease;
+}
+
+#info-panel.show{
+  height: 40vh;
+}
+
+#main {
+  position: relative;
+}
+
+/* .chart-container {
+  height: 245px;
+  width: 245px;
+} */
+/* 
+#map{
+  height: 600px;
+} */
+
+.info {
+  padding: 6px 8px;
+  font: 14px/16px Arial, Helvetica, sans-serif;
+  background: white;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+.info h4 {
+  margin: 0 0 5px;
+  color: #777;
+}
+.legend {
+  text-align: left;
+  line-height: 18px;
+  color: #555;
+}
+.legend i {
+  width: 32px;
+  height: 18px;
+  float: left;
+  margin-right: 8px;
+  opacity: 0.9;
+}

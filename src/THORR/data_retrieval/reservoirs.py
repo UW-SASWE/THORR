@@ -6,6 +6,7 @@ import geemap
 import ee
 from pathlib import Path
 import pandas as pd
+import geopandas as gpd
 import os
 from pathlib import Path
 import time
@@ -157,13 +158,15 @@ def validate_start_end_dates(start_date, end_date, logger=None):
         else:
             print("End date cannot be greater than today's date!")
         raise Exception("End date cannot be greater than today's date!")
-    
+
     # convert the start date to the first day of the month
     start_date_ = start_date_.replace(day=1)
 
     # convert the end date to the last day of the month
     first_day_of_next_month = end_date_.replace(day=28) + datetime.timedelta(days=4)
-    end_date_ = first_day_of_next_month - datetime.timedelta(days=first_day_of_next_month.day)
+    end_date_ = first_day_of_next_month - datetime.timedelta(
+        days=first_day_of_next_month.day
+    )
 
     # format dates as strings
     start_date = start_date_.strftime("%Y-%m-%d")
@@ -255,6 +258,31 @@ def prepL8(image):
     )
 
 
+def addNDVI(image):
+    """
+    Add NDVI band to image
+
+    Parameters:
+    -----------
+    image: ee.Image
+        Landsat 8 image
+
+    Returns:
+    --------
+    ee.Image
+        Landsat 8 image with NDVI band
+    """
+
+    # ndvi = image.expression(
+    #     "NDVI = (NIR - red)/(NIR + red)",
+    #     {"red": image.select("SR_B4"), "NIR": image.select("SR_B5")},
+    # ).rename("NDVI")
+
+    ndvi = image.normalizedDifference(["SR_B5", "SR_B4"]).rename("NDVI")
+
+    return image.addBands(ndvi)
+
+
 def addCelcius(image):
     """
     Add Celcius band to image
@@ -274,12 +302,50 @@ def addCelcius(image):
     return image.addBands(celcius)
 
 
+def prepL4(image):
+
+    # develop masks for unwanted pixels (fill, cloud, shadow)
+    qa_mask = image.select("QA_PIXEL").bitwiseAnd(int("11111", 2)).eq(0)
+    saturation_mask = image.select("QA_RADSAT").eq(0)
+
+    # apply scaling factors to the appropriate bands
+    opticalBands = image.select("SR_B.").multiply(0.0000275).add(-0.2)
+    thermalBand = image.select("ST_B6").multiply(0.00341802).add(149.0)
+
+    # replace original bands with scaled bands and apply masks
+    return (
+        image.addBands(opticalBands, overwrite=True)
+        .addBands(thermalBand, overwrite=True)
+        .updateMask(qa_mask)
+        .updateMask(saturation_mask)
+    )
+
+
+def addL4NDVI(image):
+
+    # ndvi = image.expression(
+    #     "NDVI = (NIR - red)/(NIR + red)",
+    #     {"red": image.select("SR_B4"), "NIR": image.select("SR_B5")},
+    # ).rename("NDVI")
+
+    ndvi = image.normalizedDifference(["SR_B4", "SR_B3"]).rename("NDVI")
+
+    return image.addBands(ndvi)
+
+
+def addL4Celcius(image):
+    celcius = image.select("ST_B6").subtract(273.15).rename("Celcius")
+
+    return image.addBands(celcius)
+
+
 def extractTempSeries(
-    reservoir,
+    dam,
     startDate,
     endDate,
     # ndwi_threshold=0.2,
     imageCollection="LANDSAT/LC08/C02/T1_L2",
+    dam_id=None,  # TODO: take this out
 ):
     """
     Extract temperature time series for a reservoir
@@ -302,16 +368,17 @@ def extractTempSeries(
     L8 = (
         ee.ImageCollection(imageCollection)
         .filterDate(startDate, endDate)
-        .filterBounds(reservoir)
+        .filterBounds(dam)
     )
 
-    def extractTemp(date):
+    def extractData(date):
         date = ee.Date(date)
         # prepare Landsat 8 image and add the NDWI band, and Celcius band
         processedL8 = (
             L8.filterDate(date, date.advance(1, "day"))
             .map(prepL8)
             .map(addCelcius)
+            .map(addNDVI)
             # .map(addNDWI)
         )
 
@@ -325,18 +392,46 @@ def extractTempSeries(
         nonWaterMask = mosaic.select("QA_PIXEL").bitwiseAnd(int("10000000", 2)).eq(0)
 
         # find the mean of the images in the collection
-        meanL8 = (
+        meanL8water = (
             processedL8.reduce(ee.Reducer.mean())
-            .updateMask(waterMask)
-            .set("system:time_start", date)
-        )
+            # .addBands(ndwi, ["NDWI"], True)
+            .updateMask(waterMask).set("system:time_start", date)
+        ).clip(dam.geometry())
+        # meanL8nonwater = (
+        #     processedL8.reduce(ee.Reducer.mean())
+        #     # .addBands(ndwi, ["NDWI"], True)
+        #     .updateMask(nonWaterMask).set("system:time_start", date)
+        # )
 
-        # get the mean temperature of the reservoir
-        temp = meanL8.select(["Celcius_mean"]).reduceRegion(
-            reducer=ee.Reducer.mean(), geometry=reservoir.geometry(), scale=30
+        # get the mean temperature of the reache
+        watertemp = meanL8water.select(["Celcius_mean"]).reduceRegion(
+            reducer=ee.Reducer.median(),
+            # reducer=ee.Reducer.mean(),
+            geometry=dam.geometry(),
+            scale=30,
         )
+        # landtemp = meanL8nonwater.select(["Celcius_mean"]).reduceRegion(
+        #     reducer=ee.Reducer.median(),
+        #     # reducer=ee.Reducer.mean(),
+        #     geometry=dam.geometry(),
+        #     scale=30,
+        # )
+        # ndvi = meanL8nonwater.select(["NDVI_mean"]).reduceRegion(
+        #     reducer=ee.Reducer.median(),
+        #     # reducer=ee.Reducer.mean(),
+        #     geometry=dam.geometry(),
+        #     scale=30,
+        # )
 
-        return ee.Feature(None, {"date": date.format("YYYY-MM-dd"), "temp(C)": temp})
+        return ee.Feature(
+            None,
+            {
+                "date": date.format("YYYY-MM-dd"),
+                "watertemp(C)": watertemp,
+                # "landtemp(C)": landtemp,
+                # "NDVI": ndvi,
+            },
+        )
 
     dates = ee.List(
         L8.map(
@@ -344,21 +439,392 @@ def extractTempSeries(
         )
         .distinct("date")
         .aggregate_array("date")
+    )
+
+    dataSeries = ee.FeatureCollection(dates.map(extractData))
+
+    return dataSeries
+
+
+def extractL4TempSeries(
+    dam,
+    startDate,
+    endDate,
+    # ndwi_threshold=0.2,
+    imageCollection="LANDSAT/LT04/C02/T1_L2",
+):
+    L4 = (
+        ee.ImageCollection(imageCollection)
+        .filterDate(startDate, endDate)
+        .filterBounds(dam)
+        .filter(ee.Filter.eq("PROCESSING_LEVEL", "L2SP"))
+    )
+
+    def extractData(date):
+        date = ee.Date(date)
+
+        processedL4 = (
+            L4.filterDate(date, date.advance(1, "day"))
+            .map(prepL4)
+            .map(addL4Celcius)
+            .map(addL4NDVI)
+        )
+
+        mosaic = processedL4.mosaic()
+        waterMask = mosaic.select("QA_PIXEL").bitwiseAnd(int("10000000", 2)).neq(0)
+        nonWaterMask = mosaic.select("QA_PIXEL").bitwiseAnd(int("10000000", 2)).eq(0)
+
+        # find the mean of the images in the collection
+        meanL4water = (
+            processedL4.reduce(ee.Reducer.mean())
+            # .addBands(ndwi, ["NDWI"], True)
+            .updateMask(waterMask).set("system:time_start", date)
+        ).clip(dam.geometry())
+        # meanL4nonwater = (
+        #     processedL4.reduce(ee.Reducer.mean())
+        #     # .addBands(ndwi, ["NDWI"], True)
+        #     .updateMask(nonWaterMask).set("system:time_start", date)
+        # )
+
+        # get the mean temperature of the reache
+        watertemp = meanL4water.select(["Celcius_mean"]).reduceRegion(
+            reducer=ee.Reducer.median(),
+            # reducer=ee.Reducer.mean(),
+            geometry=dam.geometry(),
+            scale=30,
+        )
+        # landtemp = meanL4nonwater.select(["Celcius_mean"]).reduceRegion(
+        #     reducer=ee.Reducer.median(),
+        #     # reducer=ee.Reducer.mean(),
+        #     geometry=dam.geometry(),
+        #     scale=30,
+        # )
+        # ndvi = meanL4nonwater.select(["NDVI_mean"]).reduceRegion(
+        #     reducer=ee.Reducer.median(),
+        #     # reducer=ee.Reducer.mean(),
+        #     geometry=dam.geometry(),
+        #     scale=30,
+        # )
+
+        return ee.Feature(
+            None,
+            {
+                "date": date.format("YYYY-MM-dd"),
+                "watertemp(C)": watertemp,
+                # "landtemp(C)": landtemp,
+                # "NDVI": ndvi,
+            },
+        )
+
+    dates = ee.List(
+        L4.map(
+            lambda image: ee.Feature(None, {"date": image.date().format("YYYY-MM-dd")})
+        )
+        .distinct("date")
+        .aggregate_array("date")
+    )
+
+    dataSeries = ee.FeatureCollection(dates.map(extractData))
+
+    return dataSeries
+
+
+def ee_to_df(featureCollection):
+    """
+    Convert an ee.FeatureCollection to a pandas.DataFrame
+
+    Parameters:
+    -----------
+    featureCollection: ee.FeatureCollection
+        feature collection
+
+    Returns:
+    --------
+    pandas.DataFrame
+        dataframe
+    """
+
+    columns = featureCollection.first().propertyNames().getInfo()
+    rows = (
+        featureCollection.reduceColumns(ee.Reducer.toList(len(columns)), columns)
+        .values()
+        .get(0)
         .getInfo()
     )
 
-    tempSeries = ee.FeatureCollection(dates.map(extractTemp))
+    df = pd.DataFrame(rows, columns=columns)
+    df.drop(columns=["system:index"], inplace=True)
 
-    return tempSeries
+    return df
+
+
+def download_ee_csv(downloadUrl):
+    """
+    Download an ee.FeatureCollection as a csv file
+
+    Parameters:
+    -----------
+    downloadUrl: str
+        download url
+
+    Returns:
+    --------
+    pandas.DataFrame
+        dataframe
+    """
+
+    df = pd.read_csv(downloadUrl)
+    df.drop(columns=["system:index", ".geo"], inplace=True)
+
+    return df
+
+
+def entryToDB(
+    data,
+    table_name,
+    dam_name,
+    connection,
+    date_col="date",
+    value_col="value",
+    entry_key={
+        "Date": None,
+        "DamID": None,
+        # "LandTempC": None,
+        "WaterTempC": None,
+        # "NDVI": None,
+        "Mission": None,
+    },
+):
+    data = data.copy()
+    data[entry_key["Date"]] = pd.to_datetime(data[entry_key["Date"]])
+    data = data[[value for value in entry_key.values() if value]]
+    data = data.dropna(
+        how="all",
+        subset=[
+            value
+            for value in entry_key.values()
+            if value not in [entry_key["Date"], entry_key["Mission"]]
+        ],
+    )
+    # data = data[data[value_col] != -9999]
+    data = data.sort_values(by=entry_key["Date"])
+    data = data.fillna("NULL")
+
+    # data.to_csv('data.csv')
+    # print(', '.join([str(value) for value in entry_key.values() if value!=entry_key['Date']]))
+
+    cursor = connection.cursor()
+
+    for i, row in data.iterrows():
+        # print(', '.join([str(row[value]) for value in entry_key.values() if value!=entry_key['Date']]))
+        query = f"""
+        INSERT INTO {table_name} (Date, DamID, {', '.join([str(key) for key in entry_key.keys() if key!='Date'])})
+        SELECT '{row[entry_key['Date']]}', (SELECT DamID FROM Dams WHERE Name = "{dam_name}"), {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
+        WHERE NOT EXISTS (SELECT * FROM {table_name} WHERE Date = '{row[entry_key['Date']]}' AND DamID = (SELECT DamID FROM Dams WHERE Name = "{dam_name}"))
+        """
+
+        cursor.execute(query)
+        connection.commit()
+
+
+def damwiseExtraction(
+    dams,
+    dam_id,
+    startDate,
+    endDate,
+    ndwi_threshold=0.2,
+    imageCollection="LANDSAT/LC09/C02/T1_L2",
+    checkpoint_path=None,
+    connection=None,
+):
+
+    dam_name = " ".join(dam_id.split("_")[1:])
+    # print(dam_name)
+
+    missions = {
+        "LANDSAT/LC09/C02/T1_L2": "L9",
+        "LANDSAT/LC08/C02/T1_L2": "L8",
+        "LANDSAT/LE07/C02/T1_L2": "L7",
+        "LANDSAT/LT05/C02/T1_L2": "L5",
+        "LANDSAT/LT04/C02/T1_L2": "L4",
+    }
+
+    if checkpoint_path is None:
+        checkpoint = {"river_index": 0, "reach_index": 0}
+    else:
+        with open(checkpoint_path, "r") as f:
+            checkpoint = json.load(f)
+
+    dates = divideDates(startDate, endDate)
+    waterTempSeriesList = []
+    landTempSeriesList = []
+
+    dataSeriesList = []
+
+    for date in dates:
+        startDate_ = date[0]
+        endDate_ = date[1]
+
+        dam = dams.filter(ee.Filter.eq("dam_id", ee.String(dam_id)))
+        # waterTempSeries, landTempSeries= extractTempSeries(
+        #     reservoir, startDate_, endDate_, ndwi_threshold, imageCollection
+        # )
+        # waterTempSeries = geemap.ee_to_pandas(waterTempSeries)
+        # landTempSeries = geemap.ee_to_pandas(landTempSeries)
+
+        match imageCollection:
+            case "LANDSAT/LC09/C02/T1_L2" | "LANDSAT/LC08/C02/T1_L2":
+                dataSeries = extractTempSeries(
+                    dam,
+                    startDate_,
+                    endDate_,
+                    # ndwi_threshold,
+                    imageCollection,
+                    dam_id,  # TODO: take this out
+                )
+            case (
+                "LANDSAT/LT04/C02/T1_L2"
+                | "LANDSAT/LT05/C02/T1_L2"
+                | "LANDSAT/LE07/C02/T1_L2"
+            ):
+                dataSeries = extractL4TempSeries(
+                    dam,
+                    startDate_,
+                    endDate_,
+                    # ndwi_threshold,
+                    imageCollection,
+                )
+            case _:
+                pass
+
+        # dataSeries = extractTempSeries(
+        #     reach,
+        #     startDate_,
+        #     endDate_,
+        #     # ndwi_threshold,
+        #     imageCollection,
+        # )
+        dataSeries = geemap.ee_to_gdf(dataSeries)
+        if not dataSeries.empty:
+            # print(dataSeries.head())
+
+            # convert date column to datetime
+            # waterTempSeries["date"] = pd.to_datetime(waterTempSeries["date"])
+            # landTempSeries["date"] = pd.to_datetime(landTempSeries["date"])
+            dataSeries["date"] = pd.to_datetime(dataSeries["date"])
+
+            # waterTempSeries["temp(C)"] = (
+            #     waterTempSeries["temp(C)"]
+            #     .apply(lambda x: x["Celcius_mean"])
+            #     .astype(float)
+            # )
+            # landTempSeries["temp(C)"] = (
+            #     landTempSeries["temp(C)"]
+            #     .apply(lambda x: x["Celcius_mean"])
+            #     .astype(float)
+            # )
+
+            dataSeries["watertemp(C)"] = (
+                dataSeries["watertemp(C)"]
+                .apply(lambda x: x["Celcius_mean"])
+                .astype(float)
+            )
+            # dataSeries["landtemp(C)"] = (
+            #     dataSeries["landtemp(C)"]
+            #     .apply(lambda x: x["Celcius_mean"])
+            #     .astype(float)
+            # )
+            # dataSeries["NDVI"] = (
+            #     dataSeries["NDVI"].apply(lambda x: x["NDVI_mean"]).astype(float)
+            # )
+            dataSeries["Mission"] = missions[imageCollection]
+
+            # append time series to list
+            # waterTempSeriesList.append(waterTempSeries)
+            # landTempSeriesList.append(landTempSeries)
+            dataSeriesList.append(dataSeries)
+
+        s_time = randint(3, 8)
+        time.sleep(s_time)
+
+    # concatenate all time series
+    # waterTempSeries_df = pd.concat(waterTempSeriesList, ignore_index=True)
+    # landTempSeries_df = pd.concat(landTempSeriesList, ignore_index=True)
+    dataSeries_df = pd.concat(dataSeriesList, ignore_index=True)
+
+    # sort by date
+    # waterTempSeries_df.sort_values(by="date", inplace=True)
+    # landTempSeries_df.sort_values(by="date", inplace=True)
+    dataSeries_df.sort_values(by="date", inplace=True)
+    # #drop null values
+    # # waterTempSeries_df.dropna(inplace=True)
+    # # landTempSeries_df.dropna(inplace=True)
+    # dataSeries_df.dropna(inplace=True)
+    # remove duplicates
+    # waterTempSeries_df.drop_duplicates(subset="date", inplace=True)
+    # landTempSeries_df.drop_duplicates(subset="date", inplace=True)
+    dataSeries_df.drop_duplicates(subset="date", inplace=True)
+
+    # save time series to csv
+    # waterTempSeries_df.to_csv(
+    #     data_dir / "reaches" / f"{reach_id}_watertemp.csv", index=False
+    # )
+    # landTempSeries_df.to_csv(
+    #     data_dir / "reaches" / f"{reach_id}_landtemp.csv", index=False
+    # )
+    # print(dataSeries_df.head())
+    # dataSeries_df.to_csv(
+    #     data_dir / "reservoir" / f"{reach_id}.csv", index=False
+    # )
+
+    # # land temp
+    # entryToDB(
+    #     dataSeries_df,
+    #     "ReachLandsatLandTemp",
+    #     reach_id,
+    #     connection,
+    #     date_col="date",
+    #     value_col="landtemp(C)",
+    # )
+    # # water temp
+    # entryToDB(
+    #     dataSeries_df,
+    #     "ReachLandsatWaterTemp",
+    #     reach_id,
+    #     connection,
+    #     date_col="date",
+    #     value_col="watertemp(C)",
+    # )
+    # # NDVI
+    # entryToDB(
+    #     dataSeries_df,
+    #     "ReachNDVI",
+    #     reach_id,
+    #     connection,
+    #     date_col="date",
+    #     value_col="NDVI",
+    # )
+
+    entryToDB(
+        dataSeries_df,
+        "DamData",
+        dam_name,
+        connection,
+        entry_key={
+            "Date": "date",
+            # "LandTempC": "landtemp(C)",
+            "WaterTempC": "watertemp(C)",
+            # "NDVI": "NDVI",
+            "Mission": "Mission",
+        },
+    )
 
 
 def runExtraction(
     data_dir,
-    uniq_ids,
-    dam_names,
+    reservoirs_gdf,
     start_date,
     end_date,
-    reservoirs,
     checkpoint_path=None,
     connection=None,
     logger=None,
@@ -369,115 +835,152 @@ def runExtraction(
         with open(checkpoint_path, "r") as f:
             checkpoint = json.load(f)
 
-    uniq_ids_ = uniq_ids[checkpoint["reservoir_index"] :]
-    dam_names_ = dam_names[checkpoint["reservoir_index"] :]
+    # unique_rivers = rivers[checkpoint["river_index"] :]
 
-    for dam_name, uniq_id in zip(dam_names_, uniq_ids_):
-        tempSeriesList = []
+    # for river in unique_rivers:
+    reservoirs_gdf.to_file(data_dir / "reservoirs" / "reservoirs.shp")
+    dam_ids = reservoirs_gdf["dam_id"].tolist()
+    dam_names = reservoirs_gdf["DAM_NAME"].tolist()
+    dam_ids = dam_ids[checkpoint["reservoir_index"] :]
 
-        # check if file exists
-        if os.path.isfile(data_dir / "reservoirs" / f"{uniq_id}.csv"):
-            existing_df = pd.read_csv(data_dir / "reservoirs" / f"{uniq_id}.csv")
-            existing_df["date"] = pd.to_datetime(existing_df["date"])
-            tempSeriesList.append(existing_df)
-            # print("File exists!")
+    dams = geemap.shp_to_ee(data_dir / "reservoirs" / "reservoirs.shp")
 
-        # for landsat8
-        dates = divideDates(start_date, end_date)
-        # dates = divideDates(L8startDate, L8endDate)
-        for date in dates:
-            startDate_ = date[0]
-            endDate_ = date[1]
+    # if reach_ids is None:
+    #     ee_reach_ids = reaches.select("reach_id", retainGeometry=False).getInfo()
+    #     reach_ids = [i["properties"]["reach_id"] for i in ee_reach_ids["features"]][
+    #         checkpoint["reach_index"] :
+    #     ]
+    #     # reach_ids = gdf["reach_id"].tolist()
 
-            reservoir = reservoirs.filter(ee.Filter.eq("DAM_NAME", ee.String(dam_name)))
-            tempSeries = extractTempSeries(
-                reservoir,
-                startDate_,
-                endDate_,
-                # ndwi_threshold,
-                imageCollection="LANDSAT/LC08/C02/T1_L2",
-            )
-            tempSeries = geemap.ee_to_gdf(tempSeries)
-
-            # convert date column to datetime
-            tempSeries["date"] = pd.to_datetime(tempSeries["date"])
-            tempSeries["temp(C)"] = (
-                tempSeries["temp(C)"].apply(lambda x: x["Celcius_mean"]).astype(float)
-            )
-
-            # append time series to list
-            tempSeriesList.append(tempSeries)
-
-        # for landsat9
-        # dates = divideDates(startDate, endDate)
-        # dates = divideDates(L9startDate, L9endDate)
-        for date in dates:
-            startDate_ = date[0]
-            endDate_ = date[1]
-
-            reservoir = reservoirs.filter(ee.Filter.eq("DAM_NAME", ee.String(dam_name)))
-            tempSeries = extractTempSeries(
-                reservoir,
-                startDate_,
-                endDate_,
+    for dam_name, dam_id in zip(dam_names, dam_ids):
+        # Landsat9 Data
+        if datetime.datetime.strptime(
+            end_date, "%Y-%m-%d"
+        ) >= datetime.datetime.strptime("2021-10-01", "%Y-%m-%d"):
+            # print("Landsat9")
+            damwiseExtraction(
+                dams=dams,
+                dam_id=dam_id,
+                startDate=max(
+                    datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                    datetime.datetime.strptime("2021-10-01", "%Y-%m-%d"),
+                ).strftime(
+                    "%Y-%m-%d"
+                ),  # clip the start date to 2021-10-01
+                endDate=end_date,
                 # ndwi_threshold,
                 imageCollection="LANDSAT/LC09/C02/T1_L2",
-            )
-            tempSeries = geemap.ee_to_gdf(tempSeries)
-
-            # convert date column to datetime
-            tempSeries["date"] = pd.to_datetime(tempSeries["date"])
-            tempSeries["temp(C)"] = (
-                tempSeries["temp(C)"].apply(lambda x: x["Celcius_mean"]).astype(float)
+                checkpoint_path=checkpoint_path,
+                connection=connection,
             )
 
-            # append time series to list
-            tempSeriesList.append(tempSeries)
+        # Landsat8 Data
+        if datetime.datetime.strptime(
+            end_date, "%Y-%m-%d"
+        ) >= datetime.datetime.strptime("2013-03-01", "%Y-%m-%d"):
+            # print("Landsat8")
+            damwiseExtraction(
+                dams,
+                dam_id,
+                max(
+                    datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                    datetime.datetime.strptime("2013-03-01", "%Y-%m-%d"),
+                ).strftime(
+                    "%Y-%m-%d"
+                ),  # clip the start date to 2021-10-01
+                end_date,
+                # ndwi_threshold,
+                imageCollection="LANDSAT/LC08/C02/T1_L2",
+                checkpoint_path=checkpoint_path,
+                connection=connection,
+            )
 
-        # concatenate all time series
-        tempSeries_df = pd.concat(tempSeriesList, ignore_index=True)
+        # Landsat7 Data
+        # if datetime.datetime.strptime(start_date, "%Y-%m-%d") >= datetime.datetime.strptime("1999-03-01", "%Y-%m-%d") and datetime.datetime.strptime(end_date, "%Y-%m-%d") <= datetime.datetime.strptime("2012-05-31", "%Y-%m-%d"):
+        if datetime.datetime.strptime(
+            start_date, "%Y-%m-%d"
+        ) < datetime.datetime.strptime(
+            "2024-01-31", "%Y-%m-%d"
+        ) and datetime.datetime.strptime(
+            end_date, "%Y-%m-%d"
+        ) > datetime.datetime.strptime(
+            "1999-05-01", "%Y-%m-%d"
+        ):
+            # print("Landsat7")
+            damwiseExtraction(
+                dams,
+                dam_id,
+                max(
+                    datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                    datetime.datetime.strptime("1999-05-01", "%Y-%m-%d"),
+                ).strftime("%Y-%m-%d"),
+                min(
+                    datetime.datetime.strptime(end_date, "%Y-%m-%d"),
+                    datetime.datetime.strptime("2024-01-31", "%Y-%m-%d"),
+                ).strftime("%Y-%m-%d"),
+                # ndwi_threshold,
+                imageCollection="LANDSAT/LE07/C02/T1_L2",
+                checkpoint_path=checkpoint_path,
+                connection=connection,
+            )
 
-        # sort by date
-        tempSeries_df.sort_values(by="date", inplace=True)
-        # remove duplicates
-        tempSeries_df.drop_duplicates(subset="date", inplace=True)
-        # drop geometry column
-        tempSeries_df.drop(columns=["geometry"], inplace=True)
+        # Landsat5 Data
+        # if datetime.datetime.strptime(start_date, "%Y-%m-%d") >= datetime.datetime.strptime("1984-03-01", "%Y-%m-%d") and datetime.datetime.strptime(end_date, "%Y-%m-%d") <= datetime.datetime.strptime("2012-05-31", "%Y-%m-%d"):
+        if datetime.datetime.strptime(
+            start_date, "%Y-%m-%d"
+        ) < datetime.datetime.strptime(
+            "2012-05-31", "%Y-%m-%d"
+        ) and datetime.datetime.strptime(
+            end_date, "%Y-%m-%d"
+        ) > datetime.datetime.strptime(
+            "1984-03-01", "%Y-%m-%d"
+        ):
+            # print("Landsat5")
+            damwiseExtraction(
+                dams,
+                dam_id,
+                max(
+                    datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                    datetime.datetime.strptime("1984-03-01", "%Y-%m-%d"),
+                ).strftime("%Y-%m-%d"),
+                min(
+                    datetime.datetime.strptime(end_date, "%Y-%m-%d"),
+                    datetime.datetime.strptime("2012-05-31", "%Y-%m-%d"),
+                ).strftime("%Y-%m-%d"),
+                # ndwi_threshold,
+                imageCollection="LANDSAT/LT05/C02/T1_L2",
+                checkpoint_path=checkpoint_path,
+                connection=connection,
+            )
 
-        # # save time series to csv
-        # tempSeries_df.to_csv(data_dir / "reservoirs" / f"{uniq_id}.csv", index=False)
-
-        cursor = connection.cursor()
-
-        data = tempSeries_df.dropna(subset=["temp(C)"]).copy()
-
-        # convert the date column to datetime YYYY-MM-DD
-        data["date"] = pd.to_datetime(data["date"])
-        data["date"] = data["date"].dt.date
-
-        for i, row in data.iterrows():
-            query = f"""
-            INSERT INTO DamLandsatWaterTemp (Date, DamID, Value)
-            SELECT '{row['date']}', (SELECT DamID FROM Dams WHERE Name = "{dam_name}"), {row['temp(C)']}
-            WHERE NOT EXISTS (SELECT * FROM DamLandsatWaterTemp WHERE Date = '{row['date']}' AND DamID = (SELECT DamID FROM Dams WHERE Name = "{dam_name}"))
-            """
-            try:
-                cursor.execute(query)
-                connection.commit()
-            except Exception as e:
-                if logger is not None:
-                    logger.error(f"Error: {e}")
-                else:
-                    print(f"Error: {e}")
-
-                raise
-                # raise Exception("Error!")
-
-                # if logger is not None:
-                #     logger.exception(f"Error: {query}")
-                # else:
-                #     print(query)
-                #     raise Exception("Error!")
+        # Landsat4 Data
+        # if datetime.datetime.strptime(start_date, "%Y-%m-%d") >= datetime.datetime.strptime("1982-08-01", "%Y-%m-%d") and datetime.datetime.strptime(end_date, "%Y-%m-%d") <= datetime.datetime.strptime("1993-06-30", "%Y-%m-%d"):
+        if datetime.datetime.strptime(
+            start_date, "%Y-%m-%d"
+        ) < datetime.datetime.strptime(
+            "1993-06-30", "%Y-%m-%d"
+        ) and datetime.datetime.strptime(
+            end_date, "%Y-%m-%d"
+        ) > datetime.datetime.strptime(
+            "1982-08-01", "%Y-%m-%d"
+        ):
+            # print("Landsat4")
+            damwiseExtraction(
+                dams,
+                dam_id,
+                max(
+                    datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                    datetime.datetime.strptime("1982-08-01", "%Y-%m-%d"),
+                ).strftime("%Y-%m-%d"),
+                min(
+                    datetime.datetime.strptime(end_date, "%Y-%m-%d"),
+                    datetime.datetime.strptime("1993-06-30", "%Y-%m-%d"),
+                ).strftime("%Y-%m-%d"),
+                # ndwi_threshold,
+                imageCollection="LANDSAT/LT04/C02/T1_L2",
+                checkpoint_path=checkpoint_path,
+                connection=connection,
+            )
 
         checkpoint["reservoir_index"] += 1
         json.dump(checkpoint, open(checkpoint_path, "w"))
@@ -506,12 +1009,18 @@ def get_reservoir_data(
     )
     ee.Initialize(credentials)
 
-    reservoirs = geemap.shp_to_ee(reservoirs_shp)
+    reservoirs_gdf = gpd.read_file(reservoirs_shp)
+    reservoirs_gdf = reservoirs_gdf.to_crs(epsg=4326)
 
-    ee_dam_names = reservoirs.select("DAM_NAME", retainGeometry=False).getInfo()
-    ee_uniq_ids = reservoirs.select("uniq_id", retainGeometry=False).getInfo()
-    dam_names = [i["properties"]["DAM_NAME"] for i in ee_dam_names["features"]]
-    uniq_ids = [i["properties"]["uniq_id"] for i in ee_uniq_ids["features"]]
+    # combine the grand_id and dam name to form a unique id
+    reservoirs_gdf["dam_id"] = (
+        reservoirs_gdf["GRAND_ID"].astype(str)
+        + "_"
+        + reservoirs_gdf["DAM_NAME"].str.replace(" ", "_")
+    )
+
+    reservoirs = reservoirs_gdf["DAM_NAME"].to_list()
+    # uniq_ids = reservoirs_gdf["unique_id"]
 
     try:
         with open(data_dir / "reservoirs" / "checkpoint.json", "r") as f:
@@ -530,16 +1039,14 @@ def get_reservoir_data(
 
     repeated_tries = 0
 
-    while checkpoint["reservoir_index"] < len(dam_names):
+    while checkpoint["reservoir_index"] < len(reservoirs):
         try:
             # extract temperature time series for each reservoir
             runExtraction(
                 data_dir=data_dir,
-                uniq_ids=uniq_ids,
-                dam_names=dam_names,
+                reservoirs_gdf=reservoirs_gdf,
                 start_date=start_date,
                 end_date=end_date,
-                reservoirs=reservoirs,
                 checkpoint_path=data_dir / "reservoirs" / "checkpoint.json",
                 connection=connection,
                 logger=logger,
@@ -553,7 +1060,7 @@ def get_reservoir_data(
                 print(f"Error: {e}")
 
             # sleep for 0.5 - 3 minutes
-            s_time = randint(30, 120)
+            s_time = randint(15, 45)
             if logger is not None:
                 logger.info(f"Sleeping for {s_time} seconds...")
             else:
@@ -566,7 +1073,8 @@ def get_reservoir_data(
 
             repeated_tries += 1
 
-            if repeated_tries > 3:
+            # if repeated_tries > 3, increment river_index and reset reach_index
+            if repeated_tries > 5:
                 checkpoint["reservoir_index"] += 1
 
                 repeated_tries = 0
@@ -580,7 +1088,7 @@ def get_reservoir_data(
             with open(data_dir / "reservoirs" / "checkpoint.json", "r") as f:
                 checkpoint = json.load(f)
 
-    if checkpoint["reservoir_index"] >= len(dam_names):
+    if checkpoint["reservoir_index"] >= len(reservoirs):
         checkpoint["reservoir_index"] = 0
         json.dump(checkpoint, open(data_dir / "reservoirs" / "checkpoint.json", "w"))
 
@@ -589,12 +1097,14 @@ def get_reservoir_data(
     else:
         print("All done!")
 
+    # print("Test okay")
+
 
 def main(args):
     config_path = Path(args.config)
     config_dict = read_config(
         config_path,
-        # required_sections=["project", "mysql", "data"]
+        # required_sections=["project", "mysql", "data", "ee"]
     )
 
     project_dir = Path(config_dict["project"]["project_dir"])
@@ -675,6 +1185,8 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--config", type=str, help="path to config file", required=True)
+    parser.add_argument(
+        "-c", "--config", type=str, help="path to config file", required=True
+    )
 
     main(args=parser.parse_args())
