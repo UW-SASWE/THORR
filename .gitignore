@@ -1,6 +1,9 @@
 # custom
 dbConfig.php
 esriAPIKey.php
+hydrothermalviewer/
+thorr_retired/
+thorr_faulty/
 geoPHP/
 .env/
 archive/
