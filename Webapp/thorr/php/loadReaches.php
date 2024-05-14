@@ -1,0 +1,107 @@
+<?php
+
+require_once('dbConfig.php');
+$mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
+
+// if ($mysqli_connection->connect_error) {
+//     echo "Not connected, error: " . $mysqli_connection->connect_error;
+// } else {
+//     echo "Connected.";
+// }
+
+if ($_POST['BasinID']) {
+    if ($_POST['RiverID']) {
+        $sql = <<<QUERY
+        SELECT * 
+        FROM (SELECT
+        ReachID, RiverID, Reaches.Name
+        FROM
+        thorr.Rivers
+        INNER JOIN Basins USING (BasinID)
+        INNER JOIN Reaches USING (RiverID)
+        WHERE Basins.BasinID = {$_POST['BasinID']} AND RiverID = {$_POST['RiverID']}
+        ) as T
+        ORDER BY Name ASC;
+        QUERY;
+    } else {
+        $sql = <<<QUERY
+        SELECT * 
+        FROM (SELECT
+        ReachID, RiverID, Reaches.Name
+        FROM
+        thorr.Rivers
+        INNER JOIN Basins USING (BasinID)
+        INNER JOIN Reaches USING (RiverID)
+        WHERE Basins.BasinID = {$_POST['BasinID']}
+        ) as T
+        ORDER BY Name ASC;
+        QUERY;
+    }
+} else {
+    $sql = <<<QUERY
+    SELECT * 
+    FROM (SELECT
+    ReachID, RiverID, Reaches.Name as Name
+    FROM
+    thorr.Rivers
+    INNER JOIN Basins USING (BasinID)
+    INNER JOIN Reaches USING (RiverID)
+    ) as T
+    ORDER BY Name ASC;
+    QUERY;
+}
+
+$result = $mysqli_connection->query($sql);
+echo '<option value="" selected disabled>Select Reach</option>';
+
+
+switch ($_POST['BasinID']) {
+    case "1":
+        echo <<<EOT
+        <!-- <option disabled>-CRITFC Interest-</option> -->
+        <option value="155">Below Bonneville Dam</option>
+        <option value="226">Below Chief Joseph Dam</option>
+        <option value="235">Below Grand Coulee Dam</option>
+        <option value="826">Below Hells Canyon Dam</option>
+        <option value="167">Below John Day Dam</option>
+        <option value="180">Below McNary Dam</option>
+        <option value="200">Below Priest Rapids Dam</option>
+        <option value="210">Below Rock Island Dam</option>
+        <option value="213">Below Rocky Reach Dam</option>
+        <option value="163">Below The Dalles Dam</option>
+        <option value="66">Below US/Canada Border (Columbia)</option>
+        <option value="202">Below Wanapum Dam</option>
+        <option value="221">Below Wells Dam</option>
+        <option value="807">Clearwater River Confluence</option>
+        <option value="54">Cowlitz Confluence (Columbia)</option>
+        <option value="249">Cowlitz Confluence (Cowlitz)</option>
+        <option value="166">Deschutes River Confluence (Columbia)</option>
+        <option value="274">Deschutes River Confluence (Deschutes)</option>
+        <option value="159">Hood River Confluence (Columbia)</option>
+        <option value="363">Hood River Confluence (Hood)</option>
+        <option value="161">Klickitat River Confluence (Columbia)</option>
+        <option value="488">Klickitat River Confluence (Klickitat)</option>
+        <option value="158">L. White Salmon Confluence (Columbia)</option>
+        <option value="605">L. White Salmon Confluence (LWS)</option>
+        <option value="188">Snake River Confluence (Columbia)</option>
+        <option value="717">Snake River Confluence (Snake)</option>
+        <option value="181">Umatilla River Confluence (Columbia)</option>
+        <option value="929">Umatilla River Confluence (Umatilla)</option>
+        <option value="159">White Salmon Confluence (Columbia)</option>
+        <option value="977">White Salmon Confluence (W. Salmon)</option>
+        <option value="157">Wind River Confluence</option>
+        <option value="189">Yakima River Confluence (Columbia)</option>
+        <option value="1020">Yakima River Confluence (Yakima)</option>
+        <option disabled>---</option>
+        EOT;
+        break;
+}
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while ($row = $result->fetch_assoc()) {
+        echo "<option value=" . $row["ReachID"] . ">" . $row["Name"] . "</option>";
+    }
+}
+
+$mysqli_connection->close();

@@ -8,16 +8,38 @@ $mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
 //     echo "Not connected, error: " . $mysqli_connection->connect_error;
 // }
 
-$sql = <<<QUERY
-SELECT * 
-FROM (SELECT
-RiverID, Rivers.Name, ST_AsGeoJSON(Rivers.geometry, 4) AS geometry
-FROM
-thorr.Rivers
-INNER JOIN Basins USING (BasinID)
-WHERE Basins.BasinID = {$_POST['BasinID']}
-) as T;
-QUERY;
+// echo ($_POST['row_count'] and $_POST['offset']);
+
+if ($_POST['type'] == 'dam') {
+    $sql = <<<QUERY
+        SELECT ST_AsGeoJSON(ST_Envelope(ReservoirGeometry)) as geometry, Name, Reservoir
+        FROM Dams
+        WHERE DamID = {$_POST['id']};
+        QUERY;
+} elseif ($_POST['type'] == 'reach') {
+    $sql = <<<QUERY
+        SELECT ST_AsGeoJSON(ST_Envelope(Reaches.geometry)) as geometry, Rivers.Name as Name,
+        ReachID,
+        RKm
+        FROM Reaches
+        INNER JOIN Rivers USING (RiverID)
+        WHERE ReachID = {$_POST['id']};
+        QUERY;
+} elseif ($_POST['type'] == 'basin') {
+    $sql = <<<QUERY
+        SELECT ST_AsGeoJSON(ST_Envelope(geometry)) as geometry, Basins.Name as Name
+        FROM Basins
+        WHERE BasinID = {$_POST['id']};
+        QUERY;
+} else {
+    $sql = <<<QUERY
+        SELECT ST_AsGeoJSON(ST_Envelope(geometry)) as geometry, Name
+        FROM Rivers
+        WHERE RiverID = {$_POST['id']};
+        QUERY;
+};
+
+
 
 // echo $sql;
 

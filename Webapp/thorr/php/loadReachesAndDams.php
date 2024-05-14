@@ -14,50 +14,47 @@ if ($_POST['BasinID']) {
         $sql = <<<QUERY
         SELECT * 
         FROM (SELECT
-        Dams.BasinID, Dams.RiverID, Dams.Name as Name, Dams.DamID as DamID
+        ReachID, RiverID, Reaches.Name
         FROM
-        thorr.Dams
+        hydrothermal_history.Rivers
         INNER JOIN Basins USING (BasinID)
-        INNER JOIN Rivers USING (RiverID)
+        INNER JOIN Reaches USING (RiverID)
         WHERE Basins.BasinID = {$_POST['BasinID']} AND RiverID = {$_POST['RiverID']}
-        ) as T
-        ORDER BY Name ASC;
+        ) as T;
         QUERY;
     } else {
         $sql = <<<QUERY
         SELECT * 
         FROM (SELECT
-        Dams.BasinID, Dams.RiverID, Dams.Name as Name, Dams.DamID as DamID
+        ReachID, RiverID, Reaches.Name
         FROM
-        thorr.Dams
+        hydrothermal_history.Rivers
         INNER JOIN Basins USING (BasinID)
-        INNER JOIN Rivers USING (RiverID)
+        INNER JOIN Reaches USING (RiverID)
         WHERE Basins.BasinID = {$_POST['BasinID']}
-        ) as T
-        ORDER BY Name ASC;
+        ) as T;
         QUERY;
     }
 } else {
     $sql = <<<QUERY
     SELECT * 
     FROM (SELECT
-    Dams.BasinID, Dams.DamID, Dams.RiverID, Dams.Name
+    ReachID, RiverID, Reaches.Name as Name
     FROM
-    thorr.Dams
+    hydrothermal_history.Rivers
     INNER JOIN Basins USING (BasinID)
-    INNER JOIN Rivers USING (RiverID)) as T
-    ORDER BY Name ASC;
+    INNER JOIN Reaches USING (RiverID)
+    ) as T;
     QUERY;
 }
-// echo $sql;
 
 $result = $mysqli_connection->query($sql);
-echo '<option value="" selected disabled>Select Dam</option>';
+echo '<option value="" selected disabled>Select River</option>';
 
 if ($result->num_rows > 0) {
     // output data of each row
     while ($row = $result->fetch_assoc()) {
-        echo "<option value=" . $row["DamID"] . ">" . $row["Name"] . "</option>";
+        echo "<option value=" . $row["ReachID"] . ">" . $row["Name"] . "</option>";
     }
 }
 

@@ -7,18 +7,7 @@ $mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
 // if ($mysqli_connection->connect_error) {
 //     echo "Not connected, error: " . $mysqli_connection->connect_error;
 // }
-
-$sql = <<<QUERY
-SELECT * 
-FROM (SELECT
-RiverID, Rivers.Name, ST_AsGeoJSON(Rivers.geometry, 4) AS geometry
-FROM
-thorr.Rivers
-INNER JOIN Basins USING (BasinID)
-WHERE Basins.BasinID = {$_POST['BasinID']}
-) as T;
-QUERY;
-
+$sql = "SELECT BasinID, Name, ST_AsGeoJSON(ST_Simplify(geometry, 0.005), 2) AS geometry FROM Basins WHERE BasinID = " . $_POST['BasinID'] . " ORDER BY Name ASC";
 // echo $sql;
 
 $result = $mysqli_connection->query($sql);
@@ -46,6 +35,5 @@ while ($row = $result->fetch_assoc()) {
 
 // // header('Content-type: application/json');
 echo json_encode($geojson, JSON_NUMERIC_CHECK);
-
 
 $mysqli_connection->close();

@@ -1,3 +1,22 @@
+# custom
+dbConfig.php
+esriAPIKey.php
+hydrothermalviewer/
+thorr_retired/
+thorr_faulty/
+geoPHP/
+.env/
+archive/
+
+cronjobs/
+*db_issue_sample*
+
+# specific files
+Webapp/hydrothermalviewer/js/script.js
+Results/2.WaterTempEst/2.RandomForestRegression/*.pkl
+.Rproj.user
+*project_outline*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -174,16 +193,3 @@ jspm_packages/
 *.DS_Store
 Thumbs.db
 .vscode/
-
-# custom
-dbConfig.php
-esriAPIKey.php
-geoPHP/
-.env/
-archive/
-
-cronjobs/
-
-# specific files
-Webapp/hydrothermalviewer/js/script.js
-Results/2.WaterTempEst/2.RandomForestRegression/*.pkl

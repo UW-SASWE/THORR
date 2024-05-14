@@ -36,7 +36,7 @@ if ($_POST['offset'] || $_POST['row_count']) {
                     Reservoir,
                     ST_ASGEOJSON(Dams.DamGeometry) AS geometry
             FROM
-                hydrothermal_history.Dams
+                thorr.Dams
             WHERE
                 BasinID = {$_POST['BasinID']}) AS D
                 INNER JOIN
@@ -88,7 +88,7 @@ if ($_POST['offset'] || $_POST['row_count']) {
                     Reservoir,
                     ST_ASGEOJSON(Dams.DamGeometry) AS geometry
             FROM
-                hydrothermal_history.Dams
+                thorr.Dams
             WHERE
                 BasinID = {$_POST['BasinID']}) AS D
                 INNER JOIN

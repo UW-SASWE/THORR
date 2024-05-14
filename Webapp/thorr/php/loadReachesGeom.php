@@ -13,17 +13,19 @@ $mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
 if ($_POST['offset'] || $_POST['row_count']) {
     $sql = <<<QUERY
             SELECT 
+            ReachData.Date,
+            EstTempC,
             R.ReachID,
+            RiverID,
             Name,
-            Value AS Temperature,
-            Date AS startDate,
-            IF(DAY = 1, STR_TO_DATE(CONCAT(Year,'-',LPAD(Month,2,'00'),'-',LPAD(14,2,'00')), '%Y-%m-%d'), LAST_DAY(Date)) AS endDate,
+            RKm,
             geometry
         FROM
             (SELECT 
                 ReachID,
                     RiverID,
                     Rivers.Name AS Name,
+                    Reaches.RKm AS RKm,
                     ST_ASGEOJSON(Reaches.geometry) AS geometry
             FROM
                 thorr.Rivers
@@ -32,42 +34,34 @@ if ($_POST['offset'] || $_POST['row_count']) {
             WHERE
                 Basins.BasinID = {$_POST['BasinID']}) AS R
                 INNER JOIN
+            ReachData USING (ReachID)
+                INNER JOIN
             (SELECT 
-                ReachEstimatedWaterTemp.ReachID AS ReachID,
-                    ReachEstimatedWaterTemp.Date,
-                    DAY(ReachEstimatedWaterTemp.date) AS Day,
-                    MONTH(ReachEstimatedWaterTemp.date) AS Month,
-                    YEAR(ReachEstimatedWaterTemp.date) AS Year,
-                    ROUND(ReachEstimatedWaterTemp.Value, 2) AS Value,
-                    ReachEstimatedWaterTemp.Tag
-            FROM
-                ReachEstimatedWaterTemp
-            INNER JOIN (SELECT 
                 ReachID, MAX(Date) AS Date
             FROM
-                ReachEstimatedWaterTemp
+                ReachData
             WHERE
-                Tag = 'SM'
-            GROUP BY ReachID) AS latestEstimate ON latestEstimate.Date = ReachEstimatedWaterTemp.Date
-                AND latestEstimate.ReachID = ReachEstimatedWaterTemp.ReachID
-            WHERE
-                Tag = 'SM') AS latestEstimates ON latestEstimates.ReachID = R.ReachID
+                EstTempC IS NOT NULL
+            GROUP BY ReachID) AS latestEstimate ON latestEstimate.Date = ReachData.Date
+                AND latestEstimate.ReachID = ReachData.ReachID
         LIMIT {$_POST['offset']}, {$_POST['row_count']};
         QUERY;
 } else {
     $sql = <<<QUERY
             SELECT 
+            ReachData.Date,
+            EstTempC,
             R.ReachID,
+            RiverID,
             Name,
-            Value AS Temperature,
-            Date AS startDate,
-            IF(DAY = 1, STR_TO_DATE(CONCAT(Year,'-',LPAD(Month,2,'00'),'-',LPAD(14,2,'00')), '%Y-%m-%d'), LAST_DAY(Date)) AS endDate,
+            RKm,
             geometry
         FROM
             (SELECT 
                 ReachID,
                     RiverID,
                     Rivers.Name AS Name,
+                    Reaches.RKm AS RKm,
                     ST_ASGEOJSON(Reaches.geometry) AS geometry
             FROM
                 thorr.Rivers
@@ -76,26 +70,16 @@ if ($_POST['offset'] || $_POST['row_count']) {
             WHERE
                 Basins.BasinID = {$_POST['BasinID']}) AS R
                 INNER JOIN
+            ReachData USING (ReachID)
+                INNER JOIN
             (SELECT 
-                ReachEstimatedWaterTemp.ReachID AS ReachID,
-                    ReachEstimatedWaterTemp.Date,
-                    DAY(ReachEstimatedWaterTemp.date) AS Day,
-                    MONTH(ReachEstimatedWaterTemp.date) AS Month,
-                    YEAR(ReachEstimatedWaterTemp.date) AS Year,
-                    ROUND(ReachEstimatedWaterTemp.Value, 2) AS Value,
-                    ReachEstimatedWaterTemp.Tag
-            FROM
-                ReachEstimatedWaterTemp
-            INNER JOIN (SELECT 
                 ReachID, MAX(Date) AS Date
             FROM
-                ReachEstimatedWaterTemp
+                ReachData
             WHERE
-                Tag = 'SM'
-            GROUP BY ReachID) AS latestEstimate ON latestEstimate.Date = ReachEstimatedWaterTemp.Date
-                AND latestEstimate.ReachID = ReachEstimatedWaterTemp.ReachID
-            WHERE
-                Tag = 'SM') AS latestEstimates ON latestEstimates.ReachID = R.ReachID
+                EstTempC IS NOT NULL
+            GROUP BY ReachID) AS latestEstimate ON latestEstimate.Date = ReachData.Date
+                AND latestEstimate.ReachID = ReachData.ReachID
         QUERY;
 };
 
