@@ -395,12 +395,12 @@ def extractTempSeries(
             processedL8.reduce(ee.Reducer.mean())
             # .addBands(ndwi, ["NDWI"], True)
             .updateMask(waterMask).set("system:time_start", date)
-        )
+        ).clip(reach.geometry())
         meanL8nonwater = (
             processedL8.reduce(ee.Reducer.mean())
             # .addBands(ndwi, ["NDWI"], True)
             .updateMask(nonWaterMask).set("system:time_start", date)
-        )
+        ).clip(reach.geometry())
 
         # get the mean temperature of the reache
         watertemp = meanL8water.select(["Celcius_mean"]).reduceRegion(
@@ -431,6 +431,26 @@ def extractTempSeries(
                 "NDVI": ndvi,
             },
         )
+
+    # try:
+    #     dates = ee.List(
+    #         L4.map(
+    #             lambda image: ee.Feature(None, {"date": image.date().format("YYYY-MM-dd")})
+    #         )
+    #         .distinct("date")
+    #         .aggregate_array("date")
+    #     )
+
+    #     dataSeries = ee.FeatureCollection(dates.map(extractData))
+
+    #     return dataSeries
+    # except Exception as e:
+    #     # print(e, startDate, endDate)
+    #     if logger is not None:
+    #         logger.info(f"{e}")
+    #     else:
+    #         print(f"{e}")
+    #     return None
 
     dates = ee.List(
         L8.map(
@@ -478,12 +498,12 @@ def extractL4TempSeries(
             processedL4.reduce(ee.Reducer.mean())
             # .addBands(ndwi, ["NDWI"], True)
             .updateMask(waterMask).set("system:time_start", date)
-        )
+        ).clip(reach.geometry())
         meanL4nonwater = (
             processedL4.reduce(ee.Reducer.mean())
             # .addBands(ndwi, ["NDWI"], True)
             .updateMask(nonWaterMask).set("system:time_start", date)
-        )
+        ).clip(reach.geometry())
 
         # get the mean temperature of the reache
         watertemp = meanL4water.select(["Celcius_mean"]).reduceRegion(
@@ -514,6 +534,26 @@ def extractL4TempSeries(
                 "NDVI": ndvi,
             },
         )
+
+    # try:
+    #     dates = ee.List(
+    #         L4.map(
+    #             lambda image: ee.Feature(None, {"date": image.date().format("YYYY-MM-dd")})
+    #         )
+    #         .distinct("date")
+    #         .aggregate_array("date")
+    #     )
+
+    #     dataSeries = ee.FeatureCollection(dates.map(extractData))
+
+    #     return dataSeries
+    # except Exception as e:
+    #     # print(e, startDate, endDate)
+    #     if logger is not None:
+    #         logger.info(f"{e}")
+    #     else:
+    #         print(f"{e}")
+    #     return None
 
     dates = ee.List(
         L4.map(
@@ -695,7 +735,13 @@ def reachwiseExtraction(
         #     # ndwi_threshold,
         #     imageCollection,
         # )
-        dataSeries = geemap.ee_to_gdf(dataSeries)
+        # if dataSeries is not None:
+        if dataSeries.size().getInfo(): # truthy check to see if the dataSeries is not empty
+            # print(dataSeries.size().getInfo())
+            dataSeries = geemap.ee_to_df(dataSeries)
+        else:
+            dataSeries = pd.DataFrame()
+
         if not dataSeries.empty:
             # print(dataSeries.head())
 

@@ -1,0 +1,18 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "your-app"
+dynamic = ["version"]
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "George Darkwah", email = "gdarkwah@uw.edu" },
+]
+maintainers = [
+  { name = "George Darkwah", email = "gdarkwah@uw.edu" },
+]
+
+[tool.hatch.version]
+path = "src/thorr/__about__.py"
