@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "your-app"
+name = "thorr"
 dynamic = ["version"]
 description = 'THORR - A python package that generates river temperature in a continuous spatiotemporal manner.'
 readme = "README.md"
@@ -23,8 +23,7 @@ dependencies = [
 
 [project.urls]
 GitHub = "https://github.com/UW-SASWE/THORR"
-Web Tool = "https://depts.washington.edu/saswe/thorr"
-
+Webapp = "https://depts.washington.edu/saswe/thorr"
 
 [tool.hatch.version]
 path = "src/thorr/__about__.py"
