@@ -3,6 +3,7 @@ import pandas as pd
 
 from thorr.utils import config as cfg
 
+
 class Connect:
     def __init__(self, config_file, section="mysql", logger=None, return_conn=False):
         self.config_file = config_file
@@ -17,7 +18,7 @@ class Connect:
 
         db_config = cfg.read_config(self.config_file, self.section)
         self.connection = None
-        
+
         try:
             if self.logger is not None:
                 self.logger.info("Connecting to MySQL database...")
