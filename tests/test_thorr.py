@@ -1,6 +1,7 @@
 from context import thorr
 from thorr.utils import config as cfg
 from thorr.utils import database
+from thorr.utils import logger
 import os
 
 
@@ -32,3 +33,19 @@ def test_db_connection(config_file="tests/data/thorr_config.ini", section=["mysq
 
 
 test_db_connection(config_file=".env/config/thorr_config.ini")
+
+
+# test logging
+def test_logging(config_file="tests/data/thorr_config.ini"):
+    config = cfg.read_config(config_path=config_file)
+
+    log = logger.Logger(
+        project_title=config["project"]["title"], log_dir="tests"
+    ).get_logger()
+
+    log.info("Testing logging")
+
+    assert os.path.exists(log.log_file), "Error in logging"
+
+
+test_logging()
