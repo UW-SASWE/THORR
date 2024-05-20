@@ -32,6 +32,9 @@ class Logger(object):
             log_dir = os.path.join(os.getcwd(), "logs")
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
+        
+        # create a log file attribute (path to the log file)
+        self.logger.log_file = str(Path(log_dir) / f"{logger_name}.log")
 
         self.file_handler = TimedRotatingFileHandler(
             filename=Path(log_dir) / f"{project_title}.log",
