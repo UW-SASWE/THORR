@@ -1,4 +1,4 @@
-from mysql.connector import MySQLConnection, Error, connect
+from mysql.connector import Error, connect
 import pandas as pd
 
 from thorr.utils import config as cfg
