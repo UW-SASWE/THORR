@@ -16,7 +16,7 @@ keywords = [
   "temperature",
   "thermal infrared",
 ]
-dependencies = ["geopandas", "mysql-connector-python", "pandas"]
+dependencies = ["geopandas", "mysql-connector-python", "pandas", "matplotlib", "numpy", "shapely", "rasterio"]
 
 [project.urls]
 GitHub = "https://github.com/UW-SASWE/THORR"
