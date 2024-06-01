@@ -12,41 +12,35 @@ $mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
 if ($_POST['BasinID']) {
     if ($_POST['RiverID']) {
         $sql = <<<QUERY
-        SELECT * 
-        FROM (SELECT
+        SELECT
         ReachID, RiverID, CONCAT(Rivers.Name, ' (', Reaches.RKm, ' km)') AS Name
         FROM
         thorr.Rivers
         INNER JOIN Basins USING (BasinID)
         INNER JOIN Reaches USING (RiverID)
         WHERE Basins.BasinID = {$_POST['BasinID']} AND RiverID = {$_POST['RiverID']}
-        ) as T
         ORDER BY Name ASC;
         QUERY;
     } else {
         $sql = <<<QUERY
-        SELECT * 
-        FROM (SELECT
+        SELECT
         ReachID, RiverID, CONCAT(Rivers.Name, ' (', Reaches.RKm, ' km)') AS Name
         FROM
         thorr.Rivers
         INNER JOIN Basins USING (BasinID)
         INNER JOIN Reaches USING (RiverID)
         WHERE Basins.BasinID = {$_POST['BasinID']}
-        ) as T
         ORDER BY Name ASC;
         QUERY;
     }
 } else {
     $sql = <<<QUERY
-    SELECT * 
-    FROM (SELECT
+    SELECT
     ReachID, RiverID, CONCAT(Rivers.Name, ' (', Reaches.RKm, ' km)') AS Name
     FROM
     thorr.Rivers
     INNER JOIN Basins USING (BasinID)
     INNER JOIN Reaches USING (RiverID)
-    ) as T
     ORDER BY Name ASC;
     QUERY;
 }
