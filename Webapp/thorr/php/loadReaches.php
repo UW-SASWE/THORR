@@ -14,7 +14,7 @@ if ($_POST['BasinID']) {
         $sql = <<<QUERY
         SELECT * 
         FROM (SELECT
-        ReachID, RiverID, Reaches.Name
+        ReachID, RiverID, CONCAT(Rivers.Name, ' (', Reaches.RKm, ' km)') AS Name
         FROM
         thorr.Rivers
         INNER JOIN Basins USING (BasinID)
@@ -27,7 +27,7 @@ if ($_POST['BasinID']) {
         $sql = <<<QUERY
         SELECT * 
         FROM (SELECT
-        ReachID, RiverID, Reaches.Name
+        ReachID, RiverID, CONCAT(Rivers.Name, ' (', Reaches.RKm, ' km)') AS Name
         FROM
         thorr.Rivers
         INNER JOIN Basins USING (BasinID)
@@ -41,7 +41,7 @@ if ($_POST['BasinID']) {
     $sql = <<<QUERY
     SELECT * 
     FROM (SELECT
-    ReachID, RiverID, Reaches.Name as Name
+    ReachID, RiverID, CONCAT(Rivers.Name, ' (', Reaches.RKm, ' km)') AS Name
     FROM
     thorr.Rivers
     INNER JOIN Basins USING (BasinID)
