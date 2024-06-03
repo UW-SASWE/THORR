@@ -2998,7 +2998,7 @@ function gisDownload() {
     var endDate = todayIso;
   }
 
-  console.log(basinID, reachID, riverID, startDate, endDate);
+  // console.log(basinID, reachID, riverID, startDate, endDate);
 
   var formData = new FormData();
   formData.append("BasinID", basinID);

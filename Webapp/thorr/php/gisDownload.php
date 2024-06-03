@@ -46,7 +46,7 @@ if ($_POST['ReachID']) {
             RiverID,
                 ReachID,
                 CONCAT(Rivers.Name, ' (', Reaches.RKm, ' km)') AS Name,
-                ST_ASTEXT(Reaches.geometry) AS geometry
+                ST_ASGEOJSON(Reaches.geometry) AS geometry
         FROM
             thorr.Rivers
         INNER JOIN Basins USING (BasinID)
@@ -72,7 +72,7 @@ if ($_POST['ReachID']) {
             RiverID,
                 ReachID,
                 CONCAT(Rivers.Name, ' (', Reaches.RKm, ' km)') AS Name,
-                ST_ASTEXT(Reaches.geometry) AS geometry
+                ST_ASGEOJSON(Reaches.geometry) AS geometry
         FROM
             thorr.Rivers
         INNER JOIN Basins USING (BasinID)
@@ -93,37 +93,28 @@ if ($_POST['ReachID']) {
 
 $result = $mysqli_connection->query($sql);
 
-// // write the query results to the file
-// if (!$result) {
-//     echo "Error: " . $sql . "<br>" . $mysqli_connection->error;
-// }
+# Build GeoJSON feature collection array
+$geojson = array(
+    'type'      => 'FeatureCollection',
+    'features'  => array()
+);
 
+# Loop through rows to build feature arrays
 while ($row = $result->fetch_assoc()) {
-    fputcsv($fp, array($row['ReachID'], $row['RiverID'], $row['Name'], $row['geometry'], $row['EstTempC']));
+    // echo $row['geometry'];
+    $properties = $row;
+    # Remove wkb and geometry fields from properties
+    unset($properties['geometry']);
+    $feature = array(
+        'type' => 'Feature',
+        'geometry' => json_decode($row['geometry']),
+        'properties' => $properties
+    );
+    # Add feature arrays to feature collection array
+    array_push($geojson['features'], $feature);
 }
 
+// // header('Content-type: application/json');
+echo json_encode($geojson, JSON_NUMERIC_CHECK);
 
-// Close the file
-fclose($fp);
-
-// Set headers to force download on the client side
-header('Content-Description: File Transfer');
-header('Content-Type: application/octet-stream');
-header('Content-Disposition: attachment; filename="' . basename($filename) . '"');
-header('Expires: 0');
-header('Cache-Control: must-revalidate');
-header('Pragma: public');
-header('Content-Length: ' . filesize($filename));
-
-// Clear the output buffer
-ob_clean();
-flush();
-
-// Read the file and output its contents
-readfile($filename);
-
-// delete file
-unlink($filename);
-
-// Terminate the script
-exit;
+$mysqli_connection->close();
