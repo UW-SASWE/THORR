@@ -2974,6 +2974,61 @@ function downloadData() {
   }
 }
 
+function gisDownload() {
+  var basinID = document.getElementById("basin-selector").value;
+  var reachID = document.getElementById("reach-selector").value;
+  var riverID = document.getElementById("river-selector").value;
+
+  const t = new Date(); // Get the current date and time
+  const z = t.getTimezoneOffset() * 60 * 1000; // Convert the local time zone offset from minutes to milliseconds
+  const tLocal = new Date(t - z); // Subtract the offset from the original date
+  const todayIso = tLocal.toISOString().split("T")[0]; // Convert to ISO format and remove the time
+
+  const monthAgo = new Date(tLocal);
+  monthAgo.setDate(monthAgo.getDate() - 30);
+  const monthAgoIso = monthAgo.toISOString().split("T")[0];
+
+  if (document.getElementById("start-date").value == "") {
+    var startDate = monthAgoIso;
+  } else {
+    var startDate = document.getElementById("start-date").value;
+  }
+
+  if (document.getElementById("end-date").value == "") {
+    var endDate = todayIso;
+  }
+
+  console.log(basinID, reachID, riverID, startDate, endDate);
+
+  var formData = new FormData();
+  formData.append("BasinID", basinID);
+  formData.append("ReachID", reachID);
+  formData.append("RiverID", riverID);
+  formData.append("StartDate", startDate);
+  formData.append("EndDate", endDate);
+
+  fetch("php/gisDownload.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.blob())
+    .then((blob) => {
+      // Create a new URL for the blob
+      const url = window.URL.createObjectURL(blob);
+      // Create a link and set the URL as the href
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "gis_download" + ".csv";
+      // Append the link to the body
+      document.body.appendChild(a);
+      // Trigger the download
+      a.click();
+      // Clean up by revoking the Object URL
+      window.URL.revokeObjectURL(url);
+    })
+    .catch((error) => console.error("Error:", error));
+}
+
 // fire window resize event to fix the map not showing up
 function fireResizeEvent() {
   window.dispatchEvent(new Event("resize"));
