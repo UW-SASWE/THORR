@@ -432,8 +432,9 @@
               </a>
             </header>
             <div class="d-flex flex-column">
-              <div class="container">
-                <label for="basin-selector" class="p-3 ps-1 pb-1">Basin</label
+              <div class="container pb-3">
+                <label for="basin-selector" class="p-3 ps-1 pb-1"
+                  >Basin/Region</label
                 ><select
                   class="form-select"
                   name="basin-selector"
@@ -465,6 +466,36 @@
                   aria-label="dam-selector"
                   onchange="onDamSelectorChange()"
                 ></select>
+              </div>
+              <div class="container border-top border-bottom">
+                <div class="h5 my-2">GIS Downlood</div>
+                <label for="start-date" class="ps-1 pb-1">Start Date</label>
+                <div>
+                  <input
+                    type="date"
+                    id="start-date"
+                    name="trip-start"
+                    min="1982-08-01"
+                  />
+                </div>
+
+                <label for="end-date" class="p-3 ps-1 pb-1">End Date</label>
+                <div>
+                  <input
+                    type="date"
+                    id="end-date"
+                    name="trip-start"
+                    min="1982-08-01"
+                  />
+                </div>
+                <button
+                  type="button"
+                  class="btn border my-3"
+                  role="button"
+                  onclick="gisDownload()"
+                >
+                  Download
+                </button>
               </div>
               <div class="d-inline p-3 d-flex justify-content-between">
                 <a
@@ -756,9 +787,14 @@
                     class="btn-group btn-group-sm m-2"
                     role="group"
                     aria-label="Download button group"
-                  ><button type="button" class="btn btn-primary"
-                  onclick="downloadData()"
-                  >Download</button>
+                  >
+                    <button
+                      type="button"
+                      class="btn btn-primary"
+                      onclick="downloadData()"
+                    >
+                      Download
+                    </button>
                   </div>
                 </div>
                 <div class="flex-grow-1">
