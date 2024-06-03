@@ -6,95 +6,171 @@ var selectedFeature = {
 // global variable to store the selected feature type and ID
 
 function loadBasins(priorityBasinID) {
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("basin-selector").innerHTML = this.responseText;
-    }
-  };
+  var formData = new FormData();
+  formData.append("priorityBasinID", priorityBasinID);
 
-  xmlhttp.open("POST", "php/loadBasins.php", true);
-  xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xmlhttp.send("priorityBasinID=" + priorityBasinID);
+  fetch("php/loadBasins.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.text())
+    .then((responseText) => {
+      document.getElementById("basin-selector").innerHTML = responseText;
+    })
+    .catch((error) => console.error("Error:", error));
 }
 
 function loadRivers(BasinID) {
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("river-selector").innerHTML = this.responseText;
-    }
-  };
+  var formData = new FormData();
+  formData.append("BasinID", BasinID);
 
-  xmlhttp.open("POST", "php/loadRivers.php", true);
-  xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xmlhttp.send("BasinID=" + BasinID);
+  fetch("php/loadRivers.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.text())
+    .then((responseText) => {
+      document.getElementById("river-selector").innerHTML = responseText;
+    })
+    .catch((error) => console.error("Error:", error));
+
+  // var xmlhttp = new XMLHttpRequest();
+  // xmlhttp.onreadystatechange = function () {
+  //   if (this.readyState == 4 && this.status == 200) {
+  //     document.getElementById("river-selector").innerHTML = this.responseText;
+  //   }
+  // };
+
+  // xmlhttp.open("POST", "php/loadRivers.php", true);
+  // xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  // xmlhttp.send("BasinID=" + BasinID);
 }
 
 function loadReaches(BasinID, RiverID) {
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("reach-selector").innerHTML = this.responseText;
-    }
-  };
+  var formData = new FormData();
+  formData.append("BasinID", BasinID);
+  formData.append("RiverID", RiverID);
 
-  xmlhttp.open("POST", "php/loadReaches.php", true);
-  xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xmlhttp.send("BasinID=" + BasinID + "&RiverID=" + RiverID);
+  fetch("php/loadReaches.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.text())
+    .then((responseText) => {
+      document.getElementById("reach-selector").innerHTML = responseText;
+    })
+    .catch((error) => console.error("Error:", error));
+
+  // var xmlhttp = new XMLHttpRequest();
+  // xmlhttp.onreadystatechange = function () {
+  //   if (this.readyState == 4 && this.status == 200) {
+  //     document.getElementById("reach-selector").innerHTML = this.responseText;
+  //   }
+  // };
+
+  // xmlhttp.open("POST", "php/loadReaches.php", true);
+  // xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  // xmlhttp.send("BasinID=" + BasinID + "&RiverID=" + RiverID);
 }
 
 function loadDams(BasinID, RiverID) {
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
-      document.getElementById("dam-selector").innerHTML = this.responseText;
-    }
-  };
+  var formData = new FormData();
+  formData.append("BasinID", BasinID);
 
-  xmlhttp.open("POST", "php/loadDams.php", true);
-  xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xmlhttp.send("BasinID=" + BasinID + "&RiverID=" + RiverID);
+  fetch("php/loadDams.php", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.text())
+    .then((responseText) => {
+      document.getElementById("dam-selector").innerHTML = responseText;
+    })
+    .catch((error) => console.error("Error:", error));
+
+  // var xmlhttp = new XMLHttpRequest();
+  // xmlhttp.onreadystatechange = function () {
+  //   if (this.readyState == 4 && this.status == 200) {
+  //     document.getElementById("dam-selector").innerHTML = this.responseText;
+  //   }
+  // };
+
+  // xmlhttp.open("POST", "php/loadDams.php", true);
+  // xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  // xmlhttp.send("BasinID=" + BasinID + "&RiverID=" + RiverID);
 }
 
 function loadBasinGeom(BasinID) {
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
-      var geoJSON = JSON.parse(this.responseText);
+  var formData = new FormData();
+  formData.append("BasinID", BasinID);
+
+  fetch("php/loadBasinGeom.php", {
+    method: "POST",
+    body: formData,
+  })
+    // .then((response) => response.text())
+    .then((response) => response.text())
+    .then((responseText) => {
+      var geoJSON = JSON.parse(responseText);
       var layer = L.geoJSON(geoJSON, { style: basinStyle }).addTo(map);
-    }
-  };
-  xmlhttp.open("POST", "php/loadBasinGeom.php", true);
-  xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xmlhttp.send("BasinID=" + BasinID);
+    })
+    .catch((error) => console.error("Error:", error));
 }
 
 function loadRiversGeom(BasinID) {
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
-      var geoJSON = JSON.parse(this.responseText);
+  var formData = new FormData();
+  formData.append("BasinID", BasinID);
+
+  fetch("php/loadRiversGeom.php", {
+    method: "POST",
+    body: formData,
+  })
+    // .then((response) => response.text())
+    .then((response) => response.text())
+    .then((responseText) => {
+      var geoJSON = JSON.parse(responseText);
       var layer = L.geoJSON(geoJSON).addTo(map);
-    }
-  };
-  xmlhttp.open("POST", "php/loadRiversGeom.php", true);
-  xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xmlhttp.send("BasinID=" + BasinID);
+    })
+    .catch((error) => console.error("Error:", error));
+
+  // var xmlhttp = new XMLHttpRequest();
+  // xmlhttp.onreadystatechange = function () {
+  //   if (this.readyState == 4 && this.status == 200) {
+  //     var geoJSON = JSON.parse(this.responseText);
+  //     var layer = L.geoJSON(geoJSON).addTo(map);
+  //   }
+  // };
+  // xmlhttp.open("POST", "php/loadRiversGeom.php", true);
+  // xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  // xmlhttp.send("BasinID=" + BasinID);
 }
 
 function loadReachesGeom(BasinID) {
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
-      // console.log(this.responseText);
-      var geoJSON = JSON.parse(this.responseText);
+  var formData = new FormData();
+  formData.append("BasinID", BasinID);
+
+  fetch("php/loadReachesGeom.php", {
+    method: "POST",
+    body: formData,
+  })
+    // .then((response) => response.text())
+    .then((response) => response.text())
+    .then((responseText) => {
+      var geoJSON = JSON.parse(responseText);
       var layer = L.geoJSON(geoJSON).addTo(map);
-    }
-  };
-  xmlhttp.open("POST", "php/loadReachesGeom.php", true);
-  xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xmlhttp.send("BasinID=" + BasinID);
+    })
+    .catch((error) => console.error("Error:", error));
+
+  // var xmlhttp = new XMLHttpRequest();
+  // xmlhttp.onreadystatechange = function () {
+  //   if (this.readyState == 4 && this.status == 200) {
+  //     // console.log(this.responseText);
+  //     var geoJSON = JSON.parse(this.responseText);
+  //     var layer = L.geoJSON(geoJSON).addTo(map);
+  //   }
+  // };
+  // xmlhttp.open("POST", "php/loadReachesGeom.php", true);
+  // xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  // xmlhttp.send("BasinID=" + BasinID);
 }
 
 // function to load the reaches geometry in chunks
@@ -108,24 +184,25 @@ function loadReachesGeomChunk(BasinID, row_count) {
   info.showLoading();
 
   function http(BasinID, offset, row_count) {
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
-      if (this.readyState == 4 && this.status == 200) {
-        onHttpDone(xmlhttp);
-      }
-    };
-    xmlhttp.open("POST", "php/loadReachesGeom.php", true);
-    xmlhttp.setRequestHeader(
-      "Content-type",
-      "application/x-www-form-urlencoded"
-    );
-    xmlhttp.send(
-      "BasinID=" + BasinID + "&offset=" + offset + "&row_count=" + row_count
-    );
+    var formData = new FormData();
+    formData.append("BasinID", BasinID);
+    formData.append("offset", offset);
+    formData.append("row_count", row_count);
+
+    fetch("php/loadReachesGeom.php", {
+      method: "POST",
+      body: formData,
+    })
+      // .then((response) => response.text())
+      .then((response) => response.text())
+      .then((responseText) => {
+        onHttpDone(responseText);
+      })
+      .catch((error) => console.error("Error:", error));
   }
 
-  function onHttpDone(xmlhttp) {
-    var _geoJSON = JSON.parse(xmlhttp.responseText);
+  function onHttpDone(responseText) {
+    var _geoJSON = JSON.parse(responseText);
     geoJSON.features = geoJSON.features.concat(_geoJSON.features);
 
     if (_geoJSON.features.length == 0) {
@@ -146,31 +223,58 @@ function loadReachesGeomChunk(BasinID, row_count) {
 }
 
 function loadDamsGeom(BasinID) {
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
-      var geoJSON = JSON.parse(this.responseText);
+  var formData = new FormData();
+  formData.append("BasinID", BasinID);
+
+  fetch("php/loadDamsGeom.php", {
+    method: "POST",
+    body: formData,
+  })
+    // .then((response) => response.text())
+    .then((response) => response.text())
+    .then((responseText) => {
+      var geoJSON = JSON.parse(responseText);
       damsLayer = L.geoJSON(geoJSON, {
         style: damStyle,
         onEachFeature: onEachDamFeature,
       }).addTo(map);
-    }
-  };
-  xmlhttp.open("POST", "php/loadDamsGeom.php", true);
-  xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xmlhttp.send("BasinID=" + BasinID);
+    })
+    .catch((error) => console.error("Error:", error));
+
+  // var xmlhttp = new XMLHttpRequest();
+  // xmlhttp.onreadystatechange = function () {
+  //   if (this.readyState == 4 && this.status == 200) {
+  //     var geoJSON = JSON.parse(this.responseText);
+  //     damsLayer = L.geoJSON(geoJSON, {
+  //       style: damStyle,
+  //       onEachFeature: onEachDamFeature,
+  //     }).addTo(map);
+  //   }
+  // };
+  // xmlhttp.open("POST", "php/loadDamsGeom.php", true);
+  // xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  // xmlhttp.send("BasinID=" + BasinID);
 }
 
 var damsPointsLayer;
 
 function loadDamsPoints(BasinID) {
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
+
+  
+  var formData = new FormData();
+  formData.append("BasinID", BasinID);
+
+  fetch("php/loadDamsPoints.php", {
+    method: "POST",
+    body: formData,
+  })
+    // .then((response) => response.text())
+    .then((response) => response.text())
+    .then((responseText) => {
       var LeafIcon = L.Icon.extend({
         options: {},
       });
-
+      
       var markercluster = L.markerClusterGroup({
         showCoverageOnHover: false,
         maxClusterRadius: 50,
@@ -181,7 +285,7 @@ function loadDamsPoints(BasinID) {
         },
       });
 
-      var geoJSON = JSON.parse(this.responseText);
+      var geoJSON = JSON.parse(responseText);
       // console.log(geoJSON);
       damsPointsLayer = L.geoJSON(geoJSON, {
         // convert the onEachFeature function into a proper function
@@ -237,11 +341,8 @@ function loadDamsPoints(BasinID) {
       });
       markercluster.addLayer(damsPointsLayer);
       markercluster.addTo(map);
-    }
-  };
-  xmlhttp.open("POST", "php/loadDamsPoints.php", true);
-  xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xmlhttp.send("BasinID=" + BasinID);
+    })
+    .catch((error) => console.error("Error:", error));
 }
 
 // get bound of a reach or dam feature
@@ -2988,6 +3089,10 @@ function gisDownload() {
   monthAgo.setDate(monthAgo.getDate() - 30);
   const monthAgoIso = monthAgo.toISOString().split("T")[0];
 
+  if (basinID == "") {
+    var basinID = "1";
+  }
+
   if (document.getElementById("start-date").value == "") {
     var startDate = monthAgoIso;
   } else {
@@ -2996,9 +3101,9 @@ function gisDownload() {
 
   if (document.getElementById("end-date").value == "") {
     var endDate = todayIso;
+  } else {
+    var endDate = document.getElementById("end-date").value;
   }
-
-  // console.log(basinID, reachID, riverID, startDate, endDate);
 
   var formData = new FormData();
   formData.append("BasinID", basinID);
@@ -3018,7 +3123,7 @@ function gisDownload() {
       // Create a link and set the URL as the href
       const a = document.createElement("a");
       a.href = url;
-      a.download = "gis_download" + ".csv";
+      a.download = "gis_download" + ".geojson";
       // Append the link to the body
       document.body.appendChild(a);
       // Trigger the download
@@ -3057,4 +3162,4 @@ function getEsriAPIKey() {
 }
 
 // getEsriAPIKey();
-// console.log("one")
+// console.log("one");
