@@ -1,0 +1,23 @@
+﻿pcode,unit,conversion_factor1,conversion_factor2,constant,col_name,description
+af,acre-feet,1233.4,,,storage (m3),"Reservoir Water Storage, acre-feet"
+fb,ft,0.3048,,,elevation (m),"Reservoir Water Surface Elevation, feet"
+gain,cfs,0.0283168,86400,,average gain (cfs),"Average gain, cfs"
+gd,ft,0.3048,,,stream stage (m),Average stream stage
+gj,ft,0.3048,,,canal stage (m),Canal Gauge Height (feet
+id,cfs,0.0283168,86400,,computed inflow (m3/d),"Computed Average Reservoir Inflow, cfs"
+mm,degF,0.55556,,-17.7778,avg air temp (C) ,"Average Air Temperature, degF"
+mn,degF,0.55556,,-17.7778,min air temp (C) ,"Minimum Air Temperature, degF"
+mx,degF,0.55556,,-17.7778,max air temp (C) ,"Maximum Air Temperature, degF"
+qd,cfs,0.0283168,86400,,discharge (m3/d),"Average Stream Discharge, cfs"
+qj,cfs,0.0283168,86400,,canal discharge (m3/d),Canal Discharge - CFS
+qp,cfs,0.0283168,86400,,pump discharge (m3/d),Pump Discharge
+qt,cfs,0.0283168,86400,,total avg discharge (m3/d),"Totalled Average Discharge, cfs"
+qu,cfs,0.0283168,86400,,unregulated flow (m3/d),"Estimated Average Unregulated Flow, cfs"
+qv,cfs,0.0283168,86400,,power discharge (m3/d),Power Discharge
+qx,cfs,0.0283168,86400,,max discharge (m3/d),"Maximum Discharge, cfs"
+wi,degF,0.55556,,-17.7778,min water temp (C) ,"Minimum Water Temperature, degF"
+wk,degF,0.55556,,-17.7778,max water temp (C) ,"Maximum Water Temperature, degF"
+wm,degC,1,,,max water temp (C) ,"Minimum Water Temperature, degC"
+wn,degC,1,,,min water temp (C) ,"Minimum Water Temperature, degC"
+wy,degC,1,,,avg water temp (C) ,"Average Water Temperature, degC"
+wz,degF,0.55556,,-17.7778,avg water temp (C) ,"Average Water Temperature, degF"
