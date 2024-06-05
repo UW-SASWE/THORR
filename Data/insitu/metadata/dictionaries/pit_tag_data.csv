@@ -1,0 +1,19 @@
+﻿Attribute_name,Description
+Year,Year of detection event.
+Tag_File,Tagging File of detected fish. DART-specific file_id (.DART[N])
+NFish,"Number of fish released for Tagging File matching Species, Run and Rear Type."
+Tag_ID,Individual Tag ID of fish detected.
+SpRRT,"Species, Run, Rear Type combination for Tag ID."
+Simp_sp,Simplified form of the species. Refer to the fish_data file
+Length,Fork length at release for Tag ID.
+Release_Site,Release site for Tagging File.
+Total_RKM,"Represents the total river kilometers from the mouth of the Columbia River to the release site based on the release site river kilometer as reported by PTAGIS https://www.ptagis.org/. Some release sites indicate a range of river kilometers. In these cases, a general river kilometer for the main river is assigned to the release site, e.g., SNAKE3 'Snake River - Clearwater River to Salmon River (km 224-303)' is assigned 522 (rkm for Snake River mouth)."
+Release_Date,Individual Release Date for Tag ID.
+Obs_Site,Interrogation Site for detection event.
+Obs_Time,"Observation date and time for detection event. First detection at specified Location within specified date range of query. This may not be the first detection for Tag ID at the location. See ""NotFirst"" and ""Min"" columns."
+Stage,"Life stage at time of detection as determined by DART. Life Stage of PIT Tag Observations at McNary Dam Juvenile (MCJ) rkm 470, Columbia Mainstem presented in this report are based on data filtering--including migration year, release year, release length, observation year, release site, and other criteria--used to determine the stage of the PIT-tagged fish at the time of the detection. DART categorizes PIT Tag observations into three stages:  Adult, Juvenile, and Unknown."
+Travel_Days,Days from Release Date to Observation Time.
+NotFirst,"Indicates that the query result detection event is not the first detection of Tag ID at the specified location. At some projects, this can indicate reascension of the project. However, detection sites may be inline within the project, as is the case with BO3->BO4 and BO2->BO4 at Bonneville. As a result, the total number of observations may be greater than the total number of unique PIT-tagged fish included in this report. The PTAGIS Interrogation Site Configurations are available from https://www.ptagis.org/."
+Min_Time,"Minimum or first detection time for the Tag ID at the specified Location, McNary Dam Juvenile (MCJ) rkm 470, Columbia Mainstem, not constrained by query Date Range, 07/01/2019 - 09/29/2019."
+Max_Time,"Maximum or last detection time (to date) for the Tag ID at the specified Location, McNary Dam Juvenile (MCJ) rkm 470, Columbia Mainstem, not constrained by query Date Range, 07/01/2019 - 09/29/2019."
+Location_Days,Days from Min to Max detection times.

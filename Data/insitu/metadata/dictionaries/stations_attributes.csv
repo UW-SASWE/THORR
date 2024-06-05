@@ -1,0 +1,9 @@
+﻿Attribute_name,Description
+station_ID,"Name of the station,"" dam or project. The ID of the station per the THORR project."
+id_at_source,"The ID of the station as represented at the source of the station data. In the case of multiple sources,"" this attribute refers to the ID at the primary source. Left empty when there is no specific name at the source."
+available_data,"A dictionary of the available data at the station. The dictionary may contain the followinng: {'conditions': [a list of the available conditions data], 'fish': [a list of the available fish data], 'pit_tag':[a list of the available pit tag data]}. Refer to the available_data dictionary for information of the possible keys of the dictionary and the type of value."
+source_URL,"A URL to the source of the station data."
+latitude,Latitude in the decimal degrees (WSG84 - EPSG:4326).
+longitude,Longitude in the decimal degrees (WSG84 - EPSG:4326).
+description,Brief description of the station.
+site_params,A key-value dictionary (JSON format) of any additional information/parameters specific to the station. Refer to the site_params dictionary for information of some possible keys of the dictionary and the type of value.

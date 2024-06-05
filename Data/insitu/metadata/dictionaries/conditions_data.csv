@@ -1,0 +1,10 @@
+﻿Attribute_name,Unit,Description
+min_temp(C),deg C,Observed daily minimum water temperature
+max_temp(C),deg C,Observed daily maximum water temperature
+avg_temp(C),deg C,Observed daily average water temperature
+inflow(m3/d),m3/d,"If location is a dam, this refers to the upstream flow; for reaches, this is left as null. Note: If there is a spill, the outflow is likely to not include the spill (confirm from source). "
+outflow(m3/d),m3/d,Discharge from dam or reach.
+spill(m3/d),m3/d,Discharge through the spillway of a dam
+wse(m),m,water surface elevation at the reach or upstream of dam
+wse_tail(m),m,tailwater surface elevation at the dam.
+storage(m3),m3,Volume of water stored in the reservoir
