@@ -259,8 +259,6 @@ function loadDamsGeom(BasinID) {
 var damsPointsLayer;
 
 function loadDamsPoints(BasinID) {
-
-  
   var formData = new FormData();
   formData.append("BasinID", BasinID);
 
@@ -274,7 +272,7 @@ function loadDamsPoints(BasinID) {
       var LeafIcon = L.Icon.extend({
         options: {},
       });
-      
+
       var markercluster = L.markerClusterGroup({
         showCoverageOnHover: false,
         maxClusterRadius: 50,
@@ -347,11 +345,18 @@ function loadDamsPoints(BasinID) {
 
 // get bound of a reach or dam feature
 function zoomToFeatureBounds(type, id, updateTitle = true) {
-  var xmlhttp = new XMLHttpRequest();
-  xmlhttp.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
-      // console.log(this.responseText);
-      var geoJSON = JSON.parse(this.responseText);
+  var formData = new FormData();
+  formData.append("type", type);
+  formData.append("id", id);
+
+  fetch("php/getFeatureBounds.php", {
+    method: "POST",
+    body: formData,
+  })
+    // .then((response) => response.text())
+    .then((response) => response.text())
+    .then((responseText) => {
+      var geoJSON = JSON.parse(responseText);
       // var l = L.geoJSON(geoJSON);
       window.map.fitBounds(L.geoJSON(geoJSON).getBounds().pad(0.25));
 
@@ -367,12 +372,35 @@ function zoomToFeatureBounds(type, id, updateTitle = true) {
         window.map.invalidateSize();
         window.dispatchEvent(new Event("resize"));
       }, 400);
-    }
-  };
+    })
+    .catch((error) => console.error("Error:", error));
 
-  xmlhttp.open("POST", "php/getFeatureBounds.php", true);
-  xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-  xmlhttp.send("type=" + type + "&id=" + id);
+  // var xmlhttp = new XMLHttpRequest();
+  // xmlhttp.onreadystatechange = function () {
+  //   if (this.readyState == 4 && this.status == 200) {
+  //     // console.log(this.responseText);
+  //     var geoJSON = JSON.parse(this.responseText);
+  //     // var l = L.geoJSON(geoJSON);
+  //     window.map.fitBounds(L.geoJSON(geoJSON).getBounds().pad(0.25));
+
+  //     if (updateTitle) {
+  //       updateInfoPanelTitle(geoJSON.features[0].properties);
+  //     }
+  //     var mapHeight = document.getElementById("map").style.height;
+  //     setTimeout(function () {
+  //       if (mapHeight == "100vh") {
+  //         document.getElementById("map").style.height = "60vh";
+  //       }
+  //       document.getElementById("info-panel").classList.add("show");
+  //       window.map.invalidateSize();
+  //       window.dispatchEvent(new Event("resize"));
+  //     }, 400);
+  //   }
+  // };
+
+  // xmlhttp.open("POST", "php/getFeatureBounds.php", true);
+  // xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+  // xmlhttp.send("type=" + type + "&id=" + id);
 }
 
 // leaflet style functions
@@ -693,38 +721,68 @@ function onDamSelectorChange() {
 // fetch plotting data from the database
 function fetchFeaturePlotData(type, id) {
   if (type == "reach") {
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
-      if (this.readyState == 4 && this.status == 200) {
-        // console.log(this.responseText)
-        selectedFeature.data = JSON.parse(this.responseText);
-        // console.log(selectedFeature.data)
+    var formData = new FormData();
+    formData.append("ReachID", id);
+
+    fetch("php/reachPlotData.php", {
+      method: "POST",
+      body: formData,
+    })
+      // .then((response) => response.text())
+      .then((response) => response.text())
+      .then((responseText) => {
+        selectedFeature.data = JSON.parse(responseText);
         plotData();
-      }
-    };
-    xmlhttp.open("POST", "php/reachPlotData.php", true);
-    // xmlhttp.open("POST", "php/reachPlotData_newDB.php", true);
-    xmlhttp.setRequestHeader(
-      "Content-type",
-      "application/x-www-form-urlencoded"
-    );
-    xmlhttp.send("ReachID=" + id);
+      })
+      .catch((error) => console.error("Error:", error));
+
+    // var xmlhttp = new XMLHttpRequest();
+    // xmlhttp.onreadystatechange = function () {
+    //   if (this.readyState == 4 && this.status == 200) {
+    //     // console.log(this.responseText)
+    //     selectedFeature.data = JSON.parse(this.responseText);
+    //     // console.log(selectedFeature.data)
+    //     plotData();
+    //   }
+    // };
+    // xmlhttp.open("POST", "php/reachPlotData.php", true);
+    // // xmlhttp.open("POST", "php/reachPlotData_newDB.php", true);
+    // xmlhttp.setRequestHeader(
+    //   "Content-type",
+    //   "application/x-www-form-urlencoded"
+    // );
+    // xmlhttp.send("ReachID=" + id);
   } else if (type == "dam") {
-    var xmlhttp = new XMLHttpRequest();
-    xmlhttp.onreadystatechange = function () {
-      if (this.readyState == 4 && this.status == 200) {
-        // console.log(JSON.parse(this.responseText));
-        selectedFeature.data = JSON.parse(this.responseText);
-        // console.log(selectedFeature.data)
+    var formData = new FormData();
+    formData.append("DamID", id);
+
+    fetch("php/damPlotData.php", {
+      method: "POST",
+      body: formData,
+    })
+      // .then((response) => response.text())
+      .then((response) => response.text())
+      .then((responseText) => {
+        selectedFeature.data = JSON.parse(responseText);
         plotData();
-      }
-    };
-    xmlhttp.open("POST", "php/damPlotData.php", true);
-    xmlhttp.setRequestHeader(
-      "Content-type",
-      "application/x-www-form-urlencoded"
-    );
-    xmlhttp.send("DamID=" + id);
+      })
+      .catch((error) => console.error("Error:", error));
+
+    // var xmlhttp = new XMLHttpRequest();
+    // xmlhttp.onreadystatechange = function () {
+    //   if (this.readyState == 4 && this.status == 200) {
+    //     // console.log(JSON.parse(this.responseText));
+    //     selectedFeature.data = JSON.parse(this.responseText);
+    //     // console.log(selectedFeature.data)
+    //     plotData();
+    //   }
+    // };
+    // xmlhttp.open("POST", "php/damPlotData.php", true);
+    // xmlhttp.setRequestHeader(
+    //   "Content-type",
+    //   "application/x-www-form-urlencoded"
+    // );
+    // xmlhttp.send("DamID=" + id);
   }
 }
 
@@ -3013,7 +3071,9 @@ function downloadData() {
           // Create a link and set the URL as the href
           const a = document.createElement("a");
           a.href = url;
-          a.download = "download" + id + ".csv";
+
+          var download_fname = "dam_" + id + "_" + timeScale + ".csv";
+          a.download = download_fname;
           // Append the link to the body
           document.body.appendChild(a);
           // Trigger the download
@@ -3045,7 +3105,8 @@ function downloadData() {
           // Create a link and set the URL as the href
           const a = document.createElement("a");
           a.href = url;
-          a.download = "download" + id + ".csv";
+          var download_fname = "reach_" + id + "_" + timeScale + ".csv";
+          a.download = download_fname;
           // Append the link to the body
           document.body.appendChild(a);
           // Trigger the download
@@ -3055,23 +3116,6 @@ function downloadData() {
         })
         .catch((error) => console.error("Error:", error));
       break;
-
-    // var xmlhttp = new XMLHttpRequest();
-    // // xmlhttp.onreadystatechange = function () {
-    // //   if (this.readyState == 4 && this.status == 200) {
-    // //     // console.log(this.responseText)
-    // //     selectedFeature.data = JSON.parse(this.responseText);
-    // //     // console.log(selectedFeature.data)
-    // //     plotData();
-    // //   }
-    // // };
-    // xmlhttp.open("POST", "php/reachDataDownload.php", true);
-    // // xmlhttp.open("POST", "php/reachPlotData_newDB.php", true);
-    // xmlhttp.setRequestHeader(
-    //   "Content-type",
-    //   "application/x-www-form-urlencoded"
-    // );
-    // xmlhttp.send("ReachID=" + id+"&DataType=" + datatype+"&TimeScale=" + timeScale);
   }
 }
 
@@ -3123,7 +3167,20 @@ function gisDownload() {
       // Create a link and set the URL as the href
       const a = document.createElement("a");
       a.href = url;
-      a.download = "gis_download" + ".geojson";
+
+      var download_fname =
+        "Ba_" +
+        basinID +
+        "_Re_" +
+        reachID +
+        "_Ri_" +
+        riverID +
+        "_" +
+        startDate +
+        "_" +
+        endDate +
+        ".geojson";
+      a.download = download_fname;
       // Append the link to the body
       document.body.appendChild(a);
       // Trigger the download
