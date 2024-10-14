@@ -1,2 +1,0 @@
-units,learning_rate,activation,batch_size
-64,0.01,relu,8
