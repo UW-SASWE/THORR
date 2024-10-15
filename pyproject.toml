@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "thorr"
+dynamic = ["version"]
+description = 'THORR - A python package that generates river temperature in a continuous spatiotemporal manner.'
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{ name = "George Darkwah", email = "gdarkwah@uw.edu" }]
+maintainers = [{ name = "George Darkwah", email = "gdarkwah@uw.edu" }]
+keywords = [
+  "river-temperature",
+  "remote sensing",
+  "temperature",
+  "thermal infrared",
+]
+dependencies = ["geopandas", "mysql-connector-python", "pandas", "matplotlib", "numpy", "shapely", "rasterio"]
+
+[project.urls]
+GitHub = "https://github.com/UW-SASWE/THORR"
+Webapp = "https://depts.washington.edu/saswe/thorr"
+
+[tool.hatch.version]
+path = "src/thorr/__about__.py"
