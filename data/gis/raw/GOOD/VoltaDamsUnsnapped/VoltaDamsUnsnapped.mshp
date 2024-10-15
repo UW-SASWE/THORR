@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SAGA_METADATA>
+  <HISTORY saga-version="2.3.1">
+    <MODULE library="shapes_points" id="0" name="Convert Table to Points">
+      <OPTION type="table_field" id="X" name="X" index="1">Lon (deg)</OPTION>
+      <OPTION type="table_field" id="Y" name="Y" index="0">Lat (deg)</OPTION>
+      <OPTION type="table_field" id="Z" name="Z" index="2">Name</OPTION>
+      <INPUT type="table" id="TABLE" name="Table">
+        <FILE>/home/sttt9209/Desktop/GlobalDamWatch/VoltaDams/VoltaDamsUnsnapped/Volta1200OriginalUnsnapped.txt</FILE>
+      </INPUT>
+      <OUTPUT type="shapes" id="POINTS" name="Points">Volta1200OriginalUnsnapped</OUTPUT>
+    </MODULE>
+  </HISTORY>
+  <SOURCE>
+    <FILE></FILE>
+    <DATABASE>
+      <FIELDS>
+        <FIELD TYPE="DOUBLE">Lat (deg)</FIELD>
+        <FIELD TYPE="DOUBLE">Lon (deg)</FIELD>
+        <FIELD TYPE="INTEGER">Name</FIELD>
+      </FIELDS>
+    </DATABASE>
+    <PROJECTION></PROJECTION>
+  </SOURCE>
+  <DESCRIPTION></DESCRIPTION>
+</SAGA_METADATA>
