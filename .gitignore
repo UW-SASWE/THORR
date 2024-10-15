@@ -193,3 +193,4 @@ jspm_packages/
 *.DS_Store
 Thumbs.db
 .vscode/
+data/ml_model/RFR1.joblib
