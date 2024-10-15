@@ -197,3 +197,7 @@ data/ml_model/RFR1.joblib
 /methods/04-ml_development/var1/ann_*_tuning
 *RFR*.joblib
 methods/04-ml_development/input_data/ml_input_data_all.csv
+data/MySQL/dumps_utf8mb3 (1)/thorr_transfer_Basins.sql
+data/MySQL/dumps_utf8mb3 (1)/thorr_transfer_Rivers.sql
+data/MySQL/dumps_utf8mb3 (2)/thorr_transfer_DamData.sql
+methods/06-temperature_est/reconstructed_data.csv
