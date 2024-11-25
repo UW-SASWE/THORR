@@ -22,17 +22,20 @@ test_read_config()
 
 
 # test connecting to the database
-def test_db_connection(config_file="tests/data/thorr_config.ini", section=["mysql"]):
+def test_db_connection(config_file="tests/data/thorr_config.ini", section=["mysql"], db_type="mysql"):
     config = cfg.read_config(config_path=config_file, required_sections=section)
 
     db_config_path = config[section[0]]["db_config_path"]
 
-    db = database.Connect(config_file=db_config_path, section=section[0])
+    db = database.Connect(config_file=db_config_path, section=section[0], db_type=db_type)
 
-    assert db.connection.is_connected(), "Error in connecting to the database"
+    if db_type == "mysql":
+        assert db.connection.is_connected(), "Error in connecting to the database"
+    elif db_type == "postgresql":
+        assert not db.connection.closed, "Error in connecting to the database"
 
-
-test_db_connection(config_file=".env/config/thorr_config.ini")
+# test_db_connection(config_file=".env/config/thorr_config.ini")
+test_db_connection(config_file=".env/config/thorr_config.ini", section=["postgresql"], db_type="postgresql")
 
 
 # test logging
