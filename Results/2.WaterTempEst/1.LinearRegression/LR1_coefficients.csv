@@ -1,8 +1,0 @@
-variable,coefficient,model
-DayOfMonth_scaled,0.11119830265452545,LR1
-Month_scaled,7.38614529742149,LR1
-LandTemp_scaled,4.540344462127173,LR1
-Width_scaled,0.49101187289039316,LR1
-NDVI_scaled,1.3191456361077714,LR1
-ClimateClass_scaled,-1.372857442180415,LR1
-intercept,8.790160939285146,LR1

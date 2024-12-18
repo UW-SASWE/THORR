@@ -1,0 +1,1 @@
+{"init_units": 128, "learning_rate": 0.001, "activation": "relu", "batch_size": 128, "tuner/epochs": 300, "tuner/initial_epoch": 100, "tuner/bracket": 5, "tuner/round": 5, "tuner/trial_id": "0422"}

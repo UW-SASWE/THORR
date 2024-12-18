@@ -1,0 +1,5802 @@
+{
+  "type": "FeatureCollection",
+  "name": "temperature_gauges",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_LIB",
+        "source": "DART",
+        "id": "LIB",
+        "description": "Libby Forebay and Dam",
+        "lat": 48.411432,
+        "lon": -115.31354
+      },
+      "geometry": { "type": "Point", "coordinates": [-115.31354, 48.411432] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_CCIW",
+        "source": "DART",
+        "id": "CCIW",
+        "description": "Cascade Island (below BON)",
+        "lat": 45.64850345,
+        "lon": -121.9406632
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.9406632, 45.64850345]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_ALF",
+        "source": "DART",
+        "id": "ALF",
+        "description": "Albeni Falls Forebay and Dam",
+        "lat": 48.178294,
+        "lon": -116.997745
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.997745, 48.178294] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_BON",
+        "source": "DART",
+        "id": "BON",
+        "description": "Bonneville Forebay and Dam",
+        "lat": 45.64416667,
+        "lon": -121.9405556
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.9405556, 45.64416667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_CIBW",
+        "source": "DART",
+        "id": "CIBW",
+        "description": "Boundary (US/Canada)",
+        "lat": 49.00083333,
+        "lon": -117.6283333
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-117.6283333, 49.00083333]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_CHJ",
+        "source": "DART",
+        "id": "CHJ",
+        "description": "Chief Joseph Forebay and Dam",
+        "lat": 47.99527778,
+        "lon": -119.6333333
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.6333333, 47.99527778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_CHQW",
+        "source": "DART",
+        "id": "CHQW",
+        "description": "Chief Joseph Tailrace",
+        "lat": 47.99527778,
+        "lon": -119.6333333
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.6333333, 47.99527778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_CWMW",
+        "source": "DART",
+        "id": "CWMW",
+        "description": "Camas/Washougal WA",
+        "lat": 45.577046,
+        "lon": -122.378253
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.378253, 45.577046] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_DWR",
+        "source": "DART",
+        "id": "DWR",
+        "description": "Dworshak Forebay",
+        "lat": 46.516351,
+        "lon": -116.297014
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.297014, 46.516351] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_DWQI",
+        "source": "DART",
+        "id": "DWQI",
+        "description": "Dworshak Tailrace",
+        "lat": 46.516351,
+        "lon": -116.297014
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.297014, 46.516351] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_GCL",
+        "source": "DART",
+        "id": "GCL",
+        "description": "Grand Coulee Forebay and Dam",
+        "lat": 47.954652,
+        "lon": -118.98095
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.98095, 47.954652] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_GCGW",
+        "source": "DART",
+        "id": "GCGW",
+        "description": "Grand Coulee Downstream",
+        "lat": 47.954652,
+        "lon": -118.98095
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.98095, 47.954652] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_HGHM",
+        "source": "DART",
+        "id": "HGHM",
+        "description": "Hungry Horse Tailrace",
+        "lat": 48.339662,
+        "lon": -114.010417
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.010417, 48.339662] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_IHR",
+        "source": "DART",
+        "id": "IHR",
+        "description": "Ice Harbor Forebay and Dam",
+        "lat": 46.25,
+        "lon": -118.88
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.88, 46.25] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_IDSW",
+        "source": "DART",
+        "id": "IDSW",
+        "description": "Ice Harbor Tailrace",
+        "lat": 46.25,
+        "lon": -118.88
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.88, 46.25] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_JDA",
+        "source": "DART",
+        "id": "JDA",
+        "description": "John Day Forebay and Dam",
+        "lat": 45.71638889,
+        "lon": -120.6944444
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.6944444, 45.71638889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_JHAW",
+        "source": "DART",
+        "id": "JHAW",
+        "description": "John Day Tailrace",
+        "lat": 45.71638889,
+        "lon": -120.6944444
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.6944444, 45.71638889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_LEWI",
+        "source": "DART",
+        "id": "LEWI",
+        "description": "Lewiston ID",
+        "lat": 46.418791,
+        "lon": -117.001164
+      },
+      "geometry": { "type": "Point", "coordinates": [-117.001164, 46.418791] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_LGS",
+        "source": "DART",
+        "id": "LGS",
+        "description": "Little Goose Forebay and Dam",
+        "lat": 46.587,
+        "lon": -118.028
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.028, 46.587] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_LGSW",
+        "source": "DART",
+        "id": "LGSW",
+        "description": "Little Goose Tailrace",
+        "lat": 46.587,
+        "lon": -118.028
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.028, 46.587] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_LWG",
+        "source": "DART",
+        "id": "LWG",
+        "description": "Lower Granite Forebay and Dam",
+        "lat": 46.66461538,
+        "lon": -117.4280556
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-117.4280556, 46.66461538]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_LGNW",
+        "source": "DART",
+        "id": "LGNW",
+        "description": "Lower Granite Tailrace",
+        "lat": 46.66461538,
+        "lon": -117.4280556
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-117.4280556, 46.66461538]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_LMN",
+        "source": "DART",
+        "id": "LMN",
+        "description": "Lower Monumental Forebay and Dam",
+        "lat": 46.563,
+        "lon": -118.539
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.539, 46.563] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_LMNW",
+        "source": "DART",
+        "id": "LMNW",
+        "description": "Lower Monumental Tailrace",
+        "lat": 46.563,
+        "lon": -118.539
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.539, 46.563] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_MCN",
+        "source": "DART",
+        "id": "MCN",
+        "description": "McNary Forebay and Dam (Washington)",
+        "lat": 45.92972222,
+        "lon": -119.2961111
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.2961111, 45.92972222]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_MCPW",
+        "source": "DART",
+        "id": "MCPW",
+        "description": "McNary Tailrace",
+        "lat": 45.92972222,
+        "lon": -119.2961111
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.2961111, 45.92972222]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_PAQW",
+        "source": "DART",
+        "id": "PAQW",
+        "description": "Pasco WA",
+        "lat": 46.224483,
+        "lon": -119.134932
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.134932, 46.224483] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_PRD",
+        "source": "DART",
+        "id": "PRD",
+        "description": "Priest Rapids Forebay and Dam",
+        "lat": 46.6431876,
+        "lon": -119.9094884
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.9094884, 46.6431876] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_PRXW",
+        "source": "DART",
+        "id": "PRXW",
+        "description": "Priest Rapids Downstream",
+        "lat": 46.6431876,
+        "lon": -119.9094884
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.9094884, 46.6431876] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_RIS",
+        "source": "DART",
+        "id": "RIS",
+        "description": "Rock Island Forebay and Dam",
+        "lat": 47.342155,
+        "lon": -120.094773
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.094773, 47.342155] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_RIGW",
+        "source": "DART",
+        "id": "RIGW",
+        "description": "Rock Island Tailrace",
+        "lat": 47.342155,
+        "lon": -120.094773
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.094773, 47.342155] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_RRH",
+        "source": "DART",
+        "id": "RRH",
+        "description": "Rocky Reach Forebay and Dam",
+        "lat": 47.53333333,
+        "lon": -120.2955556
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.2955556, 47.53333333]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_RRDW",
+        "source": "DART",
+        "id": "RRDW",
+        "description": "Rocky Reach Tailrace",
+        "lat": 47.53333333,
+        "lon": -120.2955556
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.2955556, 47.53333333]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_TDA",
+        "source": "DART",
+        "id": "TDA",
+        "description": "The Dalles Forebay and Dam",
+        "lat": 45.61222222,
+        "lon": -121.1344444
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.1344444, 45.61222222]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_TDDO",
+        "source": "DART",
+        "id": "TDDO",
+        "description": "The Dalles Tailrace",
+        "lat": 45.61222222,
+        "lon": -121.1344444
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.1344444, 45.61222222]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_WAN",
+        "source": "DART",
+        "id": "WAN",
+        "description": "Wanapum Forebay and Dam",
+        "lat": 46.875213,
+        "lon": -119.971004
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.971004, 46.875213] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_WANW",
+        "source": "DART",
+        "id": "WANW",
+        "description": "Wanapum Downstream",
+        "lat": 46.875213,
+        "lon": -119.971004
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.971004, 46.875213] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_WRNO",
+        "source": "DART",
+        "id": "WRNO",
+        "description": "Warrendale OR",
+        "lat": 45.615194,
+        "lon": -122.017701
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.017701, 45.615194] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_WEL",
+        "source": "DART",
+        "id": "WEL",
+        "description": "Wells Forebay and Dam",
+        "lat": 47.9454,
+        "lon": -119.866
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.866, 47.9454] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_WELW",
+        "source": "DART",
+        "id": "WELW",
+        "description": "Wells Tailrace",
+        "lat": 47.9454,
+        "lon": -119.866
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.866, 47.9454] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "DART_WFF",
+        "source": "DART",
+        "id": "WFF",
+        "description": "Willamette Falls (Sullivan Project)",
+        "lat": 45.35171201,
+        "lon": -122.6193518
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.6193518, 45.35171201]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14070615",
+        "source": "USGS",
+        "id": "14070615",
+        "description": "M F TUMALO CREEK ABV PROWELL SPRINGS, NR BEND, OR",
+        "lat": 44.03711389,
+        "lon": -121.6327694
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.6327694, 44.03711389]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14070620",
+        "source": "USGS",
+        "id": "14070620",
+        "description": "PROWELL SPRINGS DIVERSION POOL, NEAR BEND, OR",
+        "lat": 44.03721667,
+        "lon": -121.632986
+      },
+      "geometry": { "type": "Point", "coordinates": [-121.632986, 44.03721667] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14070621",
+        "source": "USGS",
+        "id": "14070621",
+        "description": "DIVERSION CANAL TO BRIDGE CREEK, NEAR BEND, OR",
+        "lat": 44.03706667,
+        "lon": -121.6325889
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.6325889, 44.03706667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14070624",
+        "source": "USGS",
+        "id": "14070624",
+        "description": "M F TUMALO CREEK BLW PROWELL SPRINGS, NR BEND, OR",
+        "lat": 44.03722778,
+        "lon": -121.6325639
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.6325639, 44.03722778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14070900",
+        "source": "USGS",
+        "id": "14070900",
+        "description": "BRIDGE CREEK BELOW INTAKE, NEAR BEND, OR",
+        "lat": 44.0310833,
+        "lon": -121.5678333
+      },
+      "geometry": { "type": "Point", "coordinates": [-121.5678333, 44.0310833] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14144800",
+        "source": "USGS",
+        "id": "14144800",
+        "description": "MIDDLE FORK WILLAMETTE RIVER NR OAKRIDGE, OR",
+        "lat": 43.60178867,
+        "lon": -122.4575474
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.4575474, 43.60178867]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14144900",
+        "source": "USGS",
+        "id": "14144900",
+        "description": "HILLS CR AB HILLS CR RES, NR OAKRIDGE, OR",
+        "lat": 43.6804006,
+        "lon": -122.3705999
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.3705999, 43.6804006] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14145500",
+        "source": "USGS",
+        "id": "14145500",
+        "description": "MF WILLAMETTE RIVER ABV SALT CRK, NEAR OAKRIDGE,OR",
+        "lat": 43.72095655,
+        "lon": -122.4378256
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.4378256, 43.72095655]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14147500",
+        "source": "USGS",
+        "id": "14147500",
+        "description": "N FK OF M FK WILLAMETTE R NR OAKRIDGE, OR",
+        "lat": 43.7567902,
+        "lon": -122.5053292
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.5053292, 43.7567902] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14148000",
+        "source": "USGS",
+        "id": "14148000",
+        "description": "MF WILLAMETTE RIVER BLW N FORK, NR OAKRIDGE, OR.",
+        "lat": 43.80123517,
+        "lon": -122.5608879
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.5608879, 43.80123517]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14150000",
+        "source": "USGS",
+        "id": "14150000",
+        "description": "MIDDLE FORK WILLAMETTE RIVER NEAR DEXTER, OR",
+        "lat": 43.9456815,
+        "lon": -122.8372967
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.8372967, 43.9456815] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14150290",
+        "source": "USGS",
+        "id": "14150290",
+        "description": "FALL CREEK ABOVE NORTH FORK, NEAR LOWELL, OR",
+        "lat": 43.9672222,
+        "lon": -122.6297222
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.6297222, 43.9672222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14150800",
+        "source": "USGS",
+        "id": "14150800",
+        "description": "WINBERRY CREEK NEAR LOWELL,OR",
+        "lat": 43.9142924,
+        "lon": -122.6886762
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.6886762, 43.9142924] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14151000",
+        "source": "USGS",
+        "id": "14151000",
+        "description": "FALL CREEK BLW WINBERRY CREEK, NEAR FALL CREEK, OR",
+        "lat": 43.94429299,
+        "lon": -122.774794
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.774794, 43.94429299] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14152000",
+        "source": "USGS",
+        "id": "14152000",
+        "description": "MIDDLE FORK WILLAMETTE RIVER AT JASPER, OR",
+        "lat": 43.99818166,
+        "lon": -122.9059126
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.9059126, 43.99818166]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14152500",
+        "source": "USGS",
+        "id": "14152500",
+        "description": "COAST FORK WILLAMETTE AT LONDON, OR",
+        "lat": 43.64151015,
+        "lon": -123.0859089
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.0859089, 43.64151015]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14153500",
+        "source": "USGS",
+        "id": "14153500",
+        "description": "COAST FORK WILLAMETTE R BLW COTTAGE GROVE DAM, OR",
+        "lat": 43.72067785,
+        "lon": -123.0497994
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.0497994, 43.72067785]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14154500",
+        "source": "USGS",
+        "id": "14154500",
+        "description": "ROW RIVER ABOVE PITCHER CREEK, NEAR DORENA, OR",
+        "lat": 43.7359565,
+        "lon": -122.8734019
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.8734019, 43.7359565] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14155500",
+        "source": "USGS",
+        "id": "14155500",
+        "description": "ROW RIVER NEAR COTTAGE GROVE, OR",
+        "lat": 43.7929012,
+        "lon": -122.9914655
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.9914655, 43.7929012] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14157500",
+        "source": "USGS",
+        "id": "14157500",
+        "description": "COAST FORK WILLAMETTE RIVER NEAR GOSHEN, OR",
+        "lat": 43.98040324,
+        "lon": -122.96647
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.96647, 43.98040324] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14159200",
+        "source": "USGS",
+        "id": "14159200",
+        "description": "SO FK MCKENZIE RIVER ABV COUGAR LAKE NR RAINBOW OR",
+        "lat": 44.047067,
+        "lon": -122.2178245
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.2178245, 44.047067] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14164700",
+        "source": "USGS",
+        "id": "14164700",
+        "description": "CEDAR CREEK AT SPRINGFIELD, OR",
+        "lat": 44.059348,
+        "lon": -122.9196644
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.9196644, 44.059348] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12488500",
+        "source": "USGS",
+        "id": "12488500",
+        "description": "AMERICAN RIVER NEAR NILE, WA",
+        "lat": 46.97761606,
+        "lon": -121.168696
+      },
+      "geometry": { "type": "Point", "coordinates": [-121.168696, 46.97761606] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12493005",
+        "source": "USGS",
+        "id": "12493005",
+        "description": "TIETON RIVER BELOW OAK CREEK NEAR NACHES, WA",
+        "lat": 46.7275,
+        "lon": -120.809861
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.809861, 46.7275] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12498690",
+        "source": "USGS",
+        "id": "12498690",
+        "description": "NACHES RIVER ABOVE DIVERSION DAM NEAR YAKIMA, WA",
+        "lat": 46.63207037,
+        "lon": -120.5886789
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.5886789, 46.63207037]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12498986",
+        "source": "USGS",
+        "id": "12498986",
+        "description": "COWICHE CREEK NEAR YAKIMA",
+        "lat": 46.62707045,
+        "lon": -120.5811787
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.5811787, 46.62707045]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14076500",
+        "source": "USGS",
+        "id": "14076500",
+        "description": "DESCHUTES RIVER NEAR CULVER, OR",
+        "lat": 44.4987293,
+        "lon": -121.3211558
+      },
+      "geometry": { "type": "Point", "coordinates": [-121.3211558, 44.4987293] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14087380",
+        "source": "USGS",
+        "id": "14087380",
+        "description": "CROOKED RIVER BLW OSBORNE CANYON, NR OPAL CITY, OR",
+        "lat": 44.4268972,
+        "lon": -121.2328728
+      },
+      "geometry": { "type": "Point", "coordinates": [-121.2328728, 44.4268972] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14087400",
+        "source": "USGS",
+        "id": "14087400",
+        "description": "CROOKED RIVER BELOW OPAL SPRINGS, NEAR CULVER, OR",
+        "lat": 44.4923407,
+        "lon": -121.298377
+      },
+      "geometry": { "type": "Point", "coordinates": [-121.298377, 44.4923407] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14091500",
+        "source": "USGS",
+        "id": "14091500",
+        "description": "METOLIUS RIVER NEAR GRANDVIEW, OR",
+        "lat": 44.6262275,
+        "lon": -121.4839433
+      },
+      "geometry": { "type": "Point", "coordinates": [-121.4839433, 44.6262275] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14092500",
+        "source": "USGS",
+        "id": "14092500",
+        "description": "DESCHUTES RIVER NEAR MADRAS, OR",
+        "lat": 44.72595225,
+        "lon": -121.2469939
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.2469939, 44.72595225]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14103000",
+        "source": "USGS",
+        "id": "14103000",
+        "description": "DESCHUTES RIVER AT MOODY, NEAR BIGGS, OR",
+        "lat": 45.6220678,
+        "lon": -120.9056203
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.9056203, 45.6220678] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14105700",
+        "source": "USGS",
+        "id": "14105700",
+        "description": "COLUMBIA RIVER AT THE DALLES, OR",
+        "lat": 45.60827778,
+        "lon": -121.1899167
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.1899167, 45.60827778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14133400",
+        "source": "USGS",
+        "id": "14133400",
+        "description": "BEAR CREEK NEAR RHODODENDRON, OR.",
+        "lat": 45.3401188,
+        "lon": -121.931191
+      },
+      "geometry": { "type": "Point", "coordinates": [-121.931191, 45.3401188] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14137002",
+        "source": "USGS",
+        "id": "14137002",
+        "description": "SANDY RIVER BELOW MARMOT DAM, NEAR MARMOT, OR",
+        "lat": 45.3995642,
+        "lon": -122.1373068
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.1373068, 45.3995642] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14138720",
+        "source": "USGS",
+        "id": "14138720",
+        "description": "BULL RUN RIVER AT LOWER FLUME NR BRIGHTWOOD, OR",
+        "lat": 45.4709515,
+        "lon": -121.8653567
+      },
+      "geometry": { "type": "Point", "coordinates": [-121.8653567, 45.4709515] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14138850",
+        "source": "USGS",
+        "id": "14138850",
+        "description": "BULL RUN RIVER NEAR MULTNOMAH FALLS, OR",
+        "lat": 45.4981743,
+        "lon": -122.0123049
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.0123049, 45.4981743] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14138870",
+        "source": "USGS",
+        "id": "14138870",
+        "description": "FIR CREEK NEAR BRIGHTWOOD, OR",
+        "lat": 45.48011889,
+        "lon": -122.0256385
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.0256385, 45.48011889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14138900",
+        "source": "USGS",
+        "id": "14138900",
+        "description": "NORTH FORK BULL RUN RIVER NEAR MULTNOMAH FALLS, OR",
+        "lat": 45.4942856,
+        "lon": -122.0359167
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.0359167, 45.4942856] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14139800",
+        "source": "USGS",
+        "id": "14139800",
+        "description": "SOUTH FORK BULL RUN RIVER NEAR BULL RUN, OR",
+        "lat": 45.444564,
+        "lon": -122.1095292
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.1095292, 45.444564] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14140000",
+        "source": "USGS",
+        "id": "14140000",
+        "description": "BULL RUN RIVER NEAR BULL RUN (RIVER ONLY), OR",
+        "lat": 45.4373,
+        "lon": -122.1796556
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.1796556, 45.4373] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14140020",
+        "source": "USGS",
+        "id": "14140020",
+        "description": "BULL RUN R AT LARSON'S BRIDGE, NEAR BULL RUN, OR",
+        "lat": 45.43175906,
+        "lon": -122.19542
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.19542, 45.43175906] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14141500",
+        "source": "USGS",
+        "id": "14141500",
+        "description": "LITTLE SANDY RIVER NEAR BULL RUN, OR",
+        "lat": 45.41539777,
+        "lon": -122.1714746
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.1714746, 45.41539777]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14142500",
+        "source": "USGS",
+        "id": "14142500",
+        "description": "SANDY RIVER BLW BULL RUN RIVER, NR BULL RUN, OR",
+        "lat": 45.4490094,
+        "lon": -122.2450885
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.2450885, 45.4490094] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14158100",
+        "source": "USGS",
+        "id": "14158100",
+        "description": "WILLAMETTE RIVER AT OWOSSO BRIDGE AT EUGENE, OR",
+        "lat": 44.09166667,
+        "lon": -123.116111
+      },
+      "geometry": { "type": "Point", "coordinates": [-123.116111, 44.09166667] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14158500",
+        "source": "USGS",
+        "id": "14158500",
+        "description": "MCKENZIE RIVER AT OUTLET OF CLEAR LAKE, OR",
+        "lat": 44.3609545,
+        "lon": -121.9956172
+      },
+      "geometry": { "type": "Point", "coordinates": [-121.9956172, 44.3609545] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14158740",
+        "source": "USGS",
+        "id": "14158740",
+        "description": "MCKENZIE RIVER BL PAYNE CR, NR BELKNAP SPRINGS, OR",
+        "lat": 44.28638889,
+        "lon": -122.0368056
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.0368056, 44.28638889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14158790",
+        "source": "USGS",
+        "id": "14158790",
+        "description": "SMITH RIVER ABV SMITH R RESV,NR BELKNAP SPRNGS,OR",
+        "lat": 44.3345666,
+        "lon": -122.0470074
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.0470074, 44.3345666] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14158798",
+        "source": "USGS",
+        "id": "14158798",
+        "description": "SMITH RIVER ABV TRAIL BRDG RESV NR BELKNAP SPRINGS",
+        "lat": 44.28988889,
+        "lon": -122.0485833
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.0485833, 44.28988889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14158850",
+        "source": "USGS",
+        "id": "14158850",
+        "description": "MCKENZIE R BLW TRAIL BR DAM NR BELKNAP SPRINGS, OR",
+        "lat": 44.2679001,
+        "lon": -122.0497826
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.0497826, 44.2679001] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14159110",
+        "source": "USGS",
+        "id": "14159110",
+        "description": "MCKENZIE RIVER ABOVE SOUTH FORK, NEAR RAINBOW, OR",
+        "lat": 44.1663755,
+        "lon": -122.2565336
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.2565336, 44.1663755] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14159500",
+        "source": "USGS",
+        "id": "14159500",
+        "description": "SOUTH FORK MCKENZIE RIVER NEAR RAINBOW, OR",
+        "lat": 44.13595817,
+        "lon": -122.248391
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.248391, 44.13595817] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14161100",
+        "source": "USGS",
+        "id": "14161100",
+        "description": "BLUE RIVER BELOW TIDBITS CREEK, NR BLUE RIVER, OR",
+        "lat": 44.2179043,
+        "lon": -122.2650676
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.2650676, 44.2179043] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14161500",
+        "source": "USGS",
+        "id": "14161500",
+        "description": "LOOKOUT CREEK NEAR BLUE RIVER, OR",
+        "lat": 44.2095708,
+        "lon": -122.256733
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.256733, 44.2095708] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14162050",
+        "source": "USGS",
+        "id": "14162050",
+        "description": "NF QUARTZ CREEK NEAR BLUE RIVER, OR",
+        "lat": 44.1845,
+        "lon": -122.3148056
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.3148056, 44.1845] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14162200",
+        "source": "USGS",
+        "id": "14162200",
+        "description": "BLUE RIVER AT BLUE RIVER, OR",
+        "lat": 44.16234819,
+        "lon": -122.3331192
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.3331192, 44.16234819]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14162450",
+        "source": "USGS",
+        "id": "14162450",
+        "description": "QUARTZ CREEK NEAR FINN ROCK, OR",
+        "lat": 44.1233611,
+        "lon": -122.3787222
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.3787222, 44.1233611] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14162500",
+        "source": "USGS",
+        "id": "14162500",
+        "description": "MCKENZIE RIVER NEAR VIDA, OR",
+        "lat": 44.1248487,
+        "lon": -122.47062
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.47062, 44.1248487] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14163000",
+        "source": "USGS",
+        "id": "14163000",
+        "description": "GATE CREEK AT VIDA, OR",
+        "lat": 44.1460861,
+        "lon": -122.5730333
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.5730333, 44.1460861] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14163150",
+        "source": "USGS",
+        "id": "14163150",
+        "description": "MCKENZIE RIVER BLW LEABURG DAM, NR LEABURG, OR",
+        "lat": 44.123738,
+        "lon": -122.6275715
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.6275715, 44.123738] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14163900",
+        "source": "USGS",
+        "id": "14163900",
+        "description": "MCKENZIE RIVER NEAR WALTERVILLE, OR",
+        "lat": 44.0698492,
+        "lon": -122.7711874
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.7711874, 44.0698492] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14164550",
+        "source": "USGS",
+        "id": "14164550",
+        "description": "CAMP CRK AT CAMP CRK RD BRIDGE, NR SPRINGFIELD, OR",
+        "lat": 44.07066667,
+        "lon": -122.8846667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.8846667, 44.07066667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14164900",
+        "source": "USGS",
+        "id": "14164900",
+        "description": "McKENZIE RIVER ABV HAYDEN BR, AT SPRINGFIELD,OR",
+        "lat": 44.0712365,
+        "lon": -122.9645273
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.9645273, 44.0712365] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14165500",
+        "source": "USGS",
+        "id": "14165500",
+        "description": "MCKENZIE RIVER NEAR COBURG, OR",
+        "lat": 44.11305556,
+        "lon": -123.0469722
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.0469722, 44.11305556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14166000",
+        "source": "USGS",
+        "id": "14166000",
+        "description": "WILLAMETTE RIVER AT HARRISBURG, OR",
+        "lat": 44.27040126,
+        "lon": -123.1737036
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.1737036, 44.27040126]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14168000",
+        "source": "USGS",
+        "id": "14168000",
+        "description": "FERN RIDGE LAKE NEAR ELMIRA, OR",
+        "lat": 44.12067879,
+        "lon": -123.3012062
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.3012062, 44.12067879]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14169000",
+        "source": "USGS",
+        "id": "14169000",
+        "description": "LONG TOM RIVER NEAR ALVADORE, OR",
+        "lat": 44.12345657,
+        "lon": -123.2998173
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.2998173, 44.12345657]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14170000",
+        "source": "USGS",
+        "id": "14170000",
+        "description": "LONG TOM RIVER AT MONROE, OR",
+        "lat": 44.31290047,
+        "lon": -123.2964859
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.2964859, 44.31290047]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14174000",
+        "source": "USGS",
+        "id": "14174000",
+        "description": "WILLAMETTE RIVER AT ALBANY, OR",
+        "lat": 44.6387328,
+        "lon": -123.1067616
+      },
+      "geometry": { "type": "Point", "coordinates": [-123.1067616, 44.6387328] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14178000",
+        "source": "USGS",
+        "id": "14178000",
+        "description": "NO SANTIAM R BLW BOULDER CRK, NR DETROIT, OR",
+        "lat": 44.7067885,
+        "lon": -122.1011859
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.1011859, 44.7067885] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14179000",
+        "source": "USGS",
+        "id": "14179000",
+        "description": "BREITENBUSH R ABV FRENCH CR NR DETROIT, OR.",
+        "lat": 44.75262179,
+        "lon": -122.1289648
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.1289648, 44.75262179]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14179100",
+        "source": "USGS",
+        "id": "14179100",
+        "description": "FRENCH CREEK NEAR DETROIT, OR",
+        "lat": 44.76039965,
+        "lon": -122.1684099
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.1684099, 44.76039965]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14180300",
+        "source": "USGS",
+        "id": "14180300",
+        "description": "BLOWOUT CREEK NEAR DETROIT, OR",
+        "lat": 44.65289999,
+        "lon": -122.130908
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.130908, 44.65289999] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14181500",
+        "source": "USGS",
+        "id": "14181500",
+        "description": "NORTH SANTIAM RIVER AT NIAGARA, OR",
+        "lat": 44.75377778,
+        "lon": -122.2974444
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.2974444, 44.75377778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14181750",
+        "source": "USGS",
+        "id": "14181750",
+        "description": "ROCK CREEK NEAR MILL CITY, OR",
+        "lat": 44.7120665,
+        "lon": -122.4275818
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.4275818, 44.7120665] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14181900",
+        "source": "USGS",
+        "id": "14181900",
+        "description": "LITTLE N SANTIAM RIVER ABV EVANS CR, AT ELKHORN,OR",
+        "lat": 44.8356775,
+        "lon": -122.354803
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.354803, 44.8356775] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14182400",
+        "source": "USGS",
+        "id": "14182400",
+        "description": "LITTLE N SANTIAM R BLW CANYON CK, NEAR MEHAMA, OR",
+        "lat": 44.79345516,
+        "lon": -122.4925835
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.4925835, 44.79345516]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14182500",
+        "source": "USGS",
+        "id": "14182500",
+        "description": "LITTLE NORTH SANTIAM RIVER NEAR MEHAMA, OR",
+        "lat": 44.7915108,
+        "lon": -122.5789738
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.5789738, 44.7915108] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14183000",
+        "source": "USGS",
+        "id": "14183000",
+        "description": "NORTH SANTIAM RIVER AT MEHAMA, OR",
+        "lat": 44.7890109,
+        "lon": -122.6186967
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.6186967, 44.7890109] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14183010",
+        "source": "USGS",
+        "id": "14183010",
+        "description": "NORTH SANTIAM RIVER NEAR MEHAMA, OR",
+        "lat": 44.78805556,
+        "lon": -122.636111
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.636111, 44.78805556] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14183020",
+        "source": "USGS",
+        "id": "14183020",
+        "description": "NORTH SANTIAM RIVER BLW STOUT CREEK, NR MEHAMA, OR",
+        "lat": 44.7782222,
+        "lon": -122.6777222
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.6777222, 44.7782222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14184100",
+        "source": "USGS",
+        "id": "14184100",
+        "description": "NORTH SANTIAM R AT GREENS BRIDGE, NR JEFFERSON, OR",
+        "lat": 44.70789976,
+        "lon": -122.9728698
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.9728698, 44.70789976]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14185000",
+        "source": "USGS",
+        "id": "14185000",
+        "description": "SOUTH SANTIAM RIVER BELOW CASCADIA, OR",
+        "lat": 44.39179225,
+        "lon": -122.4975817
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.4975817, 44.39179225]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14185800",
+        "source": "USGS",
+        "id": "14185800",
+        "description": "MIDDLE SANTIAM R NEAR CASCADIA, OR",
+        "lat": 44.5151239,
+        "lon": -122.3720249
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.3720249, 44.5151239] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14185900",
+        "source": "USGS",
+        "id": "14185900",
+        "description": "QUARTZVILLE CREEK NEAR CASCADIA, OR",
+        "lat": 44.54012357,
+        "lon": -122.4359155
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.4359155, 44.54012357]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14186200",
+        "source": "USGS",
+        "id": "14186200",
+        "description": "MIDDLE SANTIAM R BLW GREEN PETER DAM NR FOSTER, OR",
+        "lat": 44.44818005,
+        "lon": -122.5503613
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.5503613, 44.44818005]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14187200",
+        "source": "USGS",
+        "id": "14187200",
+        "description": "SOUTH SANTIAM RIVER NEAR FOSTER, OR",
+        "lat": 44.4123468,
+        "lon": -122.6886956
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.6886956, 44.4123468] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14187500",
+        "source": "USGS",
+        "id": "14187500",
+        "description": "SOUTH SANTIAM RIVER AT WATERLOO, OR",
+        "lat": 44.4984564,
+        "lon": -122.8234214
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.8234214, 44.4984564] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14189050",
+        "source": "USGS",
+        "id": "14189050",
+        "description": "SANTIAM RIVER NEAR JEFFERSON, OR",
+        "lat": 44.7387325,
+        "lon": -123.0498164
+      },
+      "geometry": { "type": "Point", "coordinates": [-123.0498164, 44.7387325] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14197900",
+        "source": "USGS",
+        "id": "14197900",
+        "description": "WILLAMETTE RIVER AT NEWBERG, OR",
+        "lat": 45.2845625,
+        "lon": -122.9614893
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.9614893, 45.2845625] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14200400",
+        "source": "USGS",
+        "id": "14200400",
+        "description": "LITTLE ABIQUA CREEK NEAR SCOTTS MILLS, OR",
+        "lat": 44.95567759,
+        "lon": -122.6284199
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.6284199, 44.95567759]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14201300",
+        "source": "USGS",
+        "id": "14201300",
+        "description": "ZOLLNER CREEK NEAR MT ANGEL, OR",
+        "lat": 45.10039816,
+        "lon": -122.8217596
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.8217596, 45.10039816]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14202650",
+        "source": "USGS",
+        "id": "14202650",
+        "description": "WAPATO CREEK AT SW GASTON ROAD, AT GASTON, OR",
+        "lat": 45.44064167,
+        "lon": -123.125
+      },
+      "geometry": { "type": "Point", "coordinates": [-123.125, 45.44064167] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14202980",
+        "source": "USGS",
+        "id": "14202980",
+        "description": "SCOGGINS CK BLW HENRY HAGG LAKE, NR GASTON, OR",
+        "lat": 45.46927968,
+        "lon": -123.200109
+      },
+      "geometry": { "type": "Point", "coordinates": [-123.200109, 45.46927968] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14203500",
+        "source": "USGS",
+        "id": "14203500",
+        "description": "TUALATIN RIVER NEAR DILLEY, OR",
+        "lat": 45.4748365,
+        "lon": -123.124274
+      },
+      "geometry": { "type": "Point", "coordinates": [-123.124274, 45.4748365] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14205350",
+        "source": "USGS",
+        "id": "14205350",
+        "description": "EF DAIRY CR ABV MURTAUGH CR NR MEACHAM CORNER, OR",
+        "lat": 45.69385556,
+        "lon": -123.0700194
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.0700194, 45.69385556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14205400",
+        "source": "USGS",
+        "id": "14205400",
+        "description": "EAST FORK DAIRY CREEK NEAR MEACHAM CORNER, OR",
+        "lat": 45.68233568,
+        "lon": -123.069553
+      },
+      "geometry": { "type": "Point", "coordinates": [-123.069553, 45.68233568] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14206241",
+        "source": "USGS",
+        "id": "14206241",
+        "description": "TUALATIN RIVER AT HWY 219 NEAR HILLSBORO, OR",
+        "lat": 45.50011635,
+        "lon": -122.9912157
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.9912157, 45.50011635]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14206694",
+        "source": "USGS",
+        "id": "14206694",
+        "description": "TUALATIN RIVER AT RIVER MILE 24.5, NR SCHOLLS, OR",
+        "lat": 45.40150659,
+        "lon": -122.8951003
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.8951003, 45.40150659]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14206950",
+        "source": "USGS",
+        "id": "14206950",
+        "description": "FANNO CREEK AT DURHAM, OR",
+        "lat": 45.403452,
+        "lon": -122.7548185
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.7548185, 45.403452] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14207200",
+        "source": "USGS",
+        "id": "14207200",
+        "description": "TUALATIN RIVER AT OSWEGO DAM, NEAR WEST LINN, OR",
+        "lat": 45.35650877,
+        "lon": -122.6850937
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.6850937, 45.35650877]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14207740",
+        "source": "USGS",
+        "id": "14207740",
+        "description": "WILLAMETTE RIVER ABOVE FALLS, AT OREGON CITY, OR",
+        "lat": 45.348454,
+        "lon": -122.6200918
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.6200918, 45.348454] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14209700",
+        "source": "USGS",
+        "id": "14209700",
+        "description": "FISH CREEK NEAR THREE LYNX, OR",
+        "lat": 45.14762079,
+        "lon": -122.1531366
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.1531366, 45.14762079]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14209710",
+        "source": "USGS",
+        "id": "14209710",
+        "description": "CLACKAMAS RIVER AT CARTER BRIDGE, NEAR ESTACADA,OR",
+        "lat": 45.16706506,
+        "lon": -122.1561923
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.1561923, 45.16706506]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14210000",
+        "source": "USGS",
+        "id": "14210000",
+        "description": "CLACKAMAS RIVER AT ESTACADA, OR",
+        "lat": 45.29984346,
+        "lon": -122.3539746
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.3539746, 45.29984346]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14211010",
+        "source": "USGS",
+        "id": "14211010",
+        "description": "CLACKAMAS RIVER NEAR OREGON CITY, OR",
+        "lat": 45.3792874,
+        "lon": -122.5773134
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.5773134, 45.3792874] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14211400",
+        "source": "USGS",
+        "id": "14211400",
+        "description": "JOHNSON CREEK AT REGNER ROAD, AT GRESHAM, OR",
+        "lat": 45.4865092,
+        "lon": -122.421757
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.421757, 45.4865092] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14211499",
+        "source": "USGS",
+        "id": "14211499",
+        "description": "KELLEY CREEK AT SE 159TH DRIVE AT PORTLAND, OR",
+        "lat": 45.4767869,
+        "lon": -122.4984239
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.4984239, 45.4767869] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14211500",
+        "source": "USGS",
+        "id": "14211500",
+        "description": "JOHNSON CREEK AT SYCAMORE, OR",
+        "lat": 45.47745556,
+        "lon": -122.5080194
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.5080194, 45.47745556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14211542",
+        "source": "USGS",
+        "id": "14211542",
+        "description": "CRYSTAL SPRINGS CREEK AT BYBEE ST, PORTLAND, OR",
+        "lat": 45.47402778,
+        "lon": -122.6417222
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.6417222, 45.47402778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14211546",
+        "source": "USGS",
+        "id": "14211546",
+        "description": "CRYSTAL SPRINGS CREEK AT MOUTH AT PORTLAND, OR",
+        "lat": 45.4606747,
+        "lon": -122.642872
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.642872, 45.4606747] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14211550",
+        "source": "USGS",
+        "id": "14211550",
+        "description": "JOHNSON CREEK AT MILWAUKIE, OR",
+        "lat": 45.452897,
+        "lon": -122.6431496
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.6431496, 45.452897] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14211720",
+        "source": "USGS",
+        "id": "14211720",
+        "description": "WILLAMETTE RIVER AT PORTLAND, OR",
+        "lat": 45.5175,
+        "lon": -122.6691667
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.6691667, 45.5175] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14246900",
+        "source": "USGS",
+        "id": "14246900",
+        "description": "COLUMBIA RIVER AT PORT WESTWARD, NEAR QUINCY, OR",
+        "lat": 46.18122136,
+        "lon": -123.1834539
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.1834539, 46.18122136]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_441344122095400",
+        "source": "USGS",
+        "id": "441344122095400",
+        "description": "LOOKOUT CREEK ABOVE MACK CREEK, NR BLUE RIVER, OR",
+        "lat": 44.2288333,
+        "lon": -122.165111
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.165111, 44.2288333] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_441400122123000",
+        "source": "USGS",
+        "id": "441400122123000",
+        "description": "MCRAE CREEK NEAR BLUE RIVER, OR",
+        "lat": 44.2333611,
+        "lon": -122.2083333
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.2083333, 44.2333611] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_441504122105500",
+        "source": "USGS",
+        "id": "441504122105500",
+        "description": "UNNAMED TRIB TO MCRAE CREEK NEAR BLUE RIVER, OR",
+        "lat": 44.2512222,
+        "lon": -122.1818333
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.1818333, 44.2512222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_441917120532300",
+        "source": "USGS",
+        "id": "441917120532300",
+        "description": "CROOKED RIVER ABV OCHOCO CREEK, NR PRINEVILLE, OR",
+        "lat": 44.32130556,
+        "lon": -120.8896944
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.8896944, 44.32130556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_441923120534300",
+        "source": "USGS",
+        "id": "441923120534300",
+        "description": "CROOKED RIVER BLW OCHOCO CREEK, NR PRINEVILLE, OR",
+        "lat": 44.32305556,
+        "lon": -120.8952778
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.8952778, 44.32305556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_441924120531900",
+        "source": "USGS",
+        "id": "441924120531900",
+        "description": "OCHOCO CREEK 0.2 MI ABV MOUTH, NR PRINEVILLE, OR",
+        "lat": 44.3233333,
+        "lon": -120.888611
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.888611, 44.3233333] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_441942120534600",
+        "source": "USGS",
+        "id": "441942120534600",
+        "description": "MCKAY CREEK 0.2 MI ABV MOUTH, NR PRINEVILLE, OR",
+        "lat": 44.3283333,
+        "lon": -120.896111
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.896111, 44.3283333] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_441944120540100",
+        "source": "USGS",
+        "id": "441944120540100",
+        "description": "CROOKED RIVER BLW MCKAY CREEK, NR PRINEVILLE, OR",
+        "lat": 44.32888889,
+        "lon": -120.9002778
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.9002778, 44.32888889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_442038120571500",
+        "source": "USGS",
+        "id": "442038120571500",
+        "description": "CROOKED RIVER BLW LYTLE CREEK, NR PRINEVILLE, OR",
+        "lat": 44.34392778,
+        "lon": -120.9543028
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.9543028, 44.34392778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_442043120570200",
+        "source": "USGS",
+        "id": "442043120570200",
+        "description": "LYTLE CREEK 0.2 MI ABV MOUTH, NR PRINEVILLE, OR",
+        "lat": 44.34515,
+        "lon": -120.9506667
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.9506667, 44.34515] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_444516122243900",
+        "source": "USGS",
+        "id": "444516122243900",
+        "description": "NORTH SANTIAM RIVER AT GATES, OR",
+        "lat": 44.75452778,
+        "lon": -122.4107222
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.4107222, 44.75452778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_444728122450000",
+        "source": "USGS",
+        "id": "444728122450000",
+        "description": "NORTH SANTIAM RIVER AT GEREN ISLAND, NR STAYTON,OR",
+        "lat": 44.79095556,
+        "lon": -122.7511989
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.7511989, 44.79095556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_452230122512201",
+        "source": "USGS",
+        "id": "452230122512201",
+        "description": "CHICKEN CREEK AT SCHOLLS-SHERWOOD HWY, SHERWOOD OR",
+        "lat": 45.3748654,
+        "lon": -122.8572543
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.8572543, 45.3748654] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_452308122501300",
+        "source": "USGS",
+        "id": "452308122501300",
+        "description": "CHICKEN CREEK ABV SEASONAL TRAIL, NR SHERWOOD, OR",
+        "lat": 45.38541667,
+        "lon": -122.8370556
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.8370556, 45.38541667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_452348122454701",
+        "source": "USGS",
+        "id": "452348122454701",
+        "description": "FANNO CREEK AT DURHAM CITY PARK, DURHAM, OR",
+        "lat": 45.3966131,
+        "lon": -122.7629714
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.7629714, 45.3966131] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_452559122472401",
+        "source": "USGS",
+        "id": "452559122472401",
+        "description": "SUMMER CREEK AT FOWLER MIDDLE SCHOOL, TIGARD, OR",
+        "lat": 45.43284038,
+        "lon": -122.7911617
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.7911617, 45.43284038]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_452631122463101",
+        "source": "USGS",
+        "id": "452631122463101",
+        "description": "ASH CREEK AT SHADY LANE, TIGARD, OR",
+        "lat": 45.4417737,
+        "lon": -122.7765475
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.7765475, 45.4417737] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_452712122474101",
+        "source": "USGS",
+        "id": "452712122474101",
+        "description": "FANNO CREEK AT GEMINI DRIVE, TIGARD, OR",
+        "lat": 45.45310127,
+        "lon": -122.7960566
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.7960566, 45.45310127]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_452718122474700",
+        "source": "USGS",
+        "id": "452718122474700",
+        "description": "FANNO CREEK AT GREENWAY PARK, NEAR SW PEARSON CT",
+        "lat": 45.4551222,
+        "lon": -122.7963056
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.7963056, 45.4551222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_452727122474801",
+        "source": "USGS",
+        "id": "452727122474801",
+        "description": "FANNO CREEK AT GREENWAY PARK NEAR TUCKERWOOD CRT",
+        "lat": 45.4576722,
+        "lon": -122.7966556
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.7966556, 45.4576722] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_452731123092100",
+        "source": "USGS",
+        "id": "452731123092100",
+        "description": "SCOGGINS CREEK NEAR SW OLD HWY 47, NEAR GASTON, OR",
+        "lat": 45.4586111,
+        "lon": -123.1559167
+      },
+      "geometry": { "type": "Point", "coordinates": [-123.1559167, 45.4586111] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_452738122474100",
+        "source": "USGS",
+        "id": "452738122474100",
+        "description": "FANNO CREEK AT GREENWAY PARK, AT SW HALL BLVD",
+        "lat": 45.4606083,
+        "lon": -122.7947806
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.7947806, 45.4606083] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_452842122450101",
+        "source": "USGS",
+        "id": "452842122450101",
+        "description": "FANNO CREEK AT WILLOWMERE DRIVE, PORTLAND, OR",
+        "lat": 45.4781624,
+        "lon": -122.751414
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.751414, 45.4781624] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453004122510301",
+        "source": "USGS",
+        "id": "453004122510301",
+        "description": "BEAVERTON CREEK AT 170TH AVE, BEAVERTON, OR",
+        "lat": 45.5009505,
+        "lon": -122.852045
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.852045, 45.5009505] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453016123052400",
+        "source": "USGS",
+        "id": "453016123052400",
+        "description": "FERNHILL WETLANDS AT OUTFALL, AT FOREST GROVE, OR",
+        "lat": 45.5043611,
+        "lon": -123.0900556
+      },
+      "geometry": { "type": "Point", "coordinates": [-123.0900556, 45.5043611] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453030122560101",
+        "source": "USGS",
+        "id": "453030122560101",
+        "description": "ROCK CREEK AT BROOKWOOD AVENUE, HILLSBORO, OR",
+        "lat": 45.5081944,
+        "lon": -122.9335
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.9335, 45.5081944] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453040123065201",
+        "source": "USGS",
+        "id": "453040123065201",
+        "description": "GALES CREEK AT OLD HWY 47, FOREST GROVE, OR",
+        "lat": 45.510878,
+        "lon": -123.115666
+      },
+      "geometry": { "type": "Point", "coordinates": [-123.115666, 45.510878] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453104122551201",
+        "source": "USGS",
+        "id": "453104122551201",
+        "description": "ROCK CREEK AT WOLL POND WAY, HILLSBORO, OR",
+        "lat": 45.51761657,
+        "lon": -122.9212139
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.9212139, 45.51761657]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453113123003501",
+        "source": "USGS",
+        "id": "453113123003501",
+        "description": "DAIRY CREEK AT HWY 8, HILLSBORO, OR",
+        "lat": 45.52022699,
+        "lon": -123.0110247
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-123.0110247, 45.52022699]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453250122494501",
+        "source": "USGS",
+        "id": "453250122494501",
+        "description": "BRONSON CREEK ABOVE NW KAISER RD",
+        "lat": 45.5473472,
+        "lon": -122.8291417
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.8291417, 45.5473472] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453302122491600",
+        "source": "USGS",
+        "id": "453302122491600",
+        "description": "BRONSON CR NEAR NW MEISNER DR AND NW HENNINGER LN",
+        "lat": 45.5504861,
+        "lon": -122.821075
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.821075, 45.5504861] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453312122485800",
+        "source": "USGS",
+        "id": "453312122485800",
+        "description": "BRONSON CREEK NEAR NW LAKEVIEW DR",
+        "lat": 45.55334167,
+        "lon": -122.8162278
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.8162278, 45.55334167]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453320122483701",
+        "source": "USGS",
+        "id": "453320122483701",
+        "description": "BRONSON CREEK AT LAIDLAW",
+        "lat": 45.55561389,
+        "lon": -122.810261
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.810261, 45.55561389] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453439122223900",
+        "source": "USGS",
+        "id": "453439122223900",
+        "description": "COLUMBIA RIVER, RIGHT BANK, AT WASHOUGAL, WA",
+        "lat": 45.57734108,
+        "lon": -122.3787027
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.3787027, 45.57734108]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453604122060000",
+        "source": "USGS",
+        "id": "453604122060000",
+        "description": "FRANZ LAKE SLOUGH ENTRANCE, COLUMBIA RIVER, WA",
+        "lat": 45.6011833,
+        "lon": -122.1000028
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.1000028, 45.6011833] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453630122021400",
+        "source": "USGS",
+        "id": "453630122021400",
+        "description": "COLUMBIA RIVER, LEFT BANK, NEAR DODSON, OR",
+        "lat": 45.60817305,
+        "lon": -122.0384174
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-122.0384174, 45.60817305]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453712121071200",
+        "source": "USGS",
+        "id": "453712121071200",
+        "description": "COLUMBIA RIVER AT THE DALLES DAM FOREBAY, WA",
+        "lat": 45.61984338,
+        "lon": -121.1211812
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.1211812, 45.61984338]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453845121562000",
+        "source": "USGS",
+        "id": "453845121562000",
+        "description": "COLUMBIA RIVER AT BONNEVILLE DAM FOREBAY, WA",
+        "lat": 45.6456726,
+        "lon": -121.9400813
+      },
+      "geometry": { "type": "Point", "coordinates": [-121.9400813, 45.6456726] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_453845121564001",
+        "source": "USGS",
+        "id": "453845121564001",
+        "description": "COLUMBIA RIVER AT CASCADE ISLAND, WA",
+        "lat": 45.6456726,
+        "lon": -121.945637
+      },
+      "geometry": { "type": "Point", "coordinates": [-121.945637, 45.6456726] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_454249120423500",
+        "source": "USGS",
+        "id": "454249120423500",
+        "description": "COLUMBIA RIVER, RIGHT BANK, NEAR CLIFFS, WA",
+        "lat": 45.7134579,
+        "lon": -120.710893
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.710893, 45.7134579] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_454314120413701",
+        "source": "USGS",
+        "id": "454314120413701",
+        "description": "COLUMBIA RIVER AT JOHN DAY DAM NAVIGATION LOCK, WA",
+        "lat": 45.7204025,
+        "lon": -120.6947814
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.6947814, 45.7204025] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_454705122451400",
+        "source": "USGS",
+        "id": "454705122451400",
+        "description": "CAMPBELL SLOUGH, RIDGEFIELD NWR, ROTH UNIT, WA",
+        "lat": 45.7847222,
+        "lon": -122.7540278
+      },
+      "geometry": { "type": "Point", "coordinates": [-122.7540278, 45.7847222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_460939123201600",
+        "source": "USGS",
+        "id": "460939123201600",
+        "description": "BIRNIE SLOUGH, WHITE'S ISLAND, COLUMBIA RIVER, WA",
+        "lat": 46.1608333,
+        "lon": -123.3378333
+      },
+      "geometry": { "type": "Point", "coordinates": [-123.3378333, 46.1608333] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_461518123285700",
+        "source": "USGS",
+        "id": "461518123285700",
+        "description": "UNNAMED SLOUGH, WELCH ISLAND, COLUMBIA RIVER, OR",
+        "lat": 46.2551111,
+        "lon": -123.4824444
+      },
+      "geometry": { "type": "Point", "coordinates": [-123.4824444, 46.2551111] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12473980",
+        "source": "USGS",
+        "id": "12473980",
+        "description": "GOLD CREEK ABOVE KEECHELUS LAKE NEAR HYAK, WA",
+        "lat": 47.3917792,
+        "lon": -121.381483
+      },
+      "geometry": { "type": "Point", "coordinates": [-121.381483, 47.3917792] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12473985",
+        "source": "USGS",
+        "id": "12473985",
+        "description": "BOX CANYON CREEK NEAR HYAK, WA",
+        "lat": 47.35900289,
+        "lon": -121.2456489
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.2456489, 47.35900289]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13173600",
+        "source": "USGS",
+        "id": "13173600",
+        "description": "SNAKE RIVER NR ADRIAN OR",
+        "lat": 43.7309932,
+        "lon": -117.0718258
+      },
+      "geometry": { "type": "Point", "coordinates": [-117.0718258, 43.7309932] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13213000",
+        "source": "USGS",
+        "id": "13213000",
+        "description": "BOISE RIVER NR PARMA ID",
+        "lat": 43.78166667,
+        "lon": -116.9727778
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.9727778, 43.78166667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13213100",
+        "source": "USGS",
+        "id": "13213100",
+        "description": "SNAKE RIVER AT NYSSA OR",
+        "lat": 43.8761111,
+        "lon": -116.9825
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.9825, 43.8761111] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12500447",
+        "source": "USGS",
+        "id": "12500447",
+        "description": "WIDE HOLLOW CREEK ABOVE MOUTH AT UNION GAP, WA",
+        "lat": 46.53873815,
+        "lon": -120.4739524
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.4739524, 46.53873815]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12500450",
+        "source": "USGS",
+        "id": "12500450",
+        "description": "YAKIMA RIVER ABOVE AHTANUM CREEK AT UNION GAP, WA",
+        "lat": 46.53429376,
+        "lon": -120.4672855
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.4672855, 46.53429376]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12505050",
+        "source": "USGS",
+        "id": "12505050",
+        "description": "YAKIMA RIVER NEAR WAPATO, WA",
+        "lat": 46.485683,
+        "lon": -120.4314502
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.4314502, 46.485683] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12505330",
+        "source": "USGS",
+        "id": "12505330",
+        "description": "YAKIMA RIVER AB E TOPPENISH DRAIN NR GRANGER, WA",
+        "lat": 46.3731848,
+        "lon": -120.2250525
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.2250525, 46.3731848] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12505350",
+        "source": "USGS",
+        "id": "12505350",
+        "description": "E TOPPENISH DRAIN AT WILSON RD NEAR TOPPENISH, WA",
+        "lat": 46.36762907,
+        "lon": -120.2511647
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.2511647, 46.36762907]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12505410",
+        "source": "USGS",
+        "id": "12505410",
+        "description": "SUB 35 DRAIN AT CONNIE ROAD NEAR GRANGER, WA",
+        "lat": 46.3362404,
+        "lon": -120.2311634
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.2311634, 46.3362404] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12505450",
+        "source": "USGS",
+        "id": "12505450",
+        "description": "GRANGER DRAIN AT GRANGER, WA",
+        "lat": 46.34346299,
+        "lon": -120.186995
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.186995, 46.34346299] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_1250547010",
+        "source": "USGS",
+        "id": "1250547010",
+        "description": "LATERAL 1 DRAIN NEAR WAPATO, WA",
+        "lat": 46.4625,
+        "lon": -120.408611
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.408611, 46.4625] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12505510",
+        "source": "USGS",
+        "id": "12505510",
+        "description": "MARION DRAIN AT INDIAN CHURCH RD AT GRANGER, WA",
+        "lat": 46.3309629,
+        "lon": -120.1994953
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.1994953, 46.3309629] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12507508",
+        "source": "USGS",
+        "id": "12507508",
+        "description": "TOPPENISH CREEK AT INDIAN CHURCH RD NR GRANGER, WA",
+        "lat": 46.31429626,
+        "lon": -120.1992173
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.1992173, 46.31429626]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12507560",
+        "source": "USGS",
+        "id": "12507560",
+        "description": "COULEE DRAIN AT NORTH SATUS ROAD NEAR SATUS, WA",
+        "lat": 46.2967967,
+        "lon": -120.1461593
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.1461593, 46.2967967] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12507573",
+        "source": "USGS",
+        "id": "12507573",
+        "description": "YAKIMA RIVER AT RM 73.8 NEAR EMERALD, WA",
+        "lat": 46.2852222,
+        "lon": -120.0919944
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.0919944, 46.2852222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_1250862050",
+        "source": "USGS",
+        "id": "1250862050",
+        "description": "SATUS CREEK BELOW NORTH DRAIN NEAR SATUS, WA",
+        "lat": 46.2754079,
+        "lon": -120.1389365
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.1389365, 46.2754079] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12508630",
+        "source": "USGS",
+        "id": "12508630",
+        "description": "SOUTH DRAIN NEAR SATUS, WA",
+        "lat": 46.2595746,
+        "lon": -120.1336583
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.1336583, 46.2595746] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12508670",
+        "source": "USGS",
+        "id": "12508670",
+        "description": "DID 7 DRAIN NEAR MABTON, WA",
+        "lat": 46.25888889,
+        "lon": -120.0655556
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.0655556, 46.25888889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12508694",
+        "source": "USGS",
+        "id": "12508694",
+        "description": "SATUS DRAIN 303 NEAR MABTON, WA",
+        "lat": 46.21666667,
+        "lon": -120.0206944
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.0206944, 46.21666667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12509060",
+        "source": "USGS",
+        "id": "12509060",
+        "description": "YAKIMA RIVER AT MABTON SIPHON NEAR GRANDVIEW, WA",
+        "lat": 46.2080833,
+        "lon": -119.8835556
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.8835556, 46.2080833] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12509489",
+        "source": "USGS",
+        "id": "12509489",
+        "description": "YAKIMA RIVER AT PROSSER, WA",
+        "lat": 46.2124361,
+        "lon": -119.7656833
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.7656833, 46.2124361] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12510500",
+        "source": "USGS",
+        "id": "12510500",
+        "description": "YAKIMA RIVER AT KIONA, WA",
+        "lat": 46.25346748,
+        "lon": -119.4780794
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.4780794, 46.25346748]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12514400",
+        "source": "USGS",
+        "id": "12514400",
+        "description": "COLUMBIA RIVER BELOW HWY 395 BRIDGE AT PASCO, WA",
+        "lat": 46.2240236,
+        "lon": -119.1163997
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.1163997, 46.2240236] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13269000",
+        "source": "USGS",
+        "id": "13269000",
+        "description": "SNAKE RIVER AT WEISER ID",
+        "lat": 44.24555556,
+        "lon": -116.9808333
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.9808333, 44.24555556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13324300",
+        "source": "USGS",
+        "id": "13324300",
+        "description": "LOOKINGGLASS CREEK NEAR LOOKING GLASS, OR",
+        "lat": 45.73180826,
+        "lon": -117.8649308
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-117.8649308, 45.73180826]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13331500",
+        "source": "USGS",
+        "id": "13331500",
+        "description": "MINAM RIVER AT MINAM, OR",
+        "lat": 45.6198669,
+        "lon": -117.7265892
+      },
+      "geometry": { "type": "Point", "coordinates": [-117.7265892, 45.6198669] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13334300",
+        "source": "USGS",
+        "id": "13334300",
+        "description": "SNAKE RIVER NEAR ANATONE, WA",
+        "lat": 46.0970994,
+        "lon": -116.9776495
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.9776495, 46.0970994] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13343000",
+        "source": "USGS",
+        "id": "13343000",
+        "description": "CLEARWATER RIVER NR LEWISTON ID",
+        "lat": 46.43416667,
+        "lon": -116.9677778
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.9677778, 46.43416667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13343590",
+        "source": "USGS",
+        "id": "13343590",
+        "description": "LOWER GRANITE LK FOREBAY AT LOWER GRANITE DAM, WA",
+        "lat": 46.65932575,
+        "lon": -117.4262934
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-117.4262934, 46.65932575]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13343595",
+        "source": "USGS",
+        "id": "13343595",
+        "description": "SNAKE RIVER (RIGHT BANK) BL LOWER GRANITE DAM, WA",
+        "lat": 46.66606178,
+        "lon": -117.4423834
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-117.4423834, 46.66606178]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13343855",
+        "source": "USGS",
+        "id": "13343855",
+        "description": "LAKE BRYAN FOREBAY AT LITTLE GOOSE DAM, WA",
+        "lat": 46.58292469,
+        "lon": -118.0243924
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.0243924, 46.58292469]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13343860",
+        "source": "USGS",
+        "id": "13343860",
+        "description": "SNAKE RIVER BELOW LITTLE GOOSE DAM, WA",
+        "lat": 46.5830522,
+        "lon": -118.0430329
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.0430329, 46.5830522] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13345000",
+        "source": "USGS",
+        "id": "13345000",
+        "description": "PALOUSE RIVER NR POTLATCH, ID",
+        "lat": 46.91527778,
+        "lon": -116.951111
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.951111, 46.91527778] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13352595",
+        "source": "USGS",
+        "id": "13352595",
+        "description": "LAKE H G WEST FOREBAY AT LOWER MONUMENTAL DAM, WA",
+        "lat": 46.5626405,
+        "lon": -118.5344299
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.5344299, 46.5626405] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13352600",
+        "source": "USGS",
+        "id": "13352600",
+        "description": "SNAKE RIVER BELOW LOWER MONUMENTAL DAM, WA",
+        "lat": 46.5537292,
+        "lon": -118.5488527
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.5488527, 46.5537292] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13352950",
+        "source": "USGS",
+        "id": "13352950",
+        "description": "LAKE SACAJAWEA FOREBAY AT ICE HARBOR DAM, WA",
+        "lat": 46.25152478,
+        "lon": -118.8774998
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.8774998, 46.25152478]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13353010",
+        "source": "USGS",
+        "id": "13353010",
+        "description": "SNAKE RIVER BL GOOSE ISLAND BL ICE HARBOR DAM, WA",
+        "lat": 46.2421853,
+        "lon": -118.9401224
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.9401224, 46.2421853] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14012995",
+        "source": "USGS",
+        "id": "14012995",
+        "description": "MILL CREEK BELOW HENRY CREEK, NEAR SPOFFORD, OR",
+        "lat": 45.988425,
+        "lon": -118.0919
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.0919, 45.988425] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14018500",
+        "source": "USGS",
+        "id": "14018500",
+        "description": "WALLA WALLA RIVER NEAR TOUCHET, WA",
+        "lat": 46.0276341,
+        "lon": -118.7297112
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.7297112, 46.0276341] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14019220",
+        "source": "USGS",
+        "id": "14019220",
+        "description": "COLUMBIA RIVER AT MCNARY DAM LOCK NR UMATILLA, OR",
+        "lat": 45.9412437,
+        "lon": -119.2930719
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.2930719, 45.9412437] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14019240",
+        "source": "USGS",
+        "id": "14019240",
+        "description": "COLUMBIA RIVER BELOW MCNARY DAM NEAR UMATILLA, OR",
+        "lat": 45.93345486,
+        "lon": -119.3263758
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.3263758, 45.93345486]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14034470",
+        "source": "USGS",
+        "id": "14034470",
+        "description": "WILLOW CREEK ABV WILLOW CR LAKE, NR HEPPNER, OR",
+        "lat": 45.34068289,
+        "lon": -119.5158544
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.5158544, 45.34068289]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14034500",
+        "source": "USGS",
+        "id": "14034500",
+        "description": "WILLOW CREEK AT HEPPNER, OR",
+        "lat": 45.3504062,
+        "lon": -119.5500218
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.5500218, 45.3504062] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14043840",
+        "source": "USGS",
+        "id": "14043840",
+        "description": "MF JOHN DAY RIVER ABV CAMP CREEK, NR GALENA, OR",
+        "lat": 44.692625,
+        "lon": -118.7943083
+      },
+      "geometry": { "type": "Point", "coordinates": [-118.7943083, 44.692625] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14046778",
+        "source": "USGS",
+        "id": "14046778",
+        "description": "BRIDGE CR ABV COYOTE CANYON NR MITCHELL, OR",
+        "lat": 44.7267988,
+        "lon": -120.301965
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.301965, 44.7267988] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_14046890",
+        "source": "USGS",
+        "id": "14046890",
+        "description": "PINE CREEK NEAR CLARNO, OR",
+        "lat": 44.91040697,
+        "lon": -120.4408632
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.4408632, 44.91040697]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_452053119323001",
+        "source": "USGS",
+        "id": "452053119323001",
+        "description": "WILLOW CREEK RESERVOIR NW CORNER, OR",
+        "lat": 45.3479643,
+        "lon": -119.5426772
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.5426772, 45.3479643] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_462023120075200",
+        "source": "USGS",
+        "id": "462023120075200",
+        "description": "DR 2 AT YAKIMA VALLEY HIGHWAY NEAR GRANGER, WA",
+        "lat": 46.33947179,
+        "lon": -120.1321426
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.1321426, 46.33947179]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12398550",
+        "source": "USGS",
+        "id": "12398550",
+        "description": "BOUNDARY RESERVOIR AT FOREBAY NR METALINE FALLS",
+        "lat": 48.98881389,
+        "lon": -117.3496903
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-117.3496903, 48.98881389]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12398600",
+        "source": "USGS",
+        "id": "12398600",
+        "description": "PEND OREILLE RIVER AT INTERNATIONAL BOUNDARY",
+        "lat": 48.99881409,
+        "lon": -117.3535794
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-117.3535794, 48.99881409]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12419000",
+        "source": "USGS",
+        "id": "12419000",
+        "description": "Spokane River near Post Falls, ID",
+        "lat": 47.70295737,
+        "lon": -116.9779747
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.9779747, 47.70295737]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12438000",
+        "source": "USGS",
+        "id": "12438000",
+        "description": "COLUMBIA RIVER AT BRIDGEPORT, WA",
+        "lat": 48.0065333,
+        "lon": -119.6653303
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.6653303, 48.0065333] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12438900",
+        "source": "USGS",
+        "id": "12438900",
+        "description": "NINEMILE CREEK NEAR OROVILLE, WA",
+        "lat": 48.9698886,
+        "lon": -119.4056188
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.4056188, 48.9698886] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12439000",
+        "source": "USGS",
+        "id": "12439000",
+        "description": "OSOYOOS LAKE NEAR OROVILLE, WA",
+        "lat": 48.9565513,
+        "lon": -119.4395108
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.4395108, 48.9565513] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12439500",
+        "source": "USGS",
+        "id": "12439500",
+        "description": "OKANOGAN RIVER AT OROVILLE, WA",
+        "lat": 48.9307184,
+        "lon": -119.4203419
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.4203419, 48.9307184] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12442500",
+        "source": "USGS",
+        "id": "12442500",
+        "description": "SIMILKAMEEN RIVER NEAR NIGHTHAWK, WA",
+        "lat": 48.98460109,
+        "lon": -119.6184098
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.6184098, 48.98460109]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12445000",
+        "source": "USGS",
+        "id": "12445000",
+        "description": "OKANOGAN RIVER NEAR TONASKET, WA",
+        "lat": 48.632375,
+        "lon": -119.4617229
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.4617229, 48.632375] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12447200",
+        "source": "USGS",
+        "id": "12447200",
+        "description": "OKANOGAN RIVER AT MALOTT, WA",
+        "lat": 48.2812606,
+        "lon": -119.7045047
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.7045047, 48.2812606] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12447302",
+        "source": "USGS",
+        "id": "12447302",
+        "description": "OKANOGAN RIVER NR WAKEFIELD BR SOUTH OF MALOTT, WA",
+        "lat": 48.2077222,
+        "lon": -119.7122778
+      },
+      "geometry": { "type": "Point", "coordinates": [-119.7122778, 48.2077222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12447390",
+        "source": "USGS",
+        "id": "12447390",
+        "description": "ANDREWS CREEK NEAR MAZAMA, WA",
+        "lat": 48.8229245,
+        "lon": -120.1459245
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.1459245, 48.8229245] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12448000",
+        "source": "USGS",
+        "id": "12448000",
+        "description": "CHEWUCH RIVER AT WINTHROP, WA",
+        "lat": 48.4770898,
+        "lon": -120.1864734
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.1864734, 48.4770898] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12448500",
+        "source": "USGS",
+        "id": "12448500",
+        "description": "METHOW RIVER AT WINTHROP, WA",
+        "lat": 48.4734787,
+        "lon": -120.1773063
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.1773063, 48.4734787] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12448990",
+        "source": "USGS",
+        "id": "12448990",
+        "description": "TWISP RIVER ABOVE NEWBY CREEK NEAR TWISP, WA",
+        "lat": 48.38069986,
+        "lon": -120.2617534
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.2617534, 48.38069986]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12448998",
+        "source": "USGS",
+        "id": "12448998",
+        "description": "TWISP RIVER NEAR TWISP, WA",
+        "lat": 48.3698671,
+        "lon": -120.148693
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.148693, 48.3698671] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12449500",
+        "source": "USGS",
+        "id": "12449500",
+        "description": "METHOW RIVER AT TWISP, WA",
+        "lat": 48.36514507,
+        "lon": -120.1161917
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.1161917, 48.36514507]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12449760",
+        "source": "USGS",
+        "id": "12449760",
+        "description": "METHOW RIVER AT CARLTON, WA",
+        "lat": 48.2362554,
+        "lon": -120.1131347
+      },
+      "geometry": { "type": "Point", "coordinates": [-120.1131347, 48.2362554] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12450480",
+        "source": "USGS",
+        "id": "12450480",
+        "description": "METHOW RIVER NEAR MOUTH NEAR PATEROS, WA",
+        "lat": 48.05130556,
+        "lon": -119.9265556
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.9265556, 48.05130556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12462500",
+        "source": "USGS",
+        "id": "12462500",
+        "description": "WENATCHEE RIVER AT MONITOR, WA",
+        "lat": 47.49929148,
+        "lon": -120.4245223
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.4245223, 47.49929148]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13081500",
+        "source": "USGS",
+        "id": "13081500",
+        "description": "SNAKE R NR MINIDOKA ID (AT HOWELLS FERRY)",
+        "lat": 42.67277778,
+        "lon": -113.5002778
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-113.5002778, 42.67277778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13082300",
+        "source": "USGS",
+        "id": "13082300",
+        "description": "MARSH CREEK NR ALBION ID",
+        "lat": 42.45555556,
+        "lon": -113.5194444
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-113.5194444, 42.45555556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13087995",
+        "source": "USGS",
+        "id": "13087995",
+        "description": "SNAKE RIVER GAGING STATION AT MILNER ID",
+        "lat": 42.52805556,
+        "lon": -114.0183333
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.0183333, 42.52805556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13088510",
+        "source": "USGS",
+        "id": "13088510",
+        "description": "BIG COTTONWOOD CREEK NEAR OAKLEY ID",
+        "lat": 42.29407878,
+        "lon": -114.02252
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.02252, 42.29407878] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13090000",
+        "source": "USGS",
+        "id": "13090000",
+        "description": "SNAKE RIVER NR KIMBERLY ID",
+        "lat": 42.5908333,
+        "lon": -114.3602778
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.3602778, 42.5908333] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13090999",
+        "source": "USGS",
+        "id": "13090999",
+        "description": "BLUE LAKES SPRING BEL PUMP PLANT NR TWIN FALLS ID",
+        "lat": 42.6147222,
+        "lon": -114.4683333
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.4683333, 42.6147222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13091995",
+        "source": "USGS",
+        "id": "13091995",
+        "description": "ROCK CREEK AT USFS FOOTBRIDGE NR ROCK CREEK, ID",
+        "lat": 42.3246359,
+        "lon": -114.2730832
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.2730832, 42.3246359] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13092300",
+        "source": "USGS",
+        "id": "13092300",
+        "description": "NORTH COTTONWOOD CREEK NR ROGERSON ID",
+        "lat": 42.33166667,
+        "lon": -114.4263889
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.4263889, 42.33166667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13092747",
+        "source": "USGS",
+        "id": "13092747",
+        "description": "ROCK CREEK AB HWY 30/93 XING AT TWIN FALLS ID",
+        "lat": 42.5625,
+        "lon": -114.4947222
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.4947222, 42.5625] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13093384",
+        "source": "USGS",
+        "id": "13093384",
+        "description": "SNAKE RIVER BLW PIGEON COVE NR TWIN FALLS, ID",
+        "lat": 42.6535833,
+        "lon": -114.6347972
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.6347972, 42.6535833] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13093478",
+        "source": "USGS",
+        "id": "13093478",
+        "description": "CEDAR DRAW AT CLOVER ROAD (3900 N.) NEAR FILER ID",
+        "lat": 42.56379686,
+        "lon": -114.6242109
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.6242109, 42.56379686]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13094000",
+        "source": "USGS",
+        "id": "13094000",
+        "description": "SNAKE RIVER NR BUHL ID",
+        "lat": 42.6658333,
+        "lon": -114.7122222
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.7122222, 42.6658333] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13094680",
+        "source": "USGS",
+        "id": "13094680",
+        "description": "MUD CREEK ABOVE CLEAR CREEK NEAR BUHL ID",
+        "lat": 42.62638889,
+        "lon": -114.8052778
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.8052778, 42.62638889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13095175",
+        "source": "USGS",
+        "id": "13095175",
+        "description": "BRIGGS SPRING AT HEAD NEAR BUHL ID",
+        "lat": 42.67388889,
+        "lon": -114.8091667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.8091667, 42.67388889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13095400",
+        "source": "USGS",
+        "id": "13095400",
+        "description": "BLIND CANYON SPRING NR BUHL ID     08S 14E 28BDD1S",
+        "lat": 42.7032366,
+        "lon": -114.8231093
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.8231093, 42.7032366] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13095500",
+        "source": "USGS",
+        "id": "13095500",
+        "description": "BOX CANYON SPRINGS NR WENDELL ID",
+        "lat": 42.7075,
+        "lon": -114.8102778
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.8102778, 42.7075] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13104900",
+        "source": "USGS",
+        "id": "13104900",
+        "description": "SHOSHONE CREEK .5 MILE ABV MOUTH NR SAN JACINTO NV",
+        "lat": 41.94944444,
+        "lon": -114.6844444
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.6844444, 41.94944444]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13107200",
+        "source": "USGS",
+        "id": "13107200",
+        "description": "SALMON FALLS CK @ LILY GRADE XING NR CASTLEFORD ID",
+        "lat": 42.45268425,
+        "lon": -114.861997
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.861997, 42.45268425] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13108150",
+        "source": "USGS",
+        "id": "13108150",
+        "description": "SALMON FALLS CREEK NR HAGERMAN ID",
+        "lat": 42.69638889,
+        "lon": -114.8552778
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.8552778, 42.69638889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13120500",
+        "source": "USGS",
+        "id": "13120500",
+        "description": "BIG LOST RIVER AT HOWELL RANCH NR CHILLY ID",
+        "lat": 43.9983333,
+        "lon": -114.021111
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.021111, 43.9983333] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13127000",
+        "source": "USGS",
+        "id": "13127000",
+        "description": "BIG LOST RIVER BL MACKAY RES NR MACKAY ID",
+        "lat": 43.93916667,
+        "lon": -113.6483333
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-113.6483333, 43.93916667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13134640",
+        "source": "USGS",
+        "id": "13134640",
+        "description": "BILLINGSLEY CR BELOW VADER GRADE NR HAGERMAN ID",
+        "lat": 42.7983333,
+        "lon": -114.8675
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.8675, 42.7983333] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13135500",
+        "source": "USGS",
+        "id": "13135500",
+        "description": "BIG WOOD RIVER NR KETCHUM ID",
+        "lat": 43.78626389,
+        "lon": -114.4250556
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.4250556, 43.78626389]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13135520",
+        "source": "USGS",
+        "id": "13135520",
+        "description": "NF BIG WOOD RIVER NR SAWTOOTH NRA HQ NR KETCHUM ID",
+        "lat": 43.7861111,
+        "lon": -114.4191667
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.4191667, 43.7861111] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13137000",
+        "source": "USGS",
+        "id": "13137000",
+        "description": "WARM SPRINGS CREEK NEAR KETCHUM ID",
+        "lat": 43.6897222,
+        "lon": -114.3847222
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.3847222, 43.6897222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13137500",
+        "source": "USGS",
+        "id": "13137500",
+        "description": "TRAIL CREEK AT KETCHUM ID",
+        "lat": 43.67421667,
+        "lon": -114.362261
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.362261, 43.67421667] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13138000",
+        "source": "USGS",
+        "id": "13138000",
+        "description": "EAST FORK BIG WOOD RIVER AT GIMLET ID",
+        "lat": 43.60305556,
+        "lon": -114.3302778
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.3302778, 43.60305556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13139510",
+        "source": "USGS",
+        "id": "13139510",
+        "description": "BIG WOOD RIVER AT HAILEY ID TOTAL FLOW",
+        "lat": 43.5172222,
+        "lon": -114.3216667
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.3216667, 43.5172222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13140800",
+        "source": "USGS",
+        "id": "13140800",
+        "description": "BIG WOOD RIVER AT STANTON CROSSING NR BELLEVUE ID",
+        "lat": 43.32916667,
+        "lon": -114.3191667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.3191667, 43.32916667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13140900",
+        "source": "USGS",
+        "id": "13140900",
+        "description": "WILLOW CREEK NR SPRING CR RANCH NR BELLEVUE ID",
+        "lat": 43.32277778,
+        "lon": -114.3241667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.3241667, 43.32277778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13141000",
+        "source": "USGS",
+        "id": "13141000",
+        "description": "BIG WOOD RIVER NR BELLEVUE, ID",
+        "lat": 43.32805556,
+        "lon": -114.3416667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.3416667, 43.32805556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13141070",
+        "source": "USGS",
+        "id": "13141070",
+        "description": "ROCK CREEK ABOVE EAGLE SPRING NEAR BELLEVUE ID",
+        "lat": 43.365,
+        "lon": -114.3977778
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.3977778, 43.365] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13150200",
+        "source": "USGS",
+        "id": "13150200",
+        "description": "STALKER CREEK NEAR GANNETT ID",
+        "lat": 43.3122222,
+        "lon": -114.1827778
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.1827778, 43.3122222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13150430",
+        "source": "USGS",
+        "id": "13150430",
+        "description": "SILVER CREEK AT SPORTSMAN ACCESS NR PICABO ID",
+        "lat": 43.3233611,
+        "lon": -114.10835
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.10835, 43.3233611] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13152500",
+        "source": "USGS",
+        "id": "13152500",
+        "description": "MALAD RIVER NR GOODING ID",
+        "lat": 42.88638889,
+        "lon": -114.8030556
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.8030556, 42.88638889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13154400",
+        "source": "USGS",
+        "id": "13154400",
+        "description": "CLOVER CREEK NR KING HILL ID",
+        "lat": 43.00305556,
+        "lon": -115.1797222
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-115.1797222, 43.00305556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13154500",
+        "source": "USGS",
+        "id": "13154500",
+        "description": "SNAKE RIVER AT KING HILL ID",
+        "lat": 43.0022222,
+        "lon": -115.2025
+      },
+      "geometry": { "type": "Point", "coordinates": [-115.2025, 43.0022222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13168500",
+        "source": "USGS",
+        "id": "13168500",
+        "description": "BRUNEAU RIVER NR HOT SPRING ID",
+        "lat": 42.7711111,
+        "lon": -115.7202778
+      },
+      "geometry": { "type": "Point", "coordinates": [-115.7202778, 42.7711111] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13169450",
+        "source": "USGS",
+        "id": "13169450",
+        "description": "BIG JACKS AT AL SADIE RANCH NR BRUNEAU, ID",
+        "lat": 42.7525,
+        "lon": -116.0044444
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.0044444, 42.7525] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13172500",
+        "source": "USGS",
+        "id": "13172500",
+        "description": "SNAKE RIVER NR MURPHY ID",
+        "lat": 43.25481389,
+        "lon": -116.3906389
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.3906389, 43.25481389]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13176400",
+        "source": "USGS",
+        "id": "13176400",
+        "description": "EF OWYHEE RIVER AT CRUTCHER CROSSING, ID",
+        "lat": 42.26136944,
+        "lon": -116.8684417
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.8684417, 42.26136944]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13185000",
+        "source": "USGS",
+        "id": "13185000",
+        "description": "BOISE RIVER NR TWIN SPRINGS ID",
+        "lat": 43.66805556,
+        "lon": -115.7252778
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-115.7252778, 43.66805556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13190500",
+        "source": "USGS",
+        "id": "13190500",
+        "description": "SF BOISE RIVER AT ANDERSON RANCH DAM ID",
+        "lat": 43.3436111,
+        "lon": -115.4775
+      },
+      "geometry": { "type": "Point", "coordinates": [-115.4775, 43.3436111] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13190505",
+        "source": "USGS",
+        "id": "13190505",
+        "description": "DIXIE CREEK BEL ANDERSON RANCH DAM ID",
+        "lat": 43.34055556,
+        "lon": -115.4783333
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-115.4783333, 43.34055556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13190565",
+        "source": "USGS",
+        "id": "13190565",
+        "description": "PIERCE CREEK AT MOUTH NEAR PRAIRIE ID",
+        "lat": 43.40305556,
+        "lon": -115.5602778
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-115.5602778, 43.40305556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13192200",
+        "source": "USGS",
+        "id": "13192200",
+        "description": "SF BOISE RIVER AT NEAL BRIDGE NR ARROWROCK DAM ID",
+        "lat": 43.55055556,
+        "lon": -115.7219444
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-115.7219444, 43.55055556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13203510",
+        "source": "USGS",
+        "id": "13203510",
+        "description": "BOISE R BL DIVERSION DAM NR BOISE ID",
+        "lat": 43.539613,
+        "lon": -116.0945556
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.0945556, 43.539613] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13206000",
+        "source": "USGS",
+        "id": "13206000",
+        "description": "BOISE RIVER AT GLENWOOD BRIDGE NR BOISE ID",
+        "lat": 43.66055556,
+        "lon": -116.2791667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.2791667, 43.66055556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13206400",
+        "source": "USGS",
+        "id": "13206400",
+        "description": "EAGLE DRAIN AT EAGLE, ID",
+        "lat": 43.69166667,
+        "lon": -116.3563889
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.3563889, 43.69166667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13207500",
+        "source": "USGS",
+        "id": "13207500",
+        "description": "DRY CREEK NEAR EAGLE ID",
+        "lat": 43.73194444,
+        "lon": -116.3041667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.3041667, 43.73194444]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13210050",
+        "source": "USGS",
+        "id": "13210050",
+        "description": "BOISE RIVER NR MIDDLETON ID",
+        "lat": 43.6848841,
+        "lon": -116.5737442
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.5737442, 43.6848841] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13210983",
+        "source": "USGS",
+        "id": "13210983",
+        "description": "MASON CREEK NR CALDWELL ID",
+        "lat": 43.6832165,
+        "lon": -116.6662481
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.6662481, 43.6832165] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13211000",
+        "source": "USGS",
+        "id": "13211000",
+        "description": "BOISE RIVER AT HWY 20-26 XING NR CALDWELL ID",
+        "lat": 43.68888889,
+        "lon": -116.6863889
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.6863889, 43.68888889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13211205",
+        "source": "USGS",
+        "id": "13211205",
+        "description": "BOISE RIVER AT CALDWELL, ID",
+        "lat": 43.67735278,
+        "lon": -116.7011306
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.7011306, 43.67735278]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13211210",
+        "source": "USGS",
+        "id": "13211210",
+        "description": "BOISE RIVER ABV INDIAN CREEK AT CALDWELL, ID",
+        "lat": 43.67776944,
+        "lon": -116.7054944
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.7054944, 43.67776944]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13251000",
+        "source": "USGS",
+        "id": "13251000",
+        "description": "PAYETTE RIVER NR PAYETTE ID",
+        "lat": 44.0422222,
+        "lon": -116.9252778
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.9252778, 44.0422222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_4242271144904",
+        "source": "USGS",
+        "id": "4242271144904",
+        "description": "BOX CANYON SPRINGS BEL AQUEDUCT DIV NR WENDELL ID",
+        "lat": 42.7075,
+        "lon": -114.8177778
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.8177778, 42.7075] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12334510",
+        "source": "USGS",
+        "id": "12334510",
+        "description": "Rock Creek near Clinton MT",
+        "lat": 46.7223361,
+        "lon": -113.683061
+      },
+      "geometry": { "type": "Point", "coordinates": [-113.683061, 46.7223361] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12334550",
+        "source": "USGS",
+        "id": "12334550",
+        "description": "Clark Fork at Turah Bridge nr Bonner MT",
+        "lat": 46.8259111,
+        "lon": -113.8140306
+      },
+      "geometry": { "type": "Point", "coordinates": [-113.8140306, 46.8259111] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12340000",
+        "source": "USGS",
+        "id": "12340000",
+        "description": "Blackfoot River near Bonner MT",
+        "lat": 46.8994111,
+        "lon": -113.7563194
+      },
+      "geometry": { "type": "Point", "coordinates": [-113.7563194, 46.8994111] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12340500",
+        "source": "USGS",
+        "id": "12340500",
+        "description": "Clark Fork above Missoula MT",
+        "lat": 46.87676389,
+        "lon": -113.9321194
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-113.9321194, 46.87676389]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12344000",
+        "source": "USGS",
+        "id": "12344000",
+        "description": "Bitterroot River near Darby MT",
+        "lat": 45.97205,
+        "lon": -114.1412333
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.1412333, 45.97205] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12352500",
+        "source": "USGS",
+        "id": "12352500",
+        "description": "Bitterroot River near Missoula MT",
+        "lat": 46.83173889,
+        "lon": -114.054861
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.054861, 46.83173889] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13235000",
+        "source": "USGS",
+        "id": "13235000",
+        "description": "SOUTH FORK PAYETTE RIVER AT LOWMAN, ID",
+        "lat": 44.08527778,
+        "lon": -115.6222222
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-115.6222222, 44.08527778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13266000",
+        "source": "USGS",
+        "id": "13266000",
+        "description": "WEISER RIVER NR WEISER ID",
+        "lat": 44.27,
+        "lon": -116.7722222
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.7722222, 44.27] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13296000",
+        "source": "USGS",
+        "id": "13296000",
+        "description": "YANKEE FORK SALMON RIVER NR CLAYTON ID",
+        "lat": 44.27888889,
+        "lon": -114.7338889
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.7338889, 44.27888889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13302005",
+        "source": "USGS",
+        "id": "13302005",
+        "description": "PAHSIMEROI RIVER AT ELLIS ID",
+        "lat": 44.69166667,
+        "lon": -114.0469444
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.0469444, 44.69166667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13302500",
+        "source": "USGS",
+        "id": "13302500",
+        "description": "SALMON RIVER AT SALMON ID",
+        "lat": 45.1836111,
+        "lon": -113.8952778
+      },
+      "geometry": { "type": "Point", "coordinates": [-113.8952778, 45.1836111] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13304050",
+        "source": "USGS",
+        "id": "13304050",
+        "description": "Big Timber Creek Abv Mouth at Leadore ID",
+        "lat": 44.68879167,
+        "lon": -113.3704056
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-113.3704056, 44.68879167]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13305000",
+        "source": "USGS",
+        "id": "13305000",
+        "description": "LEMHI RIVER NR LEMHI ID",
+        "lat": 44.94,
+        "lon": -113.6391667
+      },
+      "geometry": { "type": "Point", "coordinates": [-113.6391667, 44.94] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13307000",
+        "source": "USGS",
+        "id": "13307000",
+        "description": "SALMON RIVER NR SHOUP ID",
+        "lat": 45.3225,
+        "lon": -114.44
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.44, 45.3225] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13310800",
+        "source": "USGS",
+        "id": "13310800",
+        "description": "EFSF SALMON R ABV MEADOW CRK NR STIBNITE, ID",
+        "lat": 44.90225,
+        "lon": -115.3256667
+      },
+      "geometry": { "type": "Point", "coordinates": [-115.3256667, 44.90225] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13310850",
+        "source": "USGS",
+        "id": "13310850",
+        "description": "MEADOW CREEK NR STIBNITE, ID",
+        "lat": 44.88952778,
+        "lon": -115.3602222
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-115.3602222, 44.88952778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13311000",
+        "source": "USGS",
+        "id": "13311000",
+        "description": "EF OF SF SALMON RIVER AT STIBNITE, ID",
+        "lat": 44.9057222,
+        "lon": -115.3295
+      },
+      "geometry": { "type": "Point", "coordinates": [-115.3295, 44.9057222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13311250",
+        "source": "USGS",
+        "id": "13311250",
+        "description": "EFSF SALMON R ABV SUGAR CRK NR STIBNITE, ID",
+        "lat": 44.93477778,
+        "lon": -115.3366944
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-115.3366944, 44.93477778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13311450",
+        "source": "USGS",
+        "id": "13311450",
+        "description": "SUGAR CREEK NR STIBNITE, ID",
+        "lat": 44.9363611,
+        "lon": -115.3372222
+      },
+      "geometry": { "type": "Point", "coordinates": [-115.3372222, 44.9363611] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13313000",
+        "source": "USGS",
+        "id": "13313000",
+        "description": "JOHNSON CREEK AT YELLOW PINE ID",
+        "lat": 44.96166667,
+        "lon": -115.5
+      },
+      "geometry": { "type": "Point", "coordinates": [-115.5, 44.96166667] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13316500",
+        "source": "USGS",
+        "id": "13316500",
+        "description": "LITTLE SALMON RIVER AT RIGGINS ID",
+        "lat": 45.41305556,
+        "lon": -116.3252778
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.3252778, 45.41305556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13317000",
+        "source": "USGS",
+        "id": "13317000",
+        "description": "SALMON RIVER AT WHITE BIRD ID",
+        "lat": 45.75027778,
+        "lon": -116.3238889
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.3238889, 45.75027778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13317660",
+        "source": "USGS",
+        "id": "13317660",
+        "description": "SNAKE RIVER AT McDUFF RAPIDS AT CHINA GARDEN ID",
+        "lat": 46.00305556,
+        "lon": -116.9169444
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.9169444, 46.00305556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13337095",
+        "source": "USGS",
+        "id": "13337095",
+        "description": "UPPER CLEAR CREEK NEAR KOOSKIA, ID",
+        "lat": 46.0470361,
+        "lon": -115.866161
+      },
+      "geometry": { "type": "Point", "coordinates": [-115.866161, 46.0470361] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13337099",
+        "source": "USGS",
+        "id": "13337099",
+        "description": "CLEAR CK AT KOOSKIA NATIONAL FISH HATCHERY",
+        "lat": 46.13005278,
+        "lon": -115.9481306
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-115.9481306, 46.13005278]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13338500",
+        "source": "USGS",
+        "id": "13338500",
+        "description": "SF CLEARWATER RIVER AT STITES ID",
+        "lat": 46.08638889,
+        "lon": -115.9766667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-115.9766667, 46.08638889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13340000",
+        "source": "USGS",
+        "id": "13340000",
+        "description": "CLEARWATER RIVER AT OROFINO ID",
+        "lat": 46.4783333,
+        "lon": -116.2575
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.2575, 46.4783333] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13340600",
+        "source": "USGS",
+        "id": "13340600",
+        "description": "NF CLEARWATER RIVER NR CANYON RANGER STATION ID",
+        "lat": 46.84055556,
+        "lon": -115.621111
+      },
+      "geometry": { "type": "Point", "coordinates": [-115.621111, 46.84055556] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13341000",
+        "source": "USGS",
+        "id": "13341000",
+        "description": "NF CLEARWATER RIVER AT AHSAHKA ID",
+        "lat": 46.5043462,
+        "lon": -116.3204192
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.3204192, 46.5043462] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13341050",
+        "source": "USGS",
+        "id": "13341050",
+        "description": "CLEARWATER RIVER NR PECK ID",
+        "lat": 46.50027778,
+        "lon": -116.3925
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.3925, 46.50027778] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13342450",
+        "source": "USGS",
+        "id": "13342450",
+        "description": "LAPWAI CREEK NR LAPWAI, ID",
+        "lat": 46.42638889,
+        "lon": -116.806111
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.806111, 46.42638889] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13342500",
+        "source": "USGS",
+        "id": "13342500",
+        "description": "CLEARWATER RIVER AT SPALDING ID",
+        "lat": 46.4483333,
+        "lon": -116.8275
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.8275, 46.4483333] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12301933",
+        "source": "USGS",
+        "id": "12301933",
+        "description": "Kootenai River bl Libby Dam nr Libby MT",
+        "lat": 48.40066389,
+        "lon": -115.3187194
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-115.3187194, 48.40066389]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12305000",
+        "source": "USGS",
+        "id": "12305000",
+        "description": "KOOTENAI RIVER AT LEONIA, ID",
+        "lat": 48.6175,
+        "lon": -116.0463889
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.0463889, 48.6175] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12309500",
+        "source": "USGS",
+        "id": "12309500",
+        "description": "KOOTENAI RIVER AT BONNERS FERRY ID",
+        "lat": 48.69805556,
+        "lon": -116.3125
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.3125, 48.69805556] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12310100",
+        "source": "USGS",
+        "id": "12310100",
+        "description": "KOOTENAI RIVER @ TRIBAL HATCHERY NR BONNERS FERRY",
+        "lat": 48.70527778,
+        "lon": -116.3697222
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.3697222, 48.70527778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12314000",
+        "source": "USGS",
+        "id": "12314000",
+        "description": "KOOTENAI R AT KLOCKMANN RANCH NR BONNERS FERRY ID",
+        "lat": 48.79382868,
+        "lon": -116.381871
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.381871, 48.79382868] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12318500",
+        "source": "USGS",
+        "id": "12318500",
+        "description": "KOOTENAI RIVER NR COPELAND ID",
+        "lat": 48.905,
+        "lon": -116.4019444
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.4019444, 48.905] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12322000",
+        "source": "USGS",
+        "id": "12322000",
+        "description": "KOOTENAI RIVER AT PORTHILL ID",
+        "lat": 48.99638889,
+        "lon": -116.5075
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.5075, 48.99638889] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12353650",
+        "source": "USGS",
+        "id": "12353650",
+        "description": "Clark Fork at Superior, MT",
+        "lat": 47.19631608,
+        "lon": -114.890409
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.890409, 47.19631608] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12354500",
+        "source": "USGS",
+        "id": "12354500",
+        "description": "Clark Fork at St. Regis MT",
+        "lat": 47.30163889,
+        "lon": -115.0868694
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-115.0868694, 47.30163889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12354700",
+        "source": "USGS",
+        "id": "12354700",
+        "description": "Clark Fork near Paradise, MT",
+        "lat": 47.32187569,
+        "lon": -114.890966
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.890966, 47.32187569] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12355500",
+        "source": "USGS",
+        "id": "12355500",
+        "description": "N F Flathead River nr Columbia Falls MT",
+        "lat": 48.4957972,
+        "lon": -114.1267639
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.1267639, 48.4957972] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12362500",
+        "source": "USGS",
+        "id": "12362500",
+        "description": "S F Flathead River nr Columbia Falls MT",
+        "lat": 48.35657778,
+        "lon": -114.0378583
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.0378583, 48.35657778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12363000",
+        "source": "USGS",
+        "id": "12363000",
+        "description": "Flathead River at Columbia Falls MT",
+        "lat": 48.3618111,
+        "lon": -114.18495
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.18495, 48.3618111] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12370000",
+        "source": "USGS",
+        "id": "12370000",
+        "description": "Swan River near Bigfork, MT",
+        "lat": 48.02423056,
+        "lon": -113.9788194
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-113.9788194, 48.02423056]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12388700",
+        "source": "USGS",
+        "id": "12388700",
+        "description": "Flathead River at Perma MT",
+        "lat": 47.36679167,
+        "lon": -114.585
+      },
+      "geometry": { "type": "Point", "coordinates": [-114.585, 47.36679167] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12391950",
+        "source": "USGS",
+        "id": "12391950",
+        "description": "CLARK FORK RIVER BELOW CABINET GORGE DAM ID",
+        "lat": 48.08805556,
+        "lon": -116.0727778
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.0727778, 48.08805556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12413250",
+        "source": "USGS",
+        "id": "12413250",
+        "description": "SF COEUR D ALENE R (at Bunker Ave) AT KELLOGG ID",
+        "lat": 47.54527778,
+        "lon": -116.1341667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.1341667, 47.54527778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12413360",
+        "source": "USGS",
+        "id": "12413360",
+        "description": "EF PINE CREEK ABV GILBERT CR NEAR PINEHURST ID",
+        "lat": 47.44027778,
+        "lon": -116.1752778
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.1752778, 47.44027778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12413370",
+        "source": "USGS",
+        "id": "12413370",
+        "description": "EF PINE CREEK ABV NABOB CR NEAR PINEHURST ID",
+        "lat": 47.47666667,
+        "lon": -116.2216667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-116.2216667, 47.47666667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12413445",
+        "source": "USGS",
+        "id": "12413445",
+        "description": "PINE CREEK BELOW AMY GULCH NEAR PINEHURST ID",
+        "lat": 47.5081222,
+        "lon": -116.2418
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.2418, 47.5081222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12413470",
+        "source": "USGS",
+        "id": "12413470",
+        "description": "SF Coeur D Alene River nr Pinehurst, ID",
+        "lat": 47.5513111,
+        "lon": -116.2362917
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.2362917, 47.5513111] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12414500",
+        "source": "USGS",
+        "id": "12414500",
+        "description": "ST JOE RIVER AT CALDER, ID",
+        "lat": 47.2744444,
+        "lon": -116.1888889
+      },
+      "geometry": { "type": "Point", "coordinates": [-116.1888889, 47.2744444] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13011000",
+        "source": "USGS",
+        "id": "13011000",
+        "description": "SNAKE RIVER NEAR MORAN, WY",
+        "lat": 43.85855089,
+        "lon": -110.586597
+      },
+      "geometry": { "type": "Point", "coordinates": [-110.586597, 43.85855089] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13011500",
+        "source": "USGS",
+        "id": "13011500",
+        "description": "PACIFIC CREEK AT MORAN, WY",
+        "lat": 43.85105315,
+        "lon": -110.5171505
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-110.5171505, 43.85105315]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13011820",
+        "source": "USGS",
+        "id": "13011820",
+        "description": "Blackrock Cr bl Split Rock Cr, nr Moran, WY",
+        "lat": 43.8071111,
+        "lon": -110.1787222
+      },
+      "geometry": { "type": "Point", "coordinates": [-110.1787222, 43.8071111] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13011900",
+        "source": "USGS",
+        "id": "13011900",
+        "description": "BUFFALO FORK AB LAVA CREEK NR MORAN WY",
+        "lat": 43.83805556,
+        "lon": -110.4408333
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-110.4408333, 43.83805556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13012465",
+        "source": "USGS",
+        "id": "13012465",
+        "description": "Leidy Creek at mouth, near Moran, WY",
+        "lat": 43.7331083,
+        "lon": -110.3145611
+      },
+      "geometry": { "type": "Point", "coordinates": [-110.3145611, 43.7331083] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13012475",
+        "source": "USGS",
+        "id": "13012475",
+        "description": "South Fork Spread Cr at mouth, nr Moran, WY",
+        "lat": 43.7634833,
+        "lon": -110.3237861
+      },
+      "geometry": { "type": "Point", "coordinates": [-110.3237861, 43.7634833] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13013650",
+        "source": "USGS",
+        "id": "13013650",
+        "description": "SNAKE RIVER AT MOOSE, WY",
+        "lat": 43.65405556,
+        "lon": -110.7154722
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-110.7154722, 43.65405556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13014300",
+        "source": "USGS",
+        "id": "13014300",
+        "description": "GROS VENTRE R AB UPPER SLIDE LK, NR KELLY, WY",
+        "lat": 43.5759722,
+        "lon": -110.3109444
+      },
+      "geometry": { "type": "Point", "coordinates": [-110.3109444, 43.5759722] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13014500",
+        "source": "USGS",
+        "id": "13014500",
+        "description": "GROS VENTRE RIVER AT KELLY, WY",
+        "lat": 43.62088889,
+        "lon": -110.6230556
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-110.6230556, 43.62088889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13016450",
+        "source": "USGS",
+        "id": "13016450",
+        "description": "FISH CREEK AT WILSON, WY",
+        "lat": 43.50076005,
+        "lon": -110.8716
+      },
+      "geometry": { "type": "Point", "coordinates": [-110.8716, 43.50076005] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13018300",
+        "source": "USGS",
+        "id": "13018300",
+        "description": "CACHE CREEK NEAR JACKSON, WY",
+        "lat": 43.45215258,
+        "lon": -110.7040913
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-110.7040913, 43.45215258]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13018350",
+        "source": "USGS",
+        "id": "13018350",
+        "description": "FLAT CREEK BELOW CACHE CREEK, NEAR JACKSON, WY",
+        "lat": 43.4583611,
+        "lon": -110.7970278
+      },
+      "geometry": { "type": "Point", "coordinates": [-110.7970278, 43.4583611] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13018750",
+        "source": "USGS",
+        "id": "13018750",
+        "description": "SNAKE RIVER BELOW FLAT CREEK, NEAR JACKSON, WY",
+        "lat": 43.3722222,
+        "lon": -110.7386111
+      },
+      "geometry": { "type": "Point", "coordinates": [-110.7386111, 43.3722222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13019500",
+        "source": "USGS",
+        "id": "13019500",
+        "description": "HOBACK RIVER NEAR JACKSON, WY",
+        "lat": 43.30527778,
+        "lon": -110.6801944
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-110.6801944, 43.30527778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13022500",
+        "source": "USGS",
+        "id": "13022500",
+        "description": "SNAKE RIVER ABOVE RESERVOIR, NEAR ALPINE, WY",
+        "lat": 43.1961111,
+        "lon": -110.8894444
+      },
+      "geometry": { "type": "Point", "coordinates": [-110.8894444, 43.1961111] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13032500",
+        "source": "USGS",
+        "id": "13032500",
+        "description": "SNAKE RIVER NR IRWIN ID",
+        "lat": 43.3508333,
+        "lon": -111.2188889
+      },
+      "geometry": { "type": "Point", "coordinates": [-111.2188889, 43.3508333] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13037500",
+        "source": "USGS",
+        "id": "13037500",
+        "description": "SNAKE RIVER NR HEISE ID",
+        "lat": 43.6125,
+        "lon": -111.66
+      },
+      "geometry": { "type": "Point", "coordinates": [-111.66, 43.6125] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13038500",
+        "source": "USGS",
+        "id": "13038500",
+        "description": "SNAKE RIVER AT LORENZO ID",
+        "lat": 43.73527778,
+        "lon": -111.8780556
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-111.8780556, 43.73527778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13055000",
+        "source": "USGS",
+        "id": "13055000",
+        "description": "TETON RIVER NR ST ANTHONY ID",
+        "lat": 43.9272222,
+        "lon": -111.6138889
+      },
+      "geometry": { "type": "Point", "coordinates": [-111.6138889, 43.9272222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13056500",
+        "source": "USGS",
+        "id": "13056500",
+        "description": "HENRYS FORK NR REXBURG ID",
+        "lat": 43.8258333,
+        "lon": -111.905
+      },
+      "geometry": { "type": "Point", "coordinates": [-111.905, 43.8258333] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13057000",
+        "source": "USGS",
+        "id": "13057000",
+        "description": "SNAKE RIVER NR MENAN ID",
+        "lat": 43.75277778,
+        "lon": -111.9791667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-111.9791667, 43.75277778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13060000",
+        "source": "USGS",
+        "id": "13060000",
+        "description": "SNAKE RIVER NR SHELLEY ID",
+        "lat": 43.41305556,
+        "lon": -112.135
+      },
+      "geometry": { "type": "Point", "coordinates": [-112.135, 43.41305556] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13068500",
+        "source": "USGS",
+        "id": "13068500",
+        "description": "BLACKFOOT RIVER NR BLACKFOOT ID",
+        "lat": 43.13055556,
+        "lon": -112.4766667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-112.4766667, 43.13055556]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13069500",
+        "source": "USGS",
+        "id": "13069500",
+        "description": "SNAKE RIVER NR BLACKFOOT ID",
+        "lat": 43.12527778,
+        "lon": -112.5188889
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-112.5188889, 43.12527778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13073000",
+        "source": "USGS",
+        "id": "13073000",
+        "description": "PORTNEUF RIVER AT TOPAZ ID",
+        "lat": 42.6247222,
+        "lon": -112.0880556
+      },
+      "geometry": { "type": "Point", "coordinates": [-112.0880556, 42.6247222] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13075000",
+        "source": "USGS",
+        "id": "13075000",
+        "description": "MARSH CREEK NR MCCAMMON ID",
+        "lat": 42.63,
+        "lon": -112.2255556
+      },
+      "geometry": { "type": "Point", "coordinates": [-112.2255556, 42.63] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13075320",
+        "source": "USGS",
+        "id": "13075320",
+        "description": "MINK CREEK ABV KINNEY CREEK NR POCATELLO ID",
+        "lat": 42.7575,
+        "lon": -112.3958333
+      },
+      "geometry": { "type": "Point", "coordinates": [-112.3958333, 42.7575] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13075500",
+        "source": "USGS",
+        "id": "13075500",
+        "description": "PORTNEUF RIVER AT POCATELLO ID",
+        "lat": 42.87166667,
+        "lon": -112.4680556
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-112.4680556, 42.87166667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_432730110474601",
+        "source": "USGS",
+        "id": "432730110474601",
+        "description": "40-116-06adc01 Streambank well at station 13018350",
+        "lat": 43.4583611,
+        "lon": -110.7970278
+      },
+      "geometry": { "type": "Point", "coordinates": [-110.7970278, 43.4583611] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12323233",
+        "source": "USGS",
+        "id": "12323233",
+        "description": "Blacktail Creek above Grove Gulch, at Butte, MT",
+        "lat": 45.9912694,
+        "lon": -112.5273583
+      },
+      "geometry": { "type": "Point", "coordinates": [-112.5273583, 45.9912694] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12323242",
+        "source": "USGS",
+        "id": "12323242",
+        "description": "Silver Bow Creek at Montana Street, at Butte, MT",
+        "lat": 45.99572778,
+        "lon": -112.538761
+      },
+      "geometry": { "type": "Point", "coordinates": [-112.538761, 45.99572778] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12323600",
+        "source": "USGS",
+        "id": "12323600",
+        "description": "Silver Bow Creek at Opportunity MT",
+        "lat": 46.1077583,
+        "lon": -112.8052833
+      },
+      "geometry": { "type": "Point", "coordinates": [-112.8052833, 46.1077583] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12323750",
+        "source": "USGS",
+        "id": "12323750",
+        "description": "Silver Bow Creek at Warm Springs MT",
+        "lat": 46.1794972,
+        "lon": -112.780561
+      },
+      "geometry": { "type": "Point", "coordinates": [-112.780561, 46.1794972] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12323770",
+        "source": "USGS",
+        "id": "12323770",
+        "description": "Warm Springs Creek at Warm Springs MT",
+        "lat": 46.180375,
+        "lon": -112.7850778
+      },
+      "geometry": { "type": "Point", "coordinates": [-112.7850778, 46.180375] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12323800",
+        "source": "USGS",
+        "id": "12323800",
+        "description": "Clark Fork near Galen MT",
+        "lat": 46.20824167,
+        "lon": -112.76735
+      },
+      "geometry": { "type": "Point", "coordinates": [-112.76735, 46.20824167] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12324200",
+        "source": "USGS",
+        "id": "12324200",
+        "description": "Clark Fork at Deer Lodge MT",
+        "lat": 46.39765,
+        "lon": -112.7425389
+      },
+      "geometry": { "type": "Point", "coordinates": [-112.7425389, 46.39765] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12324400",
+        "source": "USGS",
+        "id": "12324400",
+        "description": "Clark Fork ab Little Blackfoot R nr Garrison MT",
+        "lat": 46.5109111,
+        "lon": -112.789686
+      },
+      "geometry": { "type": "Point", "coordinates": [-112.789686, 46.5109111] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12324590",
+        "source": "USGS",
+        "id": "12324590",
+        "description": "Little Blackfoot River near Garrison MT",
+        "lat": 46.5194833,
+        "lon": -112.7931722
+      },
+      "geometry": { "type": "Point", "coordinates": [-112.7931722, 46.5194833] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12335100",
+        "source": "USGS",
+        "id": "12335100",
+        "description": "Blackfoot R ab Nevada Cr nr Helmville MT",
+        "lat": 46.9187944,
+        "lon": -113.014986
+      },
+      "geometry": { "type": "Point", "coordinates": [-113.014986, 46.9187944] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12337800",
+        "source": "USGS",
+        "id": "12337800",
+        "description": "Nevada Creek at mouth nr Helmville, MT",
+        "lat": 46.8907698,
+        "lon": -113.0386674
+      },
+      "geometry": { "type": "Point", "coordinates": [-113.0386674, 46.8907698] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_12338300",
+        "source": "USGS",
+        "id": "12338300",
+        "description": "NF Blackfoot R ab Dry Gulch nr Ovando MT",
+        "lat": 46.9794944,
+        "lon": -113.092186
+      },
+      "geometry": { "type": "Point", "coordinates": [-113.092186, 46.9794944] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USGS_13010065",
+        "source": "USGS",
+        "id": "13010065",
+        "description": "SNAKE RIVER AB JACKSON LAKE AT FLAGG RANCH WY",
+        "lat": 44.09888889,
+        "lon": -110.6675
+      },
+      "geometry": { "type": "Point", "coordinates": [-110.6675, 44.09888889] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_YOKO",
+        "source": "USBR",
+        "id": "YOKO",
+        "description": "Umatilla River at Yoakum, OR",
+        "lat": 45.67722222222222,
+        "lon": -119.03583333333333
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.03583333333333, 45.67722222222222]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_PDTO",
+        "source": "USBR",
+        "id": "PDTO",
+        "description": "Umatilla River at Pendleton, OR",
+        "lat": 45.67222222222222,
+        "lon": -118.79166666666667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.79166666666667, 45.67222222222222]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_PRVO",
+        "source": "USBR",
+        "id": "PRVO",
+        "description": "Crooked River near Prineville, OR",
+        "lat": 44.11388888888889,
+        "lon": -120.79444444444444
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-120.79444444444444, 44.11388888888889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_GCGW",
+        "source": "USBR",
+        "id": "GCGW",
+        "description": "Columbia River below Grand Coulee Dam near Barry, WA",
+        "lat": 48.03333333333333,
+        "lon": -118.97666666666667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.97666666666667, 48.03333333333333]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_UMAO",
+        "source": "USBR",
+        "id": "UMAO",
+        "description": "Umatilla River near Umatilla, OR",
+        "lat": 45.9,
+        "lon": -119.33333333333333
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.33333333333333, 45.9]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_UMMO",
+        "source": "USBR",
+        "id": "UMMO",
+        "description": "Umatilla River above Butter Creek nr Hermiston",
+        "lat": 45.79527777777778,
+        "lon": -119.32277777777777
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.32277777777777, 45.79527777777778]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_CIBW",
+        "source": "USBR",
+        "id": "CIBW",
+        "description": "Columbia River at International Boundary",
+        "lat": 48.97138888888889,
+        "lon": -117.64694444444446
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-117.64694444444446, 48.97138888888889]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_UMUO",
+        "source": "USBR",
+        "id": "UMUO",
+        "description": "Umatilla River nr Echo, OR",
+        "lat": 45.72083333333334,
+        "lon": -119.17916666666667
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.17916666666667, 45.72083333333334]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_AND",
+        "source": "USBR",
+        "id": "AND",
+        "description": "Anderson Ranch Dam and Reservoir",
+        "lat": 43.358333333333334,
+        "lon": -115.44444444444444
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-115.44444444444444, 43.358333333333334]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_MYKO",
+        "source": "USBR",
+        "id": "MYKO",
+        "description": "Mckay Creek near Pilot Rock, OR",
+        "lat": 45.549166666666665,
+        "lon": -118.77333333333333
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.77333333333333, 45.549166666666665]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_MINI",
+        "source": "USBR",
+        "id": "MINI",
+        "description": "Snake River near Minidoka, ID",
+        "lat": 42.67305555555555,
+        "lon": -113.49944444444445
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-113.49944444444445, 42.67305555555555]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_HGHM",
+        "source": "USBR",
+        "id": "HGHM",
+        "description": "S.Fk. Flathead Riv nr Columbia Falls at Hungry Horse",
+        "lat": 48.35666666666667,
+        "lon": -114.03666666666666
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-114.03666666666666, 48.35666666666667]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_SPBO",
+        "source": "USBR",
+        "id": "SPBO",
+        "description": "Sprague River near Beatty, OR",
+        "lat": 42.447222222222216,
+        "lon": -121.2375
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-121.2375, 42.447222222222216]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_MCKO",
+        "source": "USBR",
+        "id": "MCKO",
+        "description": "Mckay Creek near Pendleton, OR",
+        "lat": 45.60944444444445,
+        "lon": -118.79861111111111
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.79861111111111, 45.60944444444445]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_UMDO",
+        "source": "USBR",
+        "id": "UMDO",
+        "description": "Umatilla River ar I84 near Stanfield, OR",
+        "lat": 45.776666666666664,
+        "lon": -119.21222222222222
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-119.21222222222222, 45.776666666666664]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "unique_id": "USBR_UNY",
+        "source": "USBR",
+        "id": "UNY",
+        "description": "Unity Reservoir and Burnt River near Unity, Oregon",
+        "lat": 44.50361111111111,
+        "lon": -118.19583333333334
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-118.19583333333334, 44.50361111111111]
+      }
+    }
+  ]
+}
