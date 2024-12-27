@@ -42,6 +42,7 @@ import os
 from thorr.utils import config as cfg
 from thorr.utils import database
 from thorr.utils import logger
+from thorr.utils.misc import validate_start_end_dates
 
 
 def estimate_temperature(config_path, db_type="postgresql", element="reach"):
@@ -61,6 +62,27 @@ def estimate_temperature(config_path, db_type="postgresql", element="reach"):
     model_fn = project_dir / config_dict["ml"]["model_fn"]
 
     connection = db.connection
+
+    # get start date from config file
+    if (
+        "start_date" not in config_dict["project"]
+        or not config_dict["project"]["start_date"]
+    ):
+        start_date = None
+    else:
+        start_date = config_dict["project"]["start_date"]
+
+    # get end date from config file
+    if (
+        "end_date" not in config_dict["project"]
+        or not config_dict["project"]["end_date"]
+    ):
+        end_date = None
+    else:
+        end_date = config_dict["project"]["end_date"]
+
+    # validate start and end dates
+    start_date, end_date = validate_start_end_dates(start_date, end_date, logger=log)
     
     # define a query to fetch the data from the database
     # make date pd datetime format
@@ -84,7 +106,8 @@ def estimate_temperature(config_path, db_type="postgresql", element="reach"):
         WHERE
             "LandTempC" IS NOT NULL
             AND "NDVI" IS NOT NULL
-            AND "EstTempC" IS NULL;
+            AND "Date" >= '{start_date}'
+            AND "Date" <= '{end_date}';
         """
 
 
@@ -134,12 +157,22 @@ def estimate_temperature(config_path, db_type="postgresql", element="reach"):
                                 "Name" = '{row['Name']}'
                         )
                     )
-                    AND ("Date" = '{row['Date']}');
+                    AND ("Date" = '{row['Date']}')
+                    AND ("EstTempC" IS NULL);
                 """
+                print(query)
+                break
                 
                 with connection.cursor() as cursor:
                     cursor.execute(query)
                     connection.commit()
+
+        elif element == "reservoir":
+            pass
+    elif db_type == "mysql":
+        pass
+
+    log.info("Temperature estimates have been successfully uploaded to the database.")
 
 
 def main(args):
