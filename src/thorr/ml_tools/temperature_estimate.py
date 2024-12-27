@@ -92,13 +92,26 @@ def estimate_temperature(config_path, db_type="postgresql", element="reach"):
         with connection.cursor() as cursor:
             cursor.execute(query)
             df = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
-            print(df.head())
+            df["Date"] = pd.to_datetime(df["Date"])
 
     # create a DOY column
+    df["DOY"] = df["Date"].dt.dayofyear
     # fill na values of the mean width values with 15
+    df[["WidthMean"]] = df[["WidthMean"]].fillna(15)
     # define features
+    features = [
+        "NDVI",
+        "LandTempC",
+        "ClimateClass",
+        "DOY",
+        "WidthMean",
+    ]
+    
     # load model_fn
+    rfr = load(model_fn)
     # estimate models
+    df['EstTempC'] = rfr.predict(df[features])
+    print(df.head())
     # upload estimates to the database
 
     # if element == "reach":
@@ -108,7 +121,6 @@ def main(args):
     config_path = Path(args.config)
     db_type = args.db_type
     estimate_temperature(config_path, db_type=db_type, element=args.element)
-    pass
 
 
 if __name__ == "__main__":
