@@ -80,7 +80,7 @@ def estimate_temperature(config_path, db_type="postgresql", element="reach"):
             "EstTempC"
         FROM
             {schema}."ReachData"
-            LEFT JOIN THORR."Reaches" USING ("ReachID")
+            LEFT JOIN {schema}."Reaches" USING ("ReachID")
         WHERE
             "LandTempC" IS NOT NULL
             AND "NDVI" IS NOT NULL
@@ -111,10 +111,35 @@ def estimate_temperature(config_path, db_type="postgresql", element="reach"):
     rfr = load(model_fn)
     # estimate models
     df['EstTempC'] = rfr.predict(df[features])
-    print(df.head())
+    
     # upload estimates to the database
-
-    # if element == "reach":
+    if db_type == "postgresql":
+        if element == "reach":
+            for i, row in df.iterrows():
+                # if i % 10000 == 0:
+                #     print(f"Processing row {i} of {len(df)}")
+                
+                query = f"""
+                UPDATE {schema}."ReachData"
+                SET
+                    "EstTempC" = {round(row['EstTempC'], 2)}
+                WHERE
+                    (
+                        "ReachID" = (
+                            SELECT
+                                "ReachID"
+                            FROM
+                                {schema}."Reaches"
+                            WHERE
+                                "Name" = '{row['Name']}'
+                        )
+                    )
+                    AND ("Date" = '{row['Date']}');
+                """
+                
+                with connection.cursor() as cursor:
+                    cursor.execute(query)
+                    connection.commit()
 
 
 def main(args):
