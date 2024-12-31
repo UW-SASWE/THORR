@@ -207,25 +207,52 @@ while ($row = $result->fetch_assoc()) {
 
 // query for weekly water temperatures
 $waterTempMQuery = <<<QUERY
-    SELECT 
-        STR_TO_DATE(CONCAT(YEAR(Date),
-                        '-',
-                        LPAD(MONTH(Date), 2, '00'),
-                        '-',
-                        LPAD(01, 2, '00')),
-                '%Y-%m-%d') AS Date,
-        ROUND(AVG(WaterTempC), 2) AS WaterTemperature
-    FROM
-        DamData
-    WHERE
-        DamID = {$_POST['DamID']} AND WaterTempC > 0
-    GROUP BY STR_TO_DATE(CONCAT(YEAR(Date),
+        SELECT
+            TO_DATE(
+                CONCAT(
+                    EXTRACT(
+                        YEAR
+                        FROM
+                            "Date"
+                    ),
                     '-',
-                    LPAD(MONTH(Date), 2, '00'),
+                    EXTRACT(
+                        MONTH
+                        FROM
+                            "Date"
+                    ),
                     '-',
-                    LPAD(01, 2, '00')),
-            '%Y-%m-%d')
-    ORDER BY Date;
+                    LPAD('01', 2, '00')
+                ),
+                'YYYY-MM-DD'
+            ) AS Date,
+            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
+        FROM
+            thorr."DamData"
+        WHERE
+            ("DamID" = {$_POST['DamID']})
+            AND ("WaterTempC" > 0)
+        GROUP BY
+            TO_DATE(
+                CONCAT(
+                    EXTRACT(
+                        YEAR
+                        FROM
+                            "Date"
+                    ),
+                    '-',
+                    EXTRACT(
+                        MONTH
+                        FROM
+                            "Date"
+                    ),
+                    '-',
+                    LPAD('01', 2, '00')
+                ),
+                'YYYY-MM-DD'
+            )
+        ORDER BY
+            Date;
     QUERY;
 
 $result = $mysqli_connection->query($waterTempMQuery);
