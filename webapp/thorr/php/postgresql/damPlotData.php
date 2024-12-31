@@ -2,7 +2,8 @@
 
 require_once('dbConfig.php');
 
-$mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
+$connStr = "host=$host port=$port dbname=$dbname user=$username password=$password";
+$pgsql_connection = pg_connect($connStr);
 
 // if ($mysqli_connection->connect_error) {
 //     echo "Not connected, error: " . $mysqli_connection->connect_error;
@@ -42,16 +43,16 @@ $waterTempQuery = <<<QUERY
 SELECT 
     "Date" AS Date, "WaterTempC" AS WaterTemperature
 FROM
-    thorr."DamData"
+    $schema."DamData"
 WHERE
     "DamID" = {$_POST['DamID']} AND "WaterTempC" > 0
 ORDER BY Date;
 QUERY;
 
-$result = $mysqli_connection->query($waterTempQuery);
+$result = pg_query($pgsql_connection, $waterTempQuery);
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
 
     array_push($plotData['waterTempDates'], $row['Date']);
     array_push($plotData['waterTemp'], $row['WaterTemperature']);
@@ -88,7 +89,7 @@ $waterTempBWQuery = <<<QUERY
         ) AS Date,
         ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
     FROM
-        thorr."DamData"
+        $schema."DamData"
     WHERE
         "DamID" = {$_POST['DamID']}
         AND "WaterTempC" > 0
@@ -123,10 +124,10 @@ $waterTempBWQuery = <<<QUERY
         Date;
     QUERY;
 
-$result = $mysqli_connection->query($waterTempBWQuery);
+$result = pg_query($pgsql_connection, $waterTempBWQuery);
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
 
     array_push($plotData['waterTempBWDates'], $row['Date']);
     array_push($plotData['waterTempBW'], $row['WaterTemperature']);
@@ -163,7 +164,7 @@ $waterTempWQuery = <<<QUERY
         ) AS Date,
         ROUND(AVG("WaterTempC")::numeric, 2) AS WaterTemperature
     FROM
-        thorr."DamData"
+        $schema."DamData"
     WHERE
         "DamID" = {$_POST['DamID']} AND "WaterTempC" > 0
     GROUP BY
@@ -196,10 +197,10 @@ $waterTempWQuery = <<<QUERY
     ORDER BY Date;
     QUERY;
 
-$result = $mysqli_connection->query($waterTempWQuery);
+$result = pg_query($pgsql_connection, $waterTempWQuery);
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
 
     array_push($plotData['waterTempWDates'], $row['Date']);
     array_push($plotData['waterTempW'], $row['WaterTemperature']);
@@ -228,7 +229,7 @@ $waterTempMQuery = <<<QUERY
             ) AS Date,
             ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
         FROM
-            thorr."DamData"
+            $schema."DamData"
         WHERE
             ("DamID" = {$_POST['DamID']})
             AND ("WaterTempC" > 0)
@@ -255,10 +256,10 @@ $waterTempMQuery = <<<QUERY
             Date;
     QUERY;
 
-$result = $mysqli_connection->query($waterTempMQuery);
+$result = pg_query($pgsql_connection, $waterTempMQuery);
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
 
     array_push($plotData['waterTempMDates'], $row['Date']);
     array_push($plotData['waterTempM'], $row['WaterTemperature']);
@@ -287,10 +288,10 @@ GROUP BY STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE),
 ORDER BY Date;
 QUERY;
 
-$result = $mysqli_connection->query($LTMQuery);
+$result = pg_query($pgsql_connection, $LTMQuery);
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
 
     array_push($plotData['LTMDates'], $row['Date']);
     array_push($plotData['LTM'], $row['WaterTemperature']);
@@ -321,10 +322,10 @@ GROUP BY DATE_ADD(STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE),
 ORDER BY Date;
 QUERY;
 
-$result = $mysqli_connection->query($LTMWQuery);
+$result = pg_query($pgsql_connection, $LTMWQuery);
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
 
     array_push($plotData['LTMWDates'], $row['Date']);
     array_push($plotData['LTMW'], $row['WaterTemperature']);
@@ -355,10 +356,10 @@ GROUP BY DATE_ADD(STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE),
 ORDER BY Date;
 QUERY;
 
-$result = $mysqli_connection->query($LTMBWQuery);
+$result = pg_query($pgsql_connection, $LTMBWQuery);
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
 
     array_push($plotData['LTMBWDates'], $row['Date']);
     array_push($plotData['LTMBW'], $row['WaterTemperature']);
@@ -387,10 +388,10 @@ GROUP BY STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE),
 ORDER BY Date;
 QUERY;
 
-$result = $mysqli_connection->query($LTMMQuery);
+$result = pg_query($pgsql_connection, $LTMMQuery);
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
 
     array_push($plotData['LTMMDates'], $row['Date']);
     array_push($plotData['LTMM'], $row['WaterTemperature']);
@@ -420,10 +421,10 @@ FROM
 ORDER BY Est.Date;
 QUERY;
 
-$result = $mysqli_connection->query($deviationQuery);
+$result = pg_query($pgsql_connection, $deviationQuery);
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
 
     array_push($plotData['deviationDates'], $row['Date']);
     array_push($plotData['deviation'], $row['Deviation']);
@@ -475,10 +476,10 @@ GROUP BY STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE),
 ORDER BY Est.Date;
 QUERY;
 
-$result = $mysqli_connection->query($deviationMQuery);
+$result = pg_query($pgsql_connection, $deviationMQuery);
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
 
     array_push($plotData['deviationMDates'], $row['Date']);
     array_push($plotData['deviationM'], $row['Deviation']);
@@ -515,10 +516,10 @@ FROM
 ORDER BY Est.Date;
 QUERY;
 
-$result = $mysqli_connection->query($deviationWQuery);
+$result = pg_query($pgsql_connection, $deviationWQuery);
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
 
     array_push($plotData['deviationWDates'], $row['Date']);
     array_push($plotData['deviationW'], $row['Deviation']);
@@ -553,10 +554,10 @@ FROM
 ORDER BY Est.Date;
 QUERY;
 
-$result = $mysqli_connection->query($deviationBWQuery);
+$result = pg_query($pgsql_connection, $deviationBWQuery);
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
 
     array_push($plotData['deviationBWDates'], $row['Date']);
     array_push($plotData['deviationBW'], $row['Deviation']);
