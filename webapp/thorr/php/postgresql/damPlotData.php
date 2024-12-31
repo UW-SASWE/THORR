@@ -533,26 +533,95 @@ while ($row = pg_fetch_assoc($result)) {
 
 // query for deviations (irregular)
 $deviationQuery = <<<QUERY
-SELECT 
-    Est.Date AS Date,
-    Round((Est.WaterTemperature - LTM.WaterTemperature), 2) AS Deviation
+SELECT
+    EST.Date AS Date,
+    ROUND((EST.WaterTemperature - LTM.WaterTemperature), 2) AS Deviation
 FROM
-    (SELECT 
-        Date AS Date, WaterTempC AS WaterTemperature
-    FROM
-        DamData
-    WHERE
-        DamID = {$_POST['DamID']} AND WaterTempC > 0) AS Est
-        LEFT JOIN
-    (SELECT 
-        STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE), '-', LPAD(MONTH(Date), 2, '00'), '-', LPAD(DAY(Date), 2, '00')), '%Y-%m-%d') AS Date,
-            ROUND(AVG(WaterTempC), 2) AS WaterTemperature
-    FROM
-        DamData
-    WHERE
-        DamID = {$_POST['DamID']} AND WaterTempC > 0
-    GROUP BY STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE), '-', LPAD(MONTH(Date), 2, '00'), '-', LPAD(DAY(Date), 2, '00')), '%Y-%m-%d')) AS LTM ON (MONTH(LTM.Date) = MONTH(Est.Date) and Day(LTM.Date) = Day(Est.Date))
-ORDER BY Est.Date;
+    (
+        SELECT
+            "Date" AS Date,
+            ROUND("WaterTempC"::NUMERIC, 2) AS WaterTemperature
+        FROM
+            $schema."DamData"
+        WHERE
+            "DamID" = {$_POST['DamID']}
+            AND "WaterTempC" IS NOT NULL
+    ) AS EST
+    LEFT JOIN (
+        SELECT
+            TO_DATE(
+                CONCAT(
+                    EXTRACT(
+                        YEAR
+                        FROM
+                            CURRENT_DATE
+                    ),
+                    '-',
+                    EXTRACT(
+                        MONTH
+                        FROM
+                            "Date"
+                    ),
+                    '-',
+                    EXTRACT(
+                        DAY
+                        FROM
+                            "Date"
+                    )
+                ),
+                'YYYY-MM-DD'
+            ) AS Date,
+            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
+        FROM
+            $schema."DamData"
+        WHERE
+            ("DamID" = {$_POST['DamID']})
+            AND ("WaterTempC" IS NOT NULL)
+        GROUP BY
+            TO_DATE(
+                CONCAT(
+                    EXTRACT(
+                        YEAR
+                        FROM
+                            CURRENT_DATE
+                    ),
+                    '-',
+                    EXTRACT(
+                        MONTH
+                        FROM
+                            "Date"
+                    ),
+                    '-',
+                    EXTRACT(
+                        DAY
+                        FROM
+                            "Date"
+                    )
+                ),
+                'YYYY-MM-DD'
+            )
+    ) AS LTM ON (
+        EXTRACT(
+            MONTH
+            FROM
+                LTM.Date
+        ) = EXTRACT(
+            MONTH
+            FROM
+                EST.Date
+        )
+        AND EXTRACT(
+            DOY
+            FROM
+                LTM.Date
+        ) = EXTRACT(
+            DOY
+            FROM
+                EST.Date
+        )
+    )
+ORDER BY
+    EST.Date;
 QUERY;
 
 $result = pg_query($pgsql_connection, $deviationQuery);
