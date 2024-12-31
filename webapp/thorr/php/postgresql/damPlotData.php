@@ -267,25 +267,52 @@ while ($row = pg_fetch_assoc($result)) {
 
 // query for long term mean temperatures as is (not resampled)
 $LTMQuery = <<<QUERY
-SELECT 
-    STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE),
-                    '-',
-                    LPAD(MONTH(Date), 2, '00'),
-                    '-',
-                    LPAD(DAY(Date), 2, '00')),
-            '%Y-%m-%d') AS Date,
-    ROUND(AVG(WaterTempC), 2) AS WaterTemperature
+SELECT
+    TO_DATE(
+        CONCAT(
+            EXTRACT(
+                YEAR
+                FROM
+                    CURRENT_DATE
+            ),
+            '-',
+            EXTRACT(
+                MONTH
+                FROM
+                    "Date"
+            ),
+            '-',
+            LPAD('01', 2, '00')
+        ),
+        'YYYY-MM-DD'
+    ) AS Date,
+    ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
 FROM
-    DamData
+    $schema."DamData"
 WHERE
-    DamID = {$_POST['DamID']} AND WaterTempC > 0
-GROUP BY STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE),
+    ("DamID" = {$_POST['DamID']})
+    AND ("WaterTempC" > 0)
+GROUP BY
+    TO_DATE(
+        CONCAT(
+            EXTRACT(
+                YEAR
+                FROM
+                    CURRENT_DATE
+            ),
             '-',
-            LPAD(MONTH(Date), 2, '00'),
+            EXTRACT(
+                MONTH
+                FROM
+                    "Date"
+            ),
             '-',
-            LPAD(DAY(Date), 2, '00')),
-    '%Y-%m-%d')
-ORDER BY Date;
+            LPAD('01', 2, '00')
+        ),
+        'YYYY-MM-DD'
+    )
+ORDER BY
+    Date;
 QUERY;
 
 $result = pg_query($pgsql_connection, $LTMQuery);
