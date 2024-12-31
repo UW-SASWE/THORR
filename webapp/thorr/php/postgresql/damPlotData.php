@@ -40,11 +40,11 @@ $plotData = array(
 // query for water temperatures as is (not resampled)
 $waterTempQuery = <<<QUERY
 SELECT 
-    Date AS Date, WaterTempC AS WaterTemperature
+    "Date" AS Date, "WaterTempC" AS WaterTemperature
 FROM
-    DamData
+    thorr."DamData"
 WHERE
-    DamID = {$_POST['DamID']} AND WaterTempC > 0
+    "DamID" = {$_POST['DamID']} AND "WaterTempC" > 0
 ORDER BY Date;
 QUERY;
 
