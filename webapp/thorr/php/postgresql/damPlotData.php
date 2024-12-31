@@ -925,31 +925,168 @@ while ($row = pg_fetch_assoc($result)) {
 
 // query for deviations (monthly)
 $deviationBWQuery = <<<QUERY
-SELECT 
-    Est.Date AS Date,
-    ROUND((Est.WaterTemperature - LTM.WaterTemperature),
-            2) AS Deviation
+SELECT
+    EST.Date AS Date,
+    ROUND((EST.WaterTemperature - LTM.WaterTemperature), 2) AS Deviation
 FROM
-    (SELECT 
-        DATE_ADD(STR_TO_DATE(CONCAT(YEAR(Date), '-', LPAD(01, 2, '00'), '-', LPAD(01, 2, '00')), '%Y-%m-%d'), INTERVAL (2 * (FLOOR(DAYOFYEAR(Date) / 14))) WEEK) AS Date,
-            ROUND(AVG(WaterTempC), 2) AS WaterTemperature,
-            (2 * (FLOOR(DAYOFYEAR(Date) / 14))) AS week
-    FROM
-        DamData
-    WHERE
-        DamID = {$_POST['DamID']} AND WaterTempC > 0
-    GROUP BY DATE_ADD(STR_TO_DATE(CONCAT(YEAR(Date), '-', LPAD(01, 2, '00'), '-', LPAD(01, 2, '00')), '%Y-%m-%d'), INTERVAL (2 * (FLOOR(DAYOFYEAR(Date) / 14))) WEEK) , (2 * (FLOOR(DAYOFYEAR(Date) / 14)))) AS Est
-        LEFT JOIN
-    (SELECT 
-        DATE_ADD(STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE), '-', LPAD(01, 2, '00'), '-', LPAD(01, 2, '00')), '%Y-%m-%d'), INTERVAL (2 * (FLOOR(DAYOFYEAR(Date) / 14))) WEEK) AS Date,
-            ROUND(AVG(WaterTempC), 2) AS WaterTemperature,
-            (2 * (FLOOR(DAYOFYEAR(Date) / 14))) AS week
-    FROM
-        DamData
-    WHERE
-        DamID = {$_POST['DamID']} AND WaterTempC > 0
-    GROUP BY DATE_ADD(STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE), '-', LPAD(01, 2, '00'), '-', LPAD(01, 2, '00')), '%Y-%m-%d'), INTERVAL (2 * (FLOOR(DAYOFYEAR(Date) / 14))) WEEK) , (2 * (FLOOR(DAYOFYEAR(Date) / 14)))) AS LTM ON (LTM.Week = Est.Week)
-ORDER BY Est.Date;
+    (
+        SELECT
+            DATE_ADD (
+                TO_DATE(
+                    CONCAT(
+                        EXTRACT(
+                            YEAR
+                            FROM
+                                "Date"
+                        ),
+                        '-',
+                        LPAD('01', 2, '00'),
+                        '-',
+                        LPAD('01', 2, '00')
+                    ),
+                    'YYYY-MM-DD'
+                ),
+                CONCAT(
+                    2 * FLOOR(
+                        EXTRACT(
+                            DOY
+                            FROM
+                                "Date"
+                        ) / 14
+                    ),
+                    ' week'
+                )::INTERVAL
+            ) AS Date,
+            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature,
+            2 * FLOOR(
+                EXTRACT(
+                    DOY
+                    FROM
+                        "Date"
+                ) / 14
+            ) AS week
+        FROM
+            $schema."DamData"
+        WHERE
+            "DamID" = {$_POST['DamID']}
+            AND "WaterTempC" IS NOT NULL
+        GROUP BY
+            DATE_ADD (
+                TO_DATE(
+                    CONCAT(
+                        EXTRACT(
+                            YEAR
+                            FROM
+                                "Date"
+                        ),
+                        '-',
+                        LPAD('01', 2, '00'),
+                        '-',
+                        LPAD('01', 2, '00')
+                    ),
+                    'YYYY-MM-DD'
+                ),
+                CONCAT(
+                    2 * FLOOR(
+                        EXTRACT(
+                            DOY
+                            FROM
+                                "Date"
+                        ) / 14
+                    ),
+                    ' week'
+                )::INTERVAL
+            ),
+            2 * FLOOR(
+                EXTRACT(
+                    DOY
+                    FROM
+                        "Date"
+                ) / 14
+            )
+        ORDER BY
+            Date
+    ) AS EST
+    LEFT JOIN (
+        SELECT
+            DATE_ADD (
+                TO_DATE(
+                    CONCAT(
+                        EXTRACT(
+                            YEAR
+                            FROM
+                                CURRENT_DATE
+                        ),
+                        '-',
+                        LPAD('01', 2, '00'),
+                        '-',
+                        LPAD('01', 2, '00')
+                    ),
+                    'YYYY-MM-DD'
+                ),
+                CONCAT(
+                    2 * FLOOR(
+                        EXTRACT(
+                            DOY
+                            FROM
+                                "Date"
+                        ) / 14
+                    ),
+                    ' week'
+                )::INTERVAL
+            ) AS DATE,
+            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature,
+            2 * FLOOR(
+                EXTRACT(
+                    DOY
+                    FROM
+                        "Date"
+                ) / 14
+            ) AS week
+        FROM
+            $schema."DamData"
+        WHERE
+            "DamID" = {$_POST['DamID']}
+            AND "WaterTempC" IS NOT NULL
+        GROUP BY
+            DATE_ADD (
+                TO_DATE(
+                    CONCAT(
+                        EXTRACT(
+                            YEAR
+                            FROM
+                                CURRENT_DATE
+                        ),
+                        '-',
+                        LPAD('01', 2, '00'),
+                        '-',
+                        LPAD('01', 2, '00')
+                    ),
+                    'YYYY-MM-DD'
+                ),
+                CONCAT(
+                    2 * FLOOR(
+                        EXTRACT(
+                            DOY
+                            FROM
+                                "Date"
+                        ) / 14
+                    ),
+                    ' week'
+                )::INTERVAL
+            ),
+            2 * FLOOR(
+                EXTRACT(
+                    DOY
+                    FROM
+                        "Date"
+                ) / 14
+            )
+        ORDER BY
+            Date
+    ) AS LTM ON (LTM.week = EST.week)
+ORDER BY
+    Est.Date;
 QUERY;
 
 $result = pg_query($pgsql_connection, $deviationBWQuery);
