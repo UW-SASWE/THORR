@@ -639,44 +639,104 @@ SELECT
     Est.Date AS Date,
     Round((Est.WaterTemperature - LTM.WaterTemperature), 2) AS Deviation
 FROM
-    (SELECT 
-        STR_TO_DATE(CONCAT(YEAR(Date),
-                        '-',
-                        LPAD(MONTH(Date), 2, '00'),
-                        '-',
-                        LPAD(01, 2, '00')),
-                '%Y-%m-%d') AS Date,
-        ROUND(AVG(WaterTempC), 2) AS WaterTemperature
-    FROM
-        DamData
-    WHERE
-        DamID = {$_POST['DamID']} AND WaterTempC > 0
-    GROUP BY STR_TO_DATE(CONCAT(YEAR(Date),
+    (
+        SELECT
+            TO_DATE(
+                CONCAT(
+                    EXTRACT(
+                        YEAR
+                        FROM
+                            "Date"
+                    ),
                     '-',
-                    LPAD(MONTH(Date), 2, '00'),
+                    EXTRACT(
+                        MONTH
+                        FROM
+                            "Date"
+                    ),
                     '-',
-                    LPAD(01, 2, '00')),
-            '%Y-%m-%d')) AS Est
-        LEFT JOIN
-    (SELECT 
-    STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE),
+                    LPAD('01', 2, '00')
+                ),
+                'YYYY-MM-DD'
+            ) AS Date,
+            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
+        FROM
+            $schema."DamData"
+        WHERE
+            ("DamID" = {$_POST['DamID']})
+            AND ("WaterTempC" IS NOT NULL)
+        GROUP BY
+            TO_DATE(
+                CONCAT(
+                    EXTRACT(
+                        YEAR
+                        FROM
+                            "Date"
+                    ),
                     '-',
-                    LPAD(MONTH(Date), 2, '00'),
+                    EXTRACT(
+                        MONTH
+                        FROM
+                            "Date"
+                    ),
                     '-',
-                    LPAD(01, 2, '00')),
-            '%Y-%m-%d') AS Date,
-    ROUND(AVG(WaterTempC), 2) AS WaterTemperature
-FROM
-    DamData
-WHERE
-    DamID = {$_POST['DamID']} AND WaterTempC > 0
-GROUP BY STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE),
-                '-',
-                LPAD(MONTH(Date), 2, '00'),
-                '-',
-                LPAD(01, 2, '00')),
-        '%Y-%m-%d')) AS LTM ON (MONTH(LTM.Date) = MONTH(Est.Date))
-ORDER BY Est.Date;
+                    LPAD('01', 2, '00')
+                ),
+                'YYYY-MM-DD'
+            )) AS Est
+                LEFT JOIN
+            (SELECT
+            TO_DATE(
+                CONCAT(
+                    EXTRACT(
+                        YEAR
+                        FROM
+                            CURRENT_DATE
+                    ),
+                    '-',
+                    EXTRACT(
+                        MONTH
+                        FROM
+                            "Date"
+                    ),
+                    '-',
+                    LPAD('01', 2, '00')
+                ),
+                'YYYY-MM-DD'
+            ) AS Date,
+            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
+        FROM
+            $schema."DamData"
+        WHERE
+            ("DamID" = {$_POST['DamID']})
+            AND ("WaterTempC" IS NOT NULL)
+        GROUP BY
+            TO_DATE(
+                CONCAT(
+                    EXTRACT(
+                        YEAR
+                        FROM
+                            CURRENT_DATE
+                    ),
+                    '-',
+                    EXTRACT(
+                        MONTH
+                        FROM
+                            "Date"
+                    ),
+                    '-',
+                    LPAD('01', 2, '00')
+                ),
+                'YYYY-MM-DD'
+            )) AS LTM ON (EXTRACT(
+                        MONTH
+                        FROM
+                            LTM.Date) = EXTRACT(
+                        MONTH
+                        FROM
+                            Est.Date))
+ORDER BY 
+    Est.Date;
 QUERY;
 
 $result = pg_query($pgsql_connection, $deviationMQuery);
