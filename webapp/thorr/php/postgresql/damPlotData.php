@@ -399,27 +399,68 @@ while ($row = pg_fetch_assoc($result)) {
 
 // query for long term mean temperatures (bi-weekly)
 $LTMBWQuery = <<<QUERY
-SELECT 
-    DATE_ADD(STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE),
-                        '-',
-                        LPAD(01, 2, '00'),
-                        '-',
-                        LPAD(01, 2, '00')),
-                '%Y-%m-%d'),
-        INTERVAL (2 * FLOOR(DAYOFYEAR(Date) / 14)) WEEK) AS Date,
-    ROUND(AVG(WaterTempC), 2) AS WaterTemperature
+SELECT
+    DATE_ADD (
+        TO_DATE(
+            CONCAT(
+                EXTRACT(
+                    YEAR
+                    FROM
+                        CURRENT_DATE
+                ),
+                '-',
+                LPAD('01', 2, '00'),
+                '-',
+                LPAD('01', 2, '00')
+            ),
+            'YYYY-MM-DD'
+        ),
+        CONCAT(
+            2 * FLOOR(
+                EXTRACT(
+                    DOY
+                    FROM
+                        "Date"
+                ) / 14
+            ),
+            ' week'
+        )::INTERVAL
+    ) AS Date,
+    ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
 FROM
-    DamData
+    $schema."DamData"
 WHERE
-    DamID = {$_POST['DamID']} AND WaterTempC > 0
-GROUP BY DATE_ADD(STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE),
-                    '-',
-                    LPAD(01, 2, '00'),
-                    '-',
-                    LPAD(01, 2, '00')),
-            '%Y-%m-%d'),
-    INTERVAL (2 * FLOOR(DAYOFYEAR(Date) / 14)) WEEK)
-ORDER BY Date;
+    "DamID" = {$_POST['DamID']}
+    AND "WaterTempC" IS NOT NULL
+GROUP BY
+    DATE_ADD (
+        TO_DATE(
+            CONCAT(
+                EXTRACT(
+                    YEAR
+                    FROM
+                        CURRENT_DATE
+                ),
+                '-',
+                LPAD('01', 2, '00'),
+                '-',
+                LPAD('01', 2, '00')
+            ),
+            'YYYY-MM-DD'
+        ),
+        CONCAT(
+            2 * FLOOR(
+                EXTRACT(
+                    DOY
+                    FROM
+                        "Date"
+                ) / 14
+            ),
+            ' week'
+        )::INTERVAL
+    )
+ORDER BY
+    Date;
 QUERY;
 
 $result = pg_query($pgsql_connection, $LTMBWQuery);
