@@ -3,7 +3,7 @@
 require_once('dbConfig.php');
 
 $connStr = "host=$host port=$port dbname=$dbname user=$username password=$password";
-$pgsql_connection = new pg_connect($connStr);
+$pgsql_connection = pg_connect($connStr);
 
 // The name of the text file
 $filename = "temp_download_dam.csv";
