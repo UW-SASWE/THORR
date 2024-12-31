@@ -2,7 +2,8 @@
 
 require_once('dbConfig.php');
 
-$mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
+$connStr = "host=$host port=$port dbname=$dbname user=$username password=$password";
+$pgsql_connection = new pg_connect($connStr);
 
 // The name of the text file
 $filename = "temp_download_dam.csv";
@@ -49,7 +50,7 @@ if ($_POST['DataType'] == "water-temperature") {
             ) AS Date,
             ROUND(AVG("WaterTempC")::numeric, 2) AS WaterTemperature
         FROM
-            thorr."DamData"
+            $schema."DamData"
         WHERE
             "DamID" = {$_POST['DamID']} AND "WaterTempC" IS NOT NULL
         GROUP BY
@@ -104,7 +105,7 @@ if ($_POST['DataType'] == "water-temperature") {
             ) AS Date,
             ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
         FROM
-            thorr."DamData"
+            $schema."DamData"
         WHERE
             ("DamID" = {$_POST['DamID']})
             AND ("WaterTempC" IS NOT NULL)
@@ -161,7 +162,7 @@ if ($_POST['DataType'] == "water-temperature") {
             ) AS Date,
             ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
         FROM
-            thorr."DamData"
+            $schema."DamData"
         WHERE
             "DamID" = {$_POST['DamID']}
             AND "WaterTempC" IS NOT NULL
@@ -201,7 +202,7 @@ if ($_POST['DataType'] == "water-temperature") {
             "Date" AS Date,
             ROUND("WaterTempC"::NUMERIC, 2) AS WaterTemperature
         FROM
-            thorr."DamData"
+            $schema."DamData"
         WHERE
             "DamID" = {$_POST['DamID']}
             AND "WaterTempC" IS NOT NULL
@@ -241,7 +242,7 @@ if ($_POST['DataType'] == "water-temperature") {
             ) AS Date,
             ROUND(AVG("WaterTempC")::numeric, 2) AS WaterTemperature
         FROM
-            thorr."DamData"
+            $schema."DamData"
         WHERE
             "DamID" = 1 AND "WaterTempC" IS NOT NULL
         GROUP BY
@@ -296,7 +297,7 @@ if ($_POST['DataType'] == "water-temperature") {
             ) AS Date,
             ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
         FROM
-            thorr."DamData"
+            $schema."DamData"
         WHERE
             ("DamID" = {$_POST['DamID']})
             AND ("WaterTempC" IS NOT NULL)
@@ -353,7 +354,7 @@ if ($_POST['DataType'] == "water-temperature") {
             ) AS Date,
             ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
         FROM
-            thorr."DamData"
+            $schema."DamData"
         WHERE
             "DamID" = {$_POST['DamID']}
             AND "WaterTempC" IS NOT NULL
@@ -414,7 +415,7 @@ if ($_POST['DataType'] == "water-temperature") {
             ) AS Date,
             ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
         FROM
-            thorr."DamData"
+            $schema."DamData"
         WHERE
             ("DamID" = {$_POST['DamID']})
             AND ("WaterTempC" IS NOT NULL)
@@ -489,7 +490,7 @@ if ($_POST['DataType'] == "water-temperature") {
                         ) / 7
                     ) AS week
                 FROM
-                    thorr."DamData"
+                    $schema."DamData"
                 WHERE
                     "DamID" = {$_POST['DamID']}
                     AND "WaterTempC" IS NOT NULL
@@ -567,7 +568,7 @@ if ($_POST['DataType'] == "water-temperature") {
                         ) / 7
                     ) AS week
                 FROM
-                    thorr."DamData"
+                    $schema."DamData"
                 WHERE
                     "DamID" = {$_POST['DamID']}
                     AND "WaterTempC" IS NOT NULL
@@ -639,7 +640,7 @@ if ($_POST['DataType'] == "water-temperature") {
                     ) AS Date,
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
                 FROM
-                    thorr."DamData"
+                    $schema."DamData"
                 WHERE
                     ("DamID" = {$_POST['DamID']})
                     AND ("WaterTempC" IS NOT NULL)
@@ -684,7 +685,7 @@ if ($_POST['DataType'] == "water-temperature") {
                     ) AS Date,
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
                 FROM
-                    thorr."DamData"
+                    $schema."DamData"
                 WHERE
                     ("DamID" = {$_POST['DamID']})
                     AND ("WaterTempC" IS NOT NULL)
@@ -760,7 +761,7 @@ if ($_POST['DataType'] == "water-temperature") {
                         ) / 14
                     ) AS week
                 FROM
-                    thorr."DamData"
+                    $schema."DamData"
                 WHERE
                     "DamID" = {$_POST['DamID']}
                     AND "WaterTempC" IS NOT NULL
@@ -838,7 +839,7 @@ if ($_POST['DataType'] == "water-temperature") {
                         ) / 14
                     ) AS week
                 FROM
-                    thorr."DamData"
+                    $schema."DamData"
                 WHERE
                     "DamID" = {$_POST['DamID']}
                     AND "WaterTempC" IS NOT NULL
@@ -893,7 +894,7 @@ if ($_POST['DataType'] == "water-temperature") {
                     "Date" AS Date,
                     ROUND("WaterTempC"::NUMERIC, 2) AS WaterTemperature
                 FROM
-                    THORR."DamData"
+                    $schema."DamData"
                 WHERE
                     "DamID" = {$_POST['DamID']}
                     AND "WaterTempC" IS NOT NULL
@@ -924,7 +925,7 @@ if ($_POST['DataType'] == "water-temperature") {
                     ) AS Date,
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
                 FROM
-                    THORR."DamData"
+                    $schema."DamData"
                 WHERE
                     ("DamID" = {$_POST['DamID']})
                     AND ("WaterTempC" IS NOT NULL)
@@ -977,15 +978,15 @@ if ($_POST['DataType'] == "water-temperature") {
     }
 }
 
-$result = $mysqli_connection->query($sql);
+$result = pg_query($pgsql_connection, $sql);
 
 // write the query results to the file
 if ($_POST['DataType'] == "deviations") {
-    while ($row = $result->fetch_assoc()) {
+    while ($row = pg_fetch_assoc($result)) {
         fputcsv($fp, array($row['Date'], $row['Deviation']));
     }
 } else {
-    while ($row = $result->fetch_assoc()) {
+    while ($row = pg_fetch_assoc($result)) {
         fputcsv($fp, array($row['Date'], $row['WaterTemperature']));
     }
 }
