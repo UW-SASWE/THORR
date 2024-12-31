@@ -2,7 +2,8 @@
 
 require_once('dbConfig.php');
 
-$mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
+$connStr = "host=$host port=$port dbname=$dbname user=$username password=$password";
+$pgsql_connection = pg_connect($connStr);
 
 // The name of the text file
 $filename = "temp_download_dam.csv";
@@ -15,13 +16,13 @@ $sql = <<<QUERY
 QUERY;
 
 
-$result = $mysqli_connection->query($sql);
+$result = pg_query($pgsql_connection, $sql);
 
 // write column headers
-fputcsv($fp, array_keys($result->fetch_assoc()));
+fputcsv($fp, array_keys(pg_fetch_assoc($result)));
 
 // write the query results to the file
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
     fputcsv($fp, $row);
 }
 
