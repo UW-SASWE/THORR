@@ -719,7 +719,6 @@ if ($_POST['DataType'] == "water-temperature") {
         QUERY;
     } elseif ($_POST['TimeScale'] == "bi-weekly") {
         $sql = <<<QUERY
-        
         SELECT
             EST.Date AS Date,
             ROUND((EST.WaterTemperature - LTM.WaterTemperature), 2) AS Deviation
