@@ -2,16 +2,17 @@
 
 require_once('dbConfig.php');
 
-$mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
+$connStr = "host=$host port=$port dbname=$dbname user=$username password=$password";
+$pgsql_connection = pg_connect($connStr);
 
 // if ($mysqli_connection->connect_error) {
 //     echo "Not connected, error: " . $mysqli_connection->connect_error;
 // }
-$sql = "SELECT BasinID, Name, ST_AsGeoJSON(ST_Simplify(geometry, 0.005), 2) AS geometry FROM Basins WHERE BasinID = " . $_POST['BasinID'] . " ORDER BY Name ASC";
+$sql = "SELECT "BasinID", "Name", ST_AsGeoJSON(ST_Simplify("geometry", 0.005), 2) AS geometry FROM thorr."Basins" WHERE "BasinID" = " . $_POST['BasinID'] . " ORDER BY "Name" ASC;";
 // echo $sql;
 // $sql = "SELECT BasinID, Name, ST_AsGeoJSON(ST_Simplify(geometry, 0.005), 2) AS geometry, ST_SRID(geometry) as SRID FROM Basins WHERE BasinID = " . $_POST['BasinID'] . " ORDER BY Name ASC";
 
-$result = $mysqli_connection->query($sql);
+$result = pg_query($pgsql_connection, $sql);
 
 # Build GeoJSON feature collection array
 $geojson = array(
@@ -20,7 +21,7 @@ $geojson = array(
 );
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
     // echo $row['geometry'];
     $properties = $row;
     # Remove wkb and geometry fields from properties
@@ -37,4 +38,4 @@ while ($row = $result->fetch_assoc()) {
 // // header('Content-type: application/json');
 echo json_encode($geojson, JSON_NUMERIC_CHECK);
 
-$mysqli_connection->close();
+pg_close($pgsql_connection);
