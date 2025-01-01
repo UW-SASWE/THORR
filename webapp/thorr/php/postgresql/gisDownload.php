@@ -18,77 +18,77 @@ fputcsv($fp, array('ReachID', 'RiverID', 'Name', 'geometry', 'EstTempC'));
 if ($_POST['ReachID']) {
     $sql = <<<QUERY
     SELECT 
-        ReachID, RiverID, Name, geometry, EstTempC
+        "ReachID", "RiverID", "Name", "geometry", "EstTempC"
     FROM
         (SELECT 
-            RiverID,
-                ReachID,
-                CONCAT(Rivers.Name, ' (', Reaches.RKm, ' km)') AS Name,
-                ST_ASTEXT(Reaches.geometry) AS geometry
+            "RiverID",
+                "ReachID",
+                CONCAT("Rivers"."Name", ' (', "Reaches"."RKm", ' km)') AS "Name",
+                ST_ASTEXT("Reaches"."geometry") AS "geometry"
         FROM
-            thorr.Rivers
-        INNER JOIN Reaches USING (RiverID)) AS T
+            $schema."Rivers"
+        INNER JOIN $schema."Reaches" USING ("RiverID")) AS T
             INNER JOIN
         (SELECT 
-            ReachID, ROUND(EstTempC, 2) AS EstTempC
+            "ReachID", ROUND("EstTempC"::numeric, 2) AS "EstTempC"
         FROM
-            thorr.ReachData
+            $schema."ReachData"
         WHERE
-            ReachID = {$_POST['ReachID']} AND Date > '{$_POST['StartDate']}'
-                AND Date < '{$_POST['EndDate']}'
-                AND EstTempC IS NOT NULL) AS R USING (ReachID)
+            "ReachID" = {$_POST['ReachID']} AND "Date" > '{$_POST['StartDate']}'
+                AND "Date" < '{$_POST['EndDate']}'
+                AND "EstTempC" IS NOT NULL) AS R USING ("ReachID")
     QUERY;
 } elseif ($_POST['RiverID']) {
     $sql = <<<QUERY
     SELECT 
-        ReachID, RiverID, Name, geometry, EstTempC
+        "ReachID", "RiverID", "Name", "geometry", "EstTempC"
     FROM
         (SELECT 
-            RiverID,
-                ReachID,
-                CONCAT(Rivers.Name, ' (', Reaches.RKm, ' km)') AS Name,
-                ST_ASGEOJSON(Reaches.geometry) AS geometry
+            "RiverID",
+                "ReachID",
+                CONCAT("Rivers"."Name", ' (', "Reaches"."RKm", ' km)') AS "Name",
+                ST_ASGEOJSON("Reaches"."geometry") AS "geometry"
         FROM
-            thorr.Rivers
-        INNER JOIN Basins USING (BasinID)
-        INNER JOIN Reaches USING (RiverID)
+            $schema."Rivers"
+        INNER JOIN $schema."Basins" USING ("BasinID")
+        INNER JOIN $schema."Reaches" USING ("RiverID")
         WHERE
-            RiverID = {$_POST['RiverID']}) AS T
+            "RiverID" = {$_POST['RiverID']}) AS T
             INNER JOIN
         (SELECT 
-            ReachID, ROUND(AVG(EstTempC), 2) AS EstTempC
+            "ReachID", ROUND(AVG("EstTempC")::numeric, 2) AS "EstTempC"
         FROM
-            thorr.ReachData
+            $schema."ReachData"
         WHERE
-            Date > '{$_POST['StartDate']}'
-                AND Date < '{$_POST['EndDate']}'
-        GROUP BY ReachID) AS R USING (ReachID)
+            "Date" > '{$_POST['StartDate']}'
+                AND "Date" < '{$_POST['EndDate']}'
+        GROUP BY "ReachID") AS R USING ("ReachID")
     QUERY;
 } elseif ($_POST['BasinID']) {
     $sql = <<<QUERY
     SELECT 
-        ReachID, RiverID, Name, geometry, EstTempC
+        "ReachID", "RiverID", "Name", "geometry", "EstTempC"
     FROM
         (SELECT 
-            RiverID,
-                ReachID,
-                CONCAT(Rivers.Name, ' (', Reaches.RKm, ' km)') AS Name,
-                ST_ASGEOJSON(Reaches.geometry) AS geometry
+            "RiverID",
+                "ReachID",
+                CONCAT("Rivers"."Name", ' (', "Reaches"."RKm", ' km)') AS "Name",
+                ST_ASGEOJSON("Reaches"."geometry") AS geometry
         FROM
-            thorr.Rivers
-        INNER JOIN Basins USING (BasinID)
-        INNER JOIN Reaches USING (RiverID)
+            $schema."Rivers"
+        INNER JOIN $schema."Basins" USING ("BasinID")
+        INNER JOIN $schema."Reaches" USING ("RiverID")
         WHERE
-            BasinID = {$_POST['BasinID']}) AS T
+            "BasinID" = {$_POST['BasinID']}) AS T
             INNER JOIN
         (SELECT 
-            ReachID, ROUND(AVG(EstTempC), 2) AS EstTempC
+            "ReachID", ROUND(AVG("EstTempC")::numeric, 2) AS "EstTempC"
         FROM
-            thorr.ReachData
+            $schema."ReachData"
         WHERE
-            Date > '{$_POST['StartDate']}'
-                AND Date < '{$_POST['EndDate']}'
-        GROUP BY ReachID) AS R USING (ReachID)
+            "Date" > '{$_POST['StartDate']}'
+                AND "Date" < '{$_POST['EndDate']}'
+        GROUP BY "ReachID") AS R USING ("ReachID")
     QUERY;
 }
 
