@@ -13,13 +13,13 @@ $pgsql_connection = pg_connect($connStr);
 
 if ($_POST['type'] == 'dam') {
     $sql = <<<QUERY
-        SELECT ST_AsGeoJSON(ST_Envelope("ReservoirGeometry")) as geometry, "Name", "Reservoir"
+        SELECT ST_AsGeoJSON(ST_Envelope("ReservoirGeometry")) as "geometry", "Name", "Reservoir"
         FROM $schema."Dams"
         WHERE "DamID" = {$_POST['id']};
         QUERY;
 } elseif ($_POST['type'] == 'reach') {
     $sql = <<<QUERY
-        SELECT ST_AsGeoJSON(ST_Envelope("Reaches"."geometry")) as geometry, "Rivers"."Name" as Name,
+        SELECT ST_AsGeoJSON(ST_Envelope("Reaches"."geometry")) as "geometry", "Rivers"."Name" as Name,
         "ReachID",
         "RKm"
         FROM $schema."Reaches"
@@ -28,13 +28,13 @@ if ($_POST['type'] == 'dam') {
         QUERY;
 } elseif ($_POST['type'] == 'basin') {
     $sql = <<<QUERY
-        SELECT ST_AsGeoJSON(ST_Envelope("geometry")) as geometry, "Basins"."Name" as Name
+        SELECT ST_AsGeoJSON(ST_Envelope("geometry")) as "geometry", "Basins"."Name" as Name
         FROM $schema."Basins"
         WHERE "BasinID" = {$_POST['id']};
         QUERY;
 } else {
     $sql = <<<QUERY
-        SELECT ST_AsGeoJSON(ST_Envelope("geometry")) as geometry, "Name"
+        SELECT ST_AsGeoJSON(ST_Envelope("geometry")) as "geometry", "Name"
         FROM $schema."Rivers"
         WHERE "RiverID" = {$_POST['id']};
         QUERY;
