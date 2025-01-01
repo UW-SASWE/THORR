@@ -1102,4 +1102,4 @@ while ($row = pg_fetch_assoc($result)) {
 echo json_encode($plotData, JSON_NUMERIC_CHECK);
 
 
-$mysqli_connection->close();
+pg_close($pgsql_connection);;

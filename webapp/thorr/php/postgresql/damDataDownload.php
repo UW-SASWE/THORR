@@ -990,6 +990,7 @@ if ($_POST['DataType'] == "deviations") {
     }
 }
 
+pg_close($pgsql_connection);
 
 // Close the file
 fclose($fp);

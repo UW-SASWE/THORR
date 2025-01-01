@@ -26,6 +26,7 @@ while ($row = pg_fetch_assoc($result)) {
     fputcsv($fp, $row);
 }
 
+pg_close($pgsql_connection);
 
 // Close the file
 fclose($fp);

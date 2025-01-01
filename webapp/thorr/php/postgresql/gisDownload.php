@@ -118,4 +118,4 @@ while ($row = pg_fetch_assoc($result)) {
 // // header('Content-type: application/json');
 echo json_encode($geojson, JSON_NUMERIC_CHECK);
 
-$mysqli_connection->close();
+pg_close($pgsql_connection);
