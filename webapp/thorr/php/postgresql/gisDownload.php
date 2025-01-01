@@ -2,7 +2,8 @@
 
 require_once('dbConfig.php');
 
-$mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
+$connStr = "host=$host port=$port dbname=$dbname user=$username password=$password";
+$pgsql_connection = pg_connect($connStr);
 
 // The name of the text file
 $filename = "temp_download.csv";
@@ -91,7 +92,7 @@ if ($_POST['ReachID']) {
     QUERY;
 }
 
-$result = $mysqli_connection->query($sql);
+$result = pg_query($pgsql_connection, $sql);
 
 # Build GeoJSON feature collection array
 $geojson = array(
@@ -100,7 +101,7 @@ $geojson = array(
 );
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
     // echo $row['geometry'];
     $properties = $row;
     # Remove wkb and geometry fields from properties
