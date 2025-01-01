@@ -47,8 +47,8 @@ if ($_POST['DataType'] == "water-temperature") {
                     ),
                     ' week'
                 )::INTERVAL
-            ) AS Date,
-            ROUND(AVG("WaterTempC")::numeric, 2) AS WaterTemperature
+            ) AS "Date",
+            ROUND(AVG("WaterTempC")::numeric, 2) AS "WaterTemperature"
         FROM
             $schema."DamData"
         WHERE
@@ -80,7 +80,7 @@ if ($_POST['DataType'] == "water-temperature") {
                     ' week'
                 )::INTERVAL
             )
-        ORDER BY Date;
+        ORDER BY "Date";
         QUERY;
     } elseif ($_POST['TimeScale'] == "monthly") {
         $sql = <<<QUERY
@@ -102,8 +102,8 @@ if ($_POST['DataType'] == "water-temperature") {
                     LPAD('01', 2, '00')
                 ),
                 'YYYY-MM-DD'
-            ) AS Date,
-            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
+            ) AS "Date",
+            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
         FROM
             $schema."DamData"
         WHERE
@@ -129,7 +129,7 @@ if ($_POST['DataType'] == "water-temperature") {
                 'YYYY-MM-DD'
             )
         ORDER BY
-            Date;
+            "Date";
         QUERY;
     } elseif ($_POST['TimeScale'] == "bi-weekly") {
         $sql = <<<QUERY
@@ -159,8 +159,8 @@ if ($_POST['DataType'] == "water-temperature") {
                     ),
                     ' week'
                 )::INTERVAL
-            ) AS Date,
-            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
+            ) AS "Date",
+            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
         FROM
             $schema."DamData"
         WHERE
@@ -194,20 +194,20 @@ if ($_POST['DataType'] == "water-temperature") {
                 )::INTERVAL
             )
         ORDER BY
-            Date;
+            "Date";
         QUERY;
     } elseif ($_POST['TimeScale'] == "irregular") {
         $sql = <<<QUERY
         SELECT
-            "Date" AS Date,
-            ROUND("WaterTempC"::NUMERIC, 2) AS WaterTemperature
+            "Date" AS "Date",
+            ROUND("WaterTempC"::NUMERIC, 2) AS "WaterTemperature"
         FROM
             $schema."DamData"
         WHERE
             "DamID" = {$_POST['DamID']}
             AND "WaterTempC" IS NOT NULL
         ORDER BY
-            Date;
+            "Date";
         QUERY;
     }
 } elseif ($_POST['DataType'] == "long-term-mean") {
@@ -239,12 +239,12 @@ if ($_POST['DataType'] == "water-temperature") {
                     ),
                     ' week'
                 )::INTERVAL
-            ) AS Date,
-            ROUND(AVG("WaterTempC")::numeric, 2) AS WaterTemperature
+            ) AS "Date",
+            ROUND(AVG("WaterTempC")::numeric, 2) AS "WaterTemperature"
         FROM
             $schema."DamData"
         WHERE
-            "DamID" = 1 AND "WaterTempC" IS NOT NULL
+            "DamID" = {$_POST['DamID']} AND "WaterTempC" IS NOT NULL
         GROUP BY
             DATE_ADD (
                 TO_DATE(
@@ -272,7 +272,7 @@ if ($_POST['DataType'] == "water-temperature") {
                     ' week'
                 )::INTERVAL
             )
-        ORDER BY Date;
+        ORDER BY "Date";
         QUERY;
     } elseif ($_POST['TimeScale'] == "monthly") {
         $sql = <<<QUERY
@@ -294,8 +294,8 @@ if ($_POST['DataType'] == "water-temperature") {
                     LPAD('01', 2, '00')
                 ),
                 'YYYY-MM-DD'
-            ) AS Date,
-            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
+            ) AS "Date",
+            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
         FROM
             $schema."DamData"
         WHERE
@@ -321,7 +321,7 @@ if ($_POST['DataType'] == "water-temperature") {
                 'YYYY-MM-DD'
             )
         ORDER BY
-            Date;
+            "Date";
         QUERY;
     } elseif ($_POST['TimeScale'] == "bi-weekly") {
         $sql = <<<QUERY
@@ -351,8 +351,8 @@ if ($_POST['DataType'] == "water-temperature") {
                     ),
                     ' week'
                 )::INTERVAL
-            ) AS Date,
-            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
+            ) AS "Date",
+            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
         FROM
             $schema."DamData"
         WHERE
@@ -386,7 +386,7 @@ if ($_POST['DataType'] == "water-temperature") {
                 )::INTERVAL
             )
         ORDER BY
-            Date;
+            "Date";
         QUERY;
     } elseif ($_POST['TimeScale'] == "irregular") {
         $sql = <<<QUERY
@@ -412,8 +412,8 @@ if ($_POST['DataType'] == "water-temperature") {
                     )
                 ),
                 'YYYY-MM-DD'
-            ) AS Date,
-            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
+            ) AS "Date",
+            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
         FROM
             $schema."DamData"
         WHERE
@@ -443,15 +443,15 @@ if ($_POST['DataType'] == "water-temperature") {
                 'YYYY-MM-DD'
             )
         ORDER BY
-            Date;
+            "Date";
         QUERY;
     }
 } elseif ($_POST['DataType'] == "deviations") {
     if ($_POST['TimeScale'] == "weekly") {
         $sql = <<<QUERY
         SELECT
-            EST.Date AS Date,
-            ROUND((EST.WaterTemperature - LTM.WaterTemperature), 2) AS Deviation
+            EST."Date" AS "Date",
+            ROUND((EST.WaterTemperature - LTM.WaterTemperature), 2) AS "Deviation"
         FROM
             (
                 SELECT
@@ -480,7 +480,7 @@ if ($_POST['DataType'] == "water-temperature") {
                             ),
                             ' week'
                         )::INTERVAL
-                    ) AS Date,
+                    ) AS "Date",
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature,
                     FLOOR(
                         EXTRACT(
@@ -529,7 +529,7 @@ if ($_POST['DataType'] == "water-temperature") {
                         ) / 7
                     )
                 ORDER BY
-                    Date
+                    "Date"
             ) AS EST
             LEFT JOIN (
                 SELECT
@@ -558,7 +558,7 @@ if ($_POST['DataType'] == "water-temperature") {
                             ),
                             ' week'
                         )::INTERVAL
-                    ) AS DATE,
+                    ) AS "Date",
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature,
                     FLOOR(
                         EXTRACT(
@@ -607,16 +607,16 @@ if ($_POST['DataType'] == "water-temperature") {
                         ) / 7
                     )
                 ORDER BY
-                    Date
+                    "Date"
             ) AS LTM ON (LTM.week = EST.week)
         ORDER BY
-            Est.Date;
+            "Date";
         QUERY;
     } elseif ($_POST['TimeScale'] == "monthly") {
         $sql = <<<QUERY
         SELECT 
-            Est.Date AS Date,
-            Round((Est.WaterTemperature - LTM.WaterTemperature), 2) AS Deviation
+            Est."Date" AS "Date",
+            Round((Est.WaterTemperature - LTM.WaterTemperature), 2) AS "Deviation"
         FROM
             (
                 SELECT
@@ -637,7 +637,7 @@ if ($_POST['DataType'] == "water-temperature") {
                             LPAD('01', 2, '00')
                         ),
                         'YYYY-MM-DD'
-                    ) AS Date,
+                    ) AS "Date",
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
                 FROM
                     $schema."DamData"
@@ -682,7 +682,7 @@ if ($_POST['DataType'] == "water-temperature") {
                             LPAD('01', 2, '00')
                         ),
                         'YYYY-MM-DD'
-                    ) AS Date,
+                    ) AS "Date",
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
                 FROM
                     $schema."DamData"
@@ -710,18 +710,18 @@ if ($_POST['DataType'] == "water-temperature") {
                     )) AS LTM ON (EXTRACT(
                                 MONTH
                                 FROM
-                                    LTM.Date) = EXTRACT(
+                                    LTM."Date") = EXTRACT(
                                 MONTH
                                 FROM
-                                    Est.Date))
+                                    Est."Date"))
         ORDER BY 
-            Est.Date;
+            "Date";
         QUERY;
     } elseif ($_POST['TimeScale'] == "bi-weekly") {
         $sql = <<<QUERY
         SELECT
-            EST.Date AS Date,
-            ROUND((EST.WaterTemperature - LTM.WaterTemperature), 2) AS Deviation
+            EST."Date" AS "Date",
+            ROUND((EST.WaterTemperature - LTM.WaterTemperature), 2) AS "Deviation"
         FROM
             (
                 SELECT
@@ -750,7 +750,7 @@ if ($_POST['DataType'] == "water-temperature") {
                             ),
                             ' week'
                         )::INTERVAL
-                    ) AS Date,
+                    ) AS "Date",
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature,
                     2 * FLOOR(
                         EXTRACT(
@@ -799,7 +799,7 @@ if ($_POST['DataType'] == "water-temperature") {
                         ) / 14
                     )
                 ORDER BY
-                    Date
+                    "Date"
             ) AS EST
             LEFT JOIN (
                 SELECT
@@ -828,7 +828,7 @@ if ($_POST['DataType'] == "water-temperature") {
                             ),
                             ' week'
                         )::INTERVAL
-                    ) AS DATE,
+                    ) AS "Date",
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature,
                     2 * FLOOR(
                         EXTRACT(
@@ -877,21 +877,21 @@ if ($_POST['DataType'] == "water-temperature") {
                         ) / 14
                     )
                 ORDER BY
-                    Date
+                    "Date"
             ) AS LTM ON (LTM.week = EST.week)
         ORDER BY
-            Est.Date;
+            "Date";
         QUERY;
     } elseif ($_POST['TimeScale'] == "irregular") {
         $sql = <<<QUERY
         SELECT
-            EST.Date AS Date,
-            ROUND((EST.WaterTemperature - LTM.WaterTemperature), 2) AS Deviation
+            EST."Date" AS "Date",
+            ROUND((EST."WaterTemperature" - LTM."WaterTemperature"), 2) AS "Deviation"
         FROM
             (
                 SELECT
-                    "Date" AS Date,
-                    ROUND("WaterTempC"::NUMERIC, 2) AS WaterTemperature
+                    "Date" AS "Date",
+                    ROUND("WaterTempC"::NUMERIC, 2) AS "WaterTemperature"
                 FROM
                     $schema."DamData"
                 WHERE
@@ -921,8 +921,8 @@ if ($_POST['DataType'] == "water-temperature") {
                             )
                         ),
                         'YYYY-MM-DD'
-                    ) AS Date,
-                    ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
+                    ) AS "Date",
+                    ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
                 FROM
                     $schema."DamData"
                 WHERE
@@ -955,24 +955,24 @@ if ($_POST['DataType'] == "water-temperature") {
                 EXTRACT(
                     MONTH
                     FROM
-                        LTM.Date
+                        LTM."Date"
                 ) = EXTRACT(
                     MONTH
                     FROM
-                        EST.Date
+                        EST."Date"
                 )
                 AND EXTRACT(
                     DOY
                     FROM
-                        LTM.Date
+                        LTM."Date"
                 ) = EXTRACT(
                     DOY
                     FROM
-                        EST.Date
+                        EST."Date"
                 )
             )
         ORDER BY
-            EST.Date;
+            "Date";
         QUERY;
     }
 }
