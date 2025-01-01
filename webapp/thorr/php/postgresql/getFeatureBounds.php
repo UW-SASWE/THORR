@@ -19,7 +19,7 @@ if ($_POST['type'] == 'dam') {
         QUERY;
 } elseif ($_POST['type'] == 'reach') {
     $sql = <<<QUERY
-        SELECT ST_AsGeoJSON(ST_Envelope("Reaches"."geometry")) as "geometry", "Rivers"."Name" as Name,
+        SELECT ST_AsGeoJSON(ST_Envelope("Reaches"."geometry")) as "geometry", "Rivers"."Name" as "Name",
         "ReachID",
         "RKm"
         FROM $schema."Reaches"
@@ -28,7 +28,7 @@ if ($_POST['type'] == 'dam') {
         QUERY;
 } elseif ($_POST['type'] == 'basin') {
     $sql = <<<QUERY
-        SELECT ST_AsGeoJSON(ST_Envelope("geometry")) as "geometry", "Basins"."Name" as Name
+        SELECT ST_AsGeoJSON(ST_Envelope("geometry")) as "geometry", "Basins"."Name" as "Name"
         FROM $schema."Basins"
         WHERE "BasinID" = {$_POST['id']};
         QUERY;
