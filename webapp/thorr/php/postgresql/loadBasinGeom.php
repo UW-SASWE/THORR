@@ -8,7 +8,18 @@ $pgsql_connection = pg_connect($connStr);
 // if ($mysqli_connection->connect_error) {
 //     echo "Not connected, error: " . $mysqli_connection->connect_error;
 // }
-$sql = "SELECT "BasinID", "Name", ST_AsGeoJSON(ST_Simplify("geometry", 0.005), 2) AS geometry FROM thorr."Basins" WHERE "BasinID" = " . $_POST['BasinID'] . " ORDER BY "Name" ASC;";
+$sql = <<<QUERY
+SELECT
+	"BasinID",
+	"Name",
+	ST_ASGEOJSON (ST_SIMPLIFY ("geometry", 0.005), 2) AS GEOMETRY
+FROM
+	$schema."Basins"
+WHERE
+	"BasinID" = {$_POST['BasinID']}
+ORDER BY
+	"Name" ASC;
+QUERY;
 // echo $sql;
 // $sql = "SELECT BasinID, Name, ST_AsGeoJSON(ST_Simplify(geometry, 0.005), 2) AS geometry, ST_SRID(geometry) as SRID FROM Basins WHERE BasinID = " . $_POST['BasinID'] . " ORDER BY Name ASC";
 
