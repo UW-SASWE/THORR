@@ -2,7 +2,8 @@
 
 require_once('dbConfig.php');
 
-$mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
+$connStr = "host=$host port=$port dbname=$dbname user=$username password=$password";
+$pgsql_connection = pg_connect($connStr);
 
 // if ($mysqli_connection->connect_error) {
 //     echo "Not connected, error: " . $mysqli_connection->connect_error;
@@ -12,106 +13,279 @@ $mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
 
 if ($_POST['offset'] || $_POST['row_count']) {
     $sql = <<<QUERY
-            SELECT 
-            D.DamID,
-            Name,
-            Reservoir,
-            Value AS Temperature,
-            startDate AS startDate,
-            IF(DAY = 1,
-                STR_TO_DATE(CONCAT(Year,
-                                '-',
-                                LPAD(Month, 2, '00'),
-                                '-',
-                                LPAD(14, 2, '00')),
-                        '%Y-%m-%d'),
-                LAST_DAY(startDate)) AS endDate,
-            geometry
+        SELECT
+            D."DamID",
+            "Name",
+            "Reservoir",
+            "Value" AS "Temperature",
+            "startDate" AS "startDate",
+            CASE
+                WHEN "Day" < 15 THEN TO_DATE(
+                    CONCAT("Year", '-', "Month", '-', 14),
+                    'YYYY-MM-DD'
+                )
+                ELSE (
+                    DATE_TRUNC('month', "startDate"::DATE) + INTERVAL '1 month' - INTERVAL '1 day'
+                )::DATE
+            END AS "endDate",
+            "geometry"
         FROM
-            (SELECT 
-                DamID,
-                    RiverID,
-                    BasinID,
-                    Name,
-                    Reservoir,
-                    ST_ASGEOJSON(Dams.ReservoirGeometry) AS geometry
-            FROM
-                thorr.Dams
-            WHERE
-                BasinID = {$_POST['BasinID']}) AS D
-                INNER JOIN
-            (SELECT 
-                T.DamID, T.startDate, T.Day, T.Month, T.Value, T.Year
-            FROM
-                (SELECT 
-                DamLandsatWaterTemp.DamID AS DamID,
-                    STR_TO_DATE(CONCAT(YEAR(DamLandsatWaterTemp.date), '-', LPAD(MONTH(DamLandsatWaterTemp.date), 2, '00'), '-', LPAD(IF(DAY(DamLandsatWaterTemp.date) < 15, 1, 15), 2, '00')), '%Y-%m-%d') AS startDate,
-                    IF(DAY(DamLandsatWaterTemp.date) < 15, 1, 15) AS Day,
-                    MONTH(DamLandsatWaterTemp.date) AS Month,
-                    YEAR(DamLandsatWaterTemp.date) AS Year,
-                    ROUND(AVG(DamLandsatWaterTemp.value), 2) AS Value
-            FROM
-                DamLandsatWaterTemp
-            GROUP BY Year , Month , Day , DamID , startDate) AS T
-            INNER JOIN (SELECT 
-                DamID,
-                    MAX(STR_TO_DATE(CONCAT(YEAR(DamLandsatWaterTemp.date), '-', LPAD(MONTH(DamLandsatWaterTemp.date), 2, '00'), '-', LPAD(IF(DAY(DamLandsatWaterTemp.date) < 15, 1, 15), 2, '00')), '%Y-%m-%d')) AS startDate
-            FROM
-                DamLandsatWaterTemp
-            GROUP BY DamID) AS latestEstimate ON latestEstimate.startDate = T.startDate
-                AND latestEstimate.DamID = T.DamID) AS Q ON Q.DamID = D.DamID
-        LIMIT {$_POST['offset']}, {$_POST['row_count']};
+            (
+                SELECT
+                    "DamID",
+                    "RiverID",
+                    "BasinID",
+                    "Name",
+                    "Reservoir",
+                    ST_ASGEOJSON ("Dams"."ReservoirGeometry") AS "geometry"
+                FROM
+                    "$schema"."Dams"
+                WHERE
+                    "BasinID" = {$_POST['BasinID']}
+            ) AS D
+            INNER JOIN (
+                SELECT
+                    T."DamID",
+                    T."startDate",
+                    T."Day",
+                    T."Month",
+                    T."Value",
+                    T."Year"
+                FROM
+                    (
+                        SELECT
+                            "DamID",
+                            -- STR_TO_DATE(CONCAT(YEAR(DamLandsatWaterTemp.date), '-', LPAD(MONTH(DamLandsatWaterTemp.date), 2, '00'), '-', LPAD(IF(DAY(DamLandsatWaterTemp.date) < 15, 1, 15), 2, '00')), '%Y-%m-%d') AS startDate,
+                            TO_DATE(
+                                CONCAT(
+                                    EXTRACT(
+                                        YEAR
+                                        FROM
+                                            "Date"
+                                    ),
+                                    '-',
+                                    EXTRACT(
+                                        MONTH
+                                        FROM
+                                            "Date"
+                                    ),
+                                    '-',
+                                    CASE
+                                        WHEN EXTRACT(
+                                            DAY
+                                            FROM
+                                                "Date"
+                                        ) < 15 THEN 1
+                                        ELSE 15
+                                    END
+                                ),
+                                'YYYY-MM-DD'
+                            ) AS "startDate",
+                            CASE
+                                WHEN EXTRACT(
+                                    DAY
+                                    FROM
+                                        "Date"
+                                ) < 15 THEN 1
+                                ELSE 15
+                            END AS "Day",
+                            EXTRACT(
+                                MONTH
+                                FROM
+                                    "Date"
+                            ) AS "Month",
+                            EXTRACT(
+                                YEAR
+                                FROM
+                                    "Date"
+                            ) AS "Year",
+                            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "Value"
+                        FROM
+                            "$schema"."DamData"
+                        GROUP BY
+                            "Year",
+                            "Month",
+                            "Day",
+                            "DamID",
+                            "startDate"
+                    ) AS T
+                    INNER JOIN (
+                        SELECT
+                            "DamID",
+                            MAX(
+                                TO_DATE(
+                                    CONCAT(
+                                        EXTRACT(
+                                            YEAR
+                                            FROM
+                                                "Date"
+                                        ),
+                                        '-',
+                                        EXTRACT(
+                                            MONTH
+                                            FROM
+                                                "Date"
+                                        ),
+                                        '-',
+                                        CASE
+                                            WHEN EXTRACT(
+                                                DAY
+                                                FROM
+                                                    "Date"
+                                            ) < 15 THEN 1
+                                            ELSE 15
+                                        END
+                                    ),
+                                    'YYYY-MM-DD'
+                                )
+                            ) AS "startDate"
+                        FROM
+                            "$schema"."DamData"
+                        GROUP BY
+                            "DamID"
+                    ) AS LATESTESTIMATE ON LATESTESTIMATE."startDate" = T."startDate"
+                    AND LATESTESTIMATE."DamID" = T."DamID"
+            ) AS Q ON Q."DamID" = D."DamID"
+        OFFSET
+            {$_POST['offset']}
+        LIMIT
+            {$_POST['row_count']};
         QUERY;
 } else {
     $sql = <<<QUERY
-            SELECT 
-            D.DamID,
-            Name,
-            Reservoir,
-            Value AS Temperature,
-            startDate AS startDate,
-            IF(DAY = 1,
-                STR_TO_DATE(CONCAT(Year,
-                                '-',
-                                LPAD(Month, 2, '00'),
-                                '-',
-                                LPAD(14, 2, '00')),
-                        '%Y-%m-%d'),
-                LAST_DAY(startDate)) AS endDate,
-            geometry
+        SELECT
+            D."DamID",
+            "Name",
+            "Reservoir",
+            "Value" AS "Temperature",
+            "startDate" AS "startDate",
+            CASE
+                WHEN "Day" < 15 THEN TO_DATE(
+                    CONCAT("Year", '-', "Month", '-', 14),
+                    'YYYY-MM-DD'
+                )
+                ELSE (
+                    DATE_TRUNC('month', "startDate"::DATE) + INTERVAL '1 month' - INTERVAL '1 day'
+                )::DATE
+            END AS "endDate",
+            "geometry"
         FROM
-            (SELECT 
-                DamID,
-                    RiverID,
-                    BasinID,
-                    Name,
-                    Reservoir,
-                    ST_ASGEOJSON(Dams.ReservoirGeometry) AS geometry
-            FROM
-                thorr.Dams
-            WHERE
-                BasinID = {$_POST['BasinID']}) AS D
-                INNER JOIN
-            (SELECT 
-                T.DamID, T.startDate, T.Day, T.Month, T.Value, T.Year
-            FROM
-                (SELECT 
-                DamLandsatWaterTemp.DamID AS DamID,
-                    STR_TO_DATE(CONCAT(YEAR(DamLandsatWaterTemp.date), '-', LPAD(MONTH(DamLandsatWaterTemp.date), 2, '00'), '-', LPAD(IF(DAY(DamLandsatWaterTemp.date) < 15, 1, 15), 2, '00')), '%Y-%m-%d') AS startDate,
-                    IF(DAY(DamLandsatWaterTemp.date) < 15, 1, 15) AS Day,
-                    MONTH(DamLandsatWaterTemp.date) AS Month,
-                    YEAR(DamLandsatWaterTemp.date) AS Year,
-                    ROUND(AVG(DamLandsatWaterTemp.value), 2) AS Value
-            FROM
-                DamLandsatWaterTemp
-            GROUP BY Year , Month , Day , DamID , startDate) AS T
-            INNER JOIN (SELECT 
-                DamID,
-                    MAX(STR_TO_DATE(CONCAT(YEAR(DamLandsatWaterTemp.date), '-', LPAD(MONTH(DamLandsatWaterTemp.date), 2, '00'), '-', LPAD(IF(DAY(DamLandsatWaterTemp.date) < 15, 1, 15), 2, '00')), '%Y-%m-%d')) AS startDate
-            FROM
-                DamLandsatWaterTemp
-            GROUP BY DamID) AS latestEstimate ON latestEstimate.startDate = T.startDate
-                AND latestEstimate.DamID = T.DamID) AS Q ON Q.DamID = D.DamID
+            (
+                SELECT
+                    "DamID",
+                    "RiverID",
+                    "BasinID",
+                    "Name",
+                    "Reservoir",
+                    ST_ASGEOJSON ("Dams"."ReservoirGeometry") AS "geometry"
+                FROM
+                    "$schema"."Dams"
+                WHERE
+                    "BasinID" = {$_POST['BasinID']}
+            ) AS D
+            INNER JOIN (
+                SELECT
+                    T."DamID",
+                    T."startDate",
+                    T."Day",
+                    T."Month",
+                    T."Value",
+                    T."Year"
+                FROM
+                    (
+                        SELECT
+                            "DamID",
+                            -- STR_TO_DATE(CONCAT(YEAR(DamLandsatWaterTemp.date), '-', LPAD(MONTH(DamLandsatWaterTemp.date), 2, '00'), '-', LPAD(IF(DAY(DamLandsatWaterTemp.date) < 15, 1, 15), 2, '00')), '%Y-%m-%d') AS startDate,
+                            TO_DATE(
+                                CONCAT(
+                                    EXTRACT(
+                                        YEAR
+                                        FROM
+                                            "Date"
+                                    ),
+                                    '-',
+                                    EXTRACT(
+                                        MONTH
+                                        FROM
+                                            "Date"
+                                    ),
+                                    '-',
+                                    CASE
+                                        WHEN EXTRACT(
+                                            DAY
+                                            FROM
+                                                "Date"
+                                        ) < 15 THEN 1
+                                        ELSE 15
+                                    END
+                                ),
+                                'YYYY-MM-DD'
+                            ) AS "startDate",
+                            CASE
+                                WHEN EXTRACT(
+                                    DAY
+                                    FROM
+                                        "Date"
+                                ) < 15 THEN 1
+                                ELSE 15
+                            END AS "Day",
+                            EXTRACT(
+                                MONTH
+                                FROM
+                                    "Date"
+                            ) AS "Month",
+                            EXTRACT(
+                                YEAR
+                                FROM
+                                    "Date"
+                            ) AS "Year",
+                            ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "Value"
+                        FROM
+                            "$schema"."DamData"
+                        GROUP BY
+                            "Year",
+                            "Month",
+                            "Day",
+                            "DamID",
+                            "startDate"
+                    ) AS T
+                    INNER JOIN (
+                        SELECT
+                            "DamID",
+                            MAX(
+                                TO_DATE(
+                                    CONCAT(
+                                        EXTRACT(
+                                            YEAR
+                                            FROM
+                                                "Date"
+                                        ),
+                                        '-',
+                                        EXTRACT(
+                                            MONTH
+                                            FROM
+                                                "Date"
+                                        ),
+                                        '-',
+                                        CASE
+                                            WHEN EXTRACT(
+                                                DAY
+                                                FROM
+                                                    "Date"
+                                            ) < 15 THEN 1
+                                            ELSE 15
+                                        END
+                                    ),
+                                    'YYYY-MM-DD'
+                                )
+                            ) AS "startDate"
+                        FROM
+                            "$schema"."DamData"
+                        GROUP BY
+                            "DamID"
+                    ) AS LATESTESTIMATE ON LATESTESTIMATE."startDate" = T."startDate"
+                    AND LATESTESTIMATE."DamID" = T."DamID"
+            ) AS Q ON Q."DamID" = D."DamID"
         QUERY;
 };
 
@@ -119,7 +293,7 @@ if ($_POST['offset'] || $_POST['row_count']) {
 
 // echo $sql;
 
-$result = $mysqli_connection->query($sql);
+$result = pg_query($pgsql_connection, $sql);
 
 # Build GeoJSON feature collection array
 $geojson = array(
@@ -128,7 +302,7 @@ $geojson = array(
 );
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
     // echo $row['geometry'];
     $properties = $row;
     # Remove wkb and geometry fields from properties
