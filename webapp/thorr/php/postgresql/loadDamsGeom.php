@@ -11,7 +11,7 @@ $pgsql_connection = pg_connect($connStr);
 
 // echo ($_POST['row_count'] and $_POST['offset']);
 
-if ($_POST['offset'] || $_POST['row_count']) {
+if (isset($_POST['offset']) || isset($_POST['row_count'])) {
     $sql = <<<QUERY
         SELECT
             D."DamID",
@@ -319,5 +319,4 @@ while ($row = pg_fetch_assoc($result)) {
 // // header('Content-type: application/json');
 echo json_encode($geojson, JSON_NUMERIC_CHECK);
 
-
-$mysqli_connection->close();
+pg_close($pgsql_connection);

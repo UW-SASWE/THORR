@@ -2,7 +2,8 @@
 
 require_once('dbConfig.php');
 
-$mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
+$connStr = "host=$host port=$port dbname=$dbname user=$username password=$password";
+$pgsql_connection = pg_connect($connStr);
 
 // if ($mysqli_connection->connect_error) {
 //     echo "Not connected, error: " . $mysqli_connection->connect_error;
@@ -10,72 +11,84 @@ $mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
 
 // echo ($_POST['row_count'] and $_POST['offset']);
 
-if ($_POST['offset'] || $_POST['row_count']) {
+if (isset($_POST['offset']) || isset($_POST['row_count'])) {
+    echo "Offset and row count";
     $sql = <<<QUERY
-        SELECT 
-            DamData.Date,
-            ROUND(WaterTempC, 2) as WaterTempC,
-            DamData.DamID,
-            RiverID,
-            Name,
-            geometry
+        SELECT
+            "DamData"."Date",
+            ROUND("WaterTempC"::NUMERIC, 2) AS "WaterTempC",
+            "DamData"."DamID",
+            "RiverID",
+            "Name",
+            "geometry"
         FROM
-            (SELECT 
-                DamID,
-                    RiverID,
-                    BasinID,
-                    Name,
-                    Reservoir,
-                    ST_ASGEOJSON(Dams.DamGeometry) AS geometry
-            FROM
-                thorr.Dams
-            WHERE
-                BasinID = 1) AS D
-                INNER JOIN
-            DamData USING (DamID)
-                INNER JOIN
-            (SELECT 
-                DamID, MAX(Date) AS Date
-            FROM
-                DamData
-            WHERE
-                WaterTempC IS NOT NULL
-            GROUP BY DamID) AS latestEstimate ON latestEstimate.Date = DamData.Date
-                AND latestEstimate.DamID = DamData.DamID
-        LIMIT {$_POST['offset']}, {$_POST['row_count']};
+            (
+                SELECT
+                    "DamID",
+                    "RiverID",
+                    "BasinID",
+                    "Name",
+                    "Reservoir",
+                    ST_ASGEOJSON ("Dams"."DamGeometry") AS "geometry"
+                FROM
+                    "$schema"."Dams"
+                WHERE
+                    "BasinID" = {$_POST['BasinID']}
+            ) AS D
+            INNER JOIN "$schema"."DamData" USING ("DamID")
+            INNER JOIN (
+                SELECT
+                    "DamID",
+                    MAX("Date") AS "Date"
+                FROM
+                    "$schema"."DamData"
+                WHERE
+                    "WaterTempC" IS NOT NULL
+                GROUP BY
+                    "DamID"
+            ) AS LATESTESTIMATE ON LATESTESTIMATE."Date" = "DamData"."Date"
+            AND LATESTESTIMATE."DamID" = "DamData"."DamID"
+        OFFSET
+            {$_POST['offset']}
+        LIMIT
+            {$_POST['row_count']};
         QUERY;
 } else {
     $sql = <<<QUERY
-        SELECT 
-            DamData.Date,
-            ROUND(WaterTempC, 2) as WaterTempC,
-            DamData.DamID,
-            RiverID,
-            Name,
-            geometry
+        SELECT
+            "DamData"."Date",
+            ROUND("WaterTempC"::NUMERIC, 2) AS "WaterTempC",
+            "DamData"."DamID",
+            "RiverID",
+            "Name",
+            "geometry"
         FROM
-            (SELECT 
-                DamID,
-                    RiverID,
-                    BasinID,
-                    Name,
-                    Reservoir,
-                    ST_ASGEOJSON(Dams.DamGeometry) AS geometry
-            FROM
-                thorr.Dams
-            WHERE
-                BasinID = {$_POST['BasinID']}) AS D
-                INNER JOIN
-            DamData USING (DamID)
-                INNER JOIN
-            (SELECT 
-                DamID, MAX(Date) AS Date
-            FROM
-                DamData
-            WHERE
-                WaterTempC IS NOT NULL
-            GROUP BY DamID) AS latestEstimate ON latestEstimate.Date = DamData.Date
-                AND latestEstimate.DamID = DamData.DamID
+            (
+                SELECT
+                    "DamID",
+                    "RiverID",
+                    "BasinID",
+                    "Name",
+                    "Reservoir",
+                    ST_ASGEOJSON ("Dams"."DamGeometry") AS "geometry"
+                FROM
+                    "$schema"."Dams"
+                WHERE
+                    "BasinID" = {$_POST['BasinID']}
+            ) AS D
+            INNER JOIN "$schema"."DamData" USING ("DamID")
+            INNER JOIN (
+                SELECT
+                    "DamID",
+                    MAX("Date") AS "Date"
+                FROM
+                    "$schema"."DamData"
+                WHERE
+                    "WaterTempC" IS NOT NULL
+                GROUP BY
+                    "DamID"
+            ) AS LATESTESTIMATE ON LATESTESTIMATE."Date" = "DamData"."Date"
+            AND LATESTESTIMATE."DamID" = "DamData"."DamID"
         QUERY;
 };
 
@@ -188,7 +201,7 @@ if ($_POST['offset'] || $_POST['row_count']) {
 
 // echo $sql;
 
-$result = $mysqli_connection->query($sql);
+$result = pg_query($pgsql_connection, $sql);
 
 # Build GeoJSON feature collection array
 $geojson = array(
@@ -197,7 +210,7 @@ $geojson = array(
 );
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
     // echo $row['geometry'];
     $properties = $row;
     # Remove wkb and geometry fields from properties
@@ -214,5 +227,4 @@ while ($row = $result->fetch_assoc()) {
 // // header('Content-type: application/json');
 echo json_encode($geojson, JSON_NUMERIC_CHECK);
 
-
-$mysqli_connection->close();
+pg_close($pgsql_connection);
