@@ -1,7 +1,9 @@
 <?php
 
 require_once('dbConfig.php');
-$mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
+
+$connStr = "host=$host port=$port dbname=$dbname user=$username password=$password";
+$pgsql_connection = pg_connect($connStr);
 
 // if ($mysqli_connection->connect_error) {
 //     echo "Not connected, error: " . $mysqli_connection->connect_error;
@@ -14,39 +16,40 @@ if ($_POST['BasinID']) {
         $sql = <<<QUERY
         SELECT * 
         FROM (SELECT
-        Dams.BasinID, Dams.RiverID, Dams.Name as Name, Dams.DamID as DamID
+        "Dams"."BasinID", "Dams"."RiverID", "Dams"."Name" as "Name", "Dams"."DamID" as "DamID"
         FROM
-        thorr.Dams
-        INNER JOIN Basins USING (BasinID)
-        INNER JOIN Rivers USING (RiverID)
-        WHERE Basins.BasinID = {$_POST['BasinID']} AND RiverID = {$_POST['RiverID']}
+        "$schemar"."Dams"
+        INNER JOIN "$schemar"."Basins" USING ("BasinID")
+        INNER JOIN "$schemar"."Rivers" USING ("RiverID")
+        WHERE "Basins"."BasinID" = {$_POST['BasinID']} AND "RiverID" = {$_POST['RiverID']}
         ) as T
-        ORDER BY Name ASC;
+        ORDER BY "Name" ASC;
         QUERY;
     } else {
         $sql = <<<QUERY
         SELECT * 
         FROM (SELECT
-        Dams.BasinID, Dams.RiverID, Dams.Name as Name, Dams.DamID as DamID
+        "Dams"."BasinID", "Dams"."RiverID", "Dams"."Name" as "Name", "Dams"."DamID" as "DamID"
         FROM
-        thorr.Dams
-        INNER JOIN Basins USING (BasinID)
-        INNER JOIN Rivers USING (RiverID)
-        WHERE Basins.BasinID = {$_POST['BasinID']}
+        "$schemar"."Dams"
+        INNER JOIN "$schemar"."Basins" USING ("BasinID")
+        INNER JOIN "$schemar"."Rivers" USING ("RiverID")
+        WHERE "Basins"."BasinID" = {$_POST['BasinID']}
         ) as T
-        ORDER BY Name ASC;
+        ORDER BY "Name" ASC;
         QUERY;
     }
 } else {
     $sql = <<<QUERY
-    SELECT * 
-    FROM (SELECT
-    Dams.BasinID, Dams.DamID, Dams.RiverID, Dams.Name
-    FROM
-    thorr.Dams
-    INNER JOIN Basins USING (BasinID)
-    INNER JOIN Rivers USING (RiverID)) as T
-    ORDER BY Name ASC;
+        SELECT * 
+        FROM (SELECT
+        "Dams"."BasinID", "Dams"."RiverID", "Dams"."Name" as "Name", "Dams"."DamID" as "DamID"
+        FROM
+        "$schemar"."Dams"
+        INNER JOIN "$schemar"."Basins" USING ("BasinID")
+        INNER JOIN "$schemar"."Rivers" USING ("RiverID")
+        ) as T
+        ORDER BY "Name" ASC;
     QUERY;
 }
 // echo $sql;
