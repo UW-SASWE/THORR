@@ -1,7 +1,9 @@
 <?php
 
 require_once('dbConfig.php');
-$mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
+
+$connStr = "host=$host port=$port dbname=$dbname user=$username password=$password";
+$pgsql_connection = pg_connect($connStr);
 
 // if ($mysqli_connection->connect_error) {
 //     echo "Not connected, error: " . $mysqli_connection->connect_error;
@@ -13,39 +15,52 @@ if ($_POST['BasinID']) {
     if ($_POST['RiverID']) {
         $sql = <<<QUERY
         SELECT
-        ReachID, RiverID, CONCAT(Rivers.Name, ' (', Reaches.RKm, ' km)') AS Name
+            "ReachID",
+            "RiverID",
+            CONCAT("Rivers"."Name", ' (', "Reaches"."RKm", ' km)') AS "Name"
         FROM
-        thorr.Rivers
-        INNER JOIN Basins USING (BasinID)
-        INNER JOIN Reaches USING (RiverID)
-        WHERE Basins.BasinID = {$_POST['BasinID']} AND RiverID = {$_POST['RiverID']}
-        ORDER BY Name ASC;
+            "$schema"."Rivers"
+            INNER JOIN "$schema"."Basins" USING ("BasinID")
+            INNER JOIN "$schema"."Reaches" USING ("RiverID")
+        WHERE
+            "Basins"."BasinID" = {$_POST['BasinID']}
+            AND "RiverID" = {$_POST['RiverID']}
+        ORDER BY
+            "Name" ASC;
         QUERY;
     } else {
         $sql = <<<QUERY
         SELECT
-        ReachID, RiverID, CONCAT(Rivers.Name, ' (', Reaches.RKm, ' km)') AS Name
+            "ReachID",
+            "RiverID",
+            CONCAT("Rivers"."Name", ' (', "Reaches"."RKm", ' km)') AS "Name"
         FROM
-        thorr.Rivers
-        INNER JOIN Basins USING (BasinID)
-        INNER JOIN Reaches USING (RiverID)
-        WHERE Basins.BasinID = {$_POST['BasinID']}
-        ORDER BY Name ASC;
+            "$schema"."Rivers"
+            INNER JOIN "$schema"."Basins" USING ("BasinID")
+            INNER JOIN "$schema"."Reaches" USING ("RiverID")
+        WHERE
+            "Basins"."BasinID" = {$_POST['BasinID']}
+        ORDER BY
+            "Name" ASC;
         QUERY;
     }
 } else {
     $sql = <<<QUERY
     SELECT
-    ReachID, RiverID, CONCAT(Rivers.Name, ' (', Reaches.RKm, ' km)') AS Name
+        "ReachID",
+        "RiverID",
+        CONCAT("Rivers"."Name", ' (', "Reaches"."RKm", ' km)') AS "Name"
     FROM
-    thorr.Rivers
-    INNER JOIN Basins USING (BasinID)
-    INNER JOIN Reaches USING (RiverID)
-    ORDER BY Name ASC;
+        "$schema"."Rivers"
+        INNER JOIN "$schema"."Basins" USING ("BasinID")
+        INNER JOIN "$schema"."Reaches" USING ("RiverID")
+    ORDER BY
+        "Name" ASC;
     QUERY;
 }
+echo $sql;
 
-$result = $mysqli_connection->query($sql);
+$result = pg_query($pgsql_connection, $sql);
 echo '<option value="" selected disabled>Select Reach</option>';
 
 
@@ -91,11 +106,11 @@ switch ($_POST['BasinID']) {
         break;
 }
 
-if ($result->num_rows > 0) {
+if (pg_num_rows($result) > 0) {
     // output data of each row
-    while ($row = $result->fetch_assoc()) {
+    while ($row = pg_fetch_assoc($result)) {
         echo "<option value=" . $row["ReachID"] . ">" . $row["Name"] . "</option>";
     }
 }
 
-$mysqli_connection->close();
+pg_close($pgsql_connection);
