@@ -57,11 +57,11 @@ if ($_POST['BasinID']) {
 $result = $mysqli_connection->query($sql);
 echo '<option value="" selected disabled>Select Dam</option>';
 
-if ($result->num_rows > 0) {
+if (pg_num_rows($result) > 0) {
     // output data of each row
-    while ($row = $result->fetch_assoc()) {
+    while ($row = pg_fetch_assoc($result)) {
         echo "<option value=" . $row["DamID"] . ">" . $row["Name"] . "</option>";
     }
 }
 
-$mysqli_connection->close();
+pg_close($pgsql_connection);
