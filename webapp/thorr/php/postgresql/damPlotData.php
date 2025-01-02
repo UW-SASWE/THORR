@@ -41,9 +41,9 @@ $plotData = array(
 // query for water temperatures as is (not resampled)
 $waterTempQuery = <<<QUERY
 SELECT 
-    "Date" AS "Date", "WaterTempC" AS "WaterTemperature"
+    "Date" ::DATE AS "Date", "WaterTempC" AS "WaterTemperature"
 FROM
-    $schema."DamData"
+    "$schema"."DamData"
 WHERE
     "DamID" = {$_POST['DamID']} AND "WaterTempC" > 0
 ORDER BY "Date";
@@ -86,10 +86,10 @@ $waterTempBWQuery = <<<QUERY
                 ),
                 ' week'
             )::INTERVAL
-        ) AS "Date",
+        ) ::DATE AS "Date",
         ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
     FROM
-        $schema."DamData"
+        "$schema"."DamData"
     WHERE
         "DamID" = {$_POST['DamID']}
         AND "WaterTempC" > 0
@@ -161,10 +161,10 @@ $waterTempWQuery = <<<QUERY
                 ),
                 ' week'
             )::INTERVAL
-        ) AS "Date",
+        ) ::DATE AS "Date",
         ROUND(AVG("WaterTempC")::numeric, 2) AS "WaterTemperature"
     FROM
-        $schema."DamData"
+        "$schema"."DamData"
     WHERE
         "DamID" = {$_POST['DamID']} AND "WaterTempC" > 0
     GROUP BY
@@ -226,10 +226,10 @@ $waterTempMQuery = <<<QUERY
                 LPAD('01', 2, '00')
             ),
             'YYYY-MM-DD'
-        ) AS "Date",
+        ) ::DATE AS "Date",
         ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
     FROM
-        $schema."DamData"
+        "$schema"."DamData"
     WHERE
         ("DamID" = {$_POST['DamID']})
         AND ("WaterTempC" > 0)
@@ -285,10 +285,10 @@ SELECT
             LPAD('01', 2, '00')
         ),
         'YYYY-MM-DD'
-    ) AS "Date",
+    ) ::DATE AS "Date",
     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
 FROM
-    $schema."DamData"
+    "$schema"."DamData"
 WHERE
     ("DamID" = {$_POST['DamID']})
     AND ("WaterTempC" > 0)
@@ -352,10 +352,10 @@ SELECT
             ),
             ' week'
         )::INTERVAL
-    ) AS "Date",
+    ) ::DATE AS "Date",
     ROUND(AVG("WaterTempC")::numeric, 2) AS "WaterTemperature"
 FROM
-    $schema."DamData"
+    "$schema"."DamData"
 WHERE
     "DamID" = 1 AND "WaterTempC" IS NOT NULL
 GROUP BY
@@ -425,10 +425,10 @@ SELECT
             ),
             ' week'
         )::INTERVAL
-    ) AS "Date",
+    ) ::DATE AS "Date",
     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
 FROM
-    $schema."DamData"
+    "$schema"."DamData"
 WHERE
     "DamID" = {$_POST['DamID']}
     AND "WaterTempC" IS NOT NULL
@@ -492,10 +492,10 @@ SELECT
             LPAD('01', 2, '00')
         ),
         'YYYY-MM-DD'
-    ) AS "Date",
+    ) ::DATE AS "Date",
     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
 FROM
-    $schema."DamData"
+    "$schema"."DamData"
 WHERE
     ("DamID" = {$_POST['DamID']})
     AND ("WaterTempC" > 0)
@@ -534,7 +534,7 @@ while ($row = pg_fetch_assoc($result)) {
 // query for deviations (irregular)
 $deviationQuery = <<<QUERY
 SELECT
-    EST.Date AS "Date",
+    EST.Date ::DATE AS "Date",
     ROUND((EST.WaterTemperature - LTM.WaterTemperature), 2) AS "Deviation"
 FROM
     (
@@ -542,7 +542,7 @@ FROM
             "Date" AS Date,
             ROUND("WaterTempC"::NUMERIC, 2) AS WaterTemperature
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             "DamID" = {$_POST['DamID']}
             AND "WaterTempC" IS NOT NULL
@@ -573,7 +573,7 @@ FROM
             ) AS Date,
             ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             ("DamID" = {$_POST['DamID']})
             AND ("WaterTempC" IS NOT NULL)
@@ -636,7 +636,7 @@ while ($row = pg_fetch_assoc($result)) {
 // query for deviations (monthly)
 $deviationMQuery = <<<QUERY
 SELECT 
-    Est.Date AS "Date",
+    Est.Date ::DATE AS "Date",
     Round((Est.WaterTemperature - LTM.WaterTemperature), 2) AS "Deviation"
 FROM
     (
@@ -661,7 +661,7 @@ FROM
             ) AS Date,
             ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             ("DamID" = {$_POST['DamID']})
             AND ("WaterTempC" IS NOT NULL)
@@ -706,7 +706,7 @@ FROM
             ) AS Date,
             ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             ("DamID" = {$_POST['DamID']})
             AND ("WaterTempC" IS NOT NULL)
@@ -751,7 +751,7 @@ while ($row = pg_fetch_assoc($result)) {
 // query for deviations (monthly)
 $deviationWQuery = <<<QUERY
 SELECT
-    EST.Date AS "Date",
+    EST.Date ::DATE AS "Date",
     ROUND((EST.WaterTemperature - LTM.WaterTemperature), 2) AS "Deviation"
 FROM
     (
@@ -791,7 +791,7 @@ FROM
                 ) / 7
             ) AS week
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             "DamID" = {$_POST['DamID']}
             AND "WaterTempC" IS NOT NULL
@@ -869,7 +869,7 @@ FROM
                 ) / 7
             ) AS week
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             "DamID" = {$_POST['DamID']}
             AND "WaterTempC" IS NOT NULL
@@ -926,7 +926,7 @@ while ($row = pg_fetch_assoc($result)) {
 // query for deviations (monthly)
 $deviationBWQuery = <<<QUERY
 SELECT
-    EST.Date AS "Date",
+    EST.Date ::DATE AS "Date",
     ROUND((EST.WaterTemperature - LTM.WaterTemperature), 2) AS "Deviation"
 FROM
     (
@@ -966,7 +966,7 @@ FROM
                 ) / 14
             ) AS week
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             "DamID" = {$_POST['DamID']}
             AND "WaterTempC" IS NOT NULL
@@ -1044,7 +1044,7 @@ FROM
                 ) / 14
             ) AS week
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             "DamID" = {$_POST['DamID']}
             AND "WaterTempC" IS NOT NULL

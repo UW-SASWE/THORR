@@ -14,7 +14,7 @@ SELECT
 	"Name",
 	ST_ASGEOJSON (ST_SIMPLIFY ("geometry", 0.005), 2) AS GEOMETRY
 FROM
-	$schema."Basins"
+	"$schema"."Basins"
 WHERE
 	"BasinID" = {$_POST['BasinID']}
 ORDER BY

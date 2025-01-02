@@ -18,9 +18,9 @@ if ($_POST['BasinID']) {
         FROM (SELECT
         "Dams"."BasinID", "Dams"."RiverID", "Dams"."Name" as "Name", "Dams"."DamID" as "DamID"
         FROM
-        "$schemar"."Dams"
-        INNER JOIN "$schemar"."Basins" USING ("BasinID")
-        INNER JOIN "$schemar"."Rivers" USING ("RiverID")
+        "$schema"."Dams"
+        INNER JOIN "$schema"."Basins" USING ("BasinID")
+        INNER JOIN "$schema"."Rivers" USING ("RiverID")
         WHERE "Basins"."BasinID" = {$_POST['BasinID']} AND "RiverID" = {$_POST['RiverID']}
         ) as T
         ORDER BY "Name" ASC;
@@ -31,9 +31,9 @@ if ($_POST['BasinID']) {
         FROM (SELECT
         "Dams"."BasinID", "Dams"."RiverID", "Dams"."Name" as "Name", "Dams"."DamID" as "DamID"
         FROM
-        "$schemar"."Dams"
-        INNER JOIN "$schemar"."Basins" USING ("BasinID")
-        INNER JOIN "$schemar"."Rivers" USING ("RiverID")
+        "$schema"."Dams"
+        INNER JOIN "$schema"."Basins" USING ("BasinID")
+        INNER JOIN "$schema"."Rivers" USING ("RiverID")
         WHERE "Basins"."BasinID" = {$_POST['BasinID']}
         ) as T
         ORDER BY "Name" ASC;
@@ -45,9 +45,9 @@ if ($_POST['BasinID']) {
         FROM (SELECT
         "Dams"."BasinID", "Dams"."RiverID", "Dams"."Name" as "Name", "Dams"."DamID" as "DamID"
         FROM
-        "$schemar"."Dams"
-        INNER JOIN "$schemar"."Basins" USING ("BasinID")
-        INNER JOIN "$schemar"."Rivers" USING ("RiverID")
+        "$schema"."Dams"
+        INNER JOIN "$schema"."Basins" USING ("BasinID")
+        INNER JOIN "$schema"."Rivers" USING ("RiverID")
         ) as T
         ORDER BY "Name" ASC;
     QUERY;

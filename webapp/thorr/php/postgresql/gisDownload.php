@@ -26,13 +26,13 @@ if ($_POST['ReachID']) {
                 CONCAT("Rivers"."Name", ' (', "Reaches"."RKm", ' km)') AS "Name",
                 ST_ASTEXT("Reaches"."geometry") AS "geometry"
         FROM
-            $schema."Rivers"
-        INNER JOIN $schema."Reaches" USING ("RiverID")) AS T
+            "$schema"."Rivers"
+        INNER JOIN "$schema"."Reaches" USING ("RiverID")) AS T
             INNER JOIN
         (SELECT 
             "ReachID", ROUND("EstTempC"::numeric, 2) AS "EstTempC"
         FROM
-            $schema."ReachData"
+            "$schema"."ReachData"
         WHERE
             "ReachID" = {$_POST['ReachID']} AND "Date" > '{$_POST['StartDate']}'
                 AND "Date" < '{$_POST['EndDate']}'
@@ -49,16 +49,16 @@ if ($_POST['ReachID']) {
                 CONCAT("Rivers"."Name", ' (', "Reaches"."RKm", ' km)') AS "Name",
                 ST_ASGEOJSON("Reaches"."geometry") AS "geometry"
         FROM
-            $schema."Rivers"
-        INNER JOIN $schema."Basins" USING ("BasinID")
-        INNER JOIN $schema."Reaches" USING ("RiverID")
+            "$schema"."Rivers"
+        INNER JOIN "$schema"."Basins" USING ("BasinID")
+        INNER JOIN "$schema"."Reaches" USING ("RiverID")
         WHERE
             "RiverID" = {$_POST['RiverID']}) AS T
             INNER JOIN
         (SELECT 
             "ReachID", ROUND(AVG("EstTempC")::numeric, 2) AS "EstTempC"
         FROM
-            $schema."ReachData"
+            "$schema"."ReachData"
         WHERE
             "Date" > '{$_POST['StartDate']}'
                 AND "Date" < '{$_POST['EndDate']}'
@@ -75,16 +75,16 @@ if ($_POST['ReachID']) {
                 CONCAT("Rivers"."Name", ' (', "Reaches"."RKm", ' km)') AS "Name",
                 ST_ASGEOJSON("Reaches"."geometry") AS geometry
         FROM
-            $schema."Rivers"
-        INNER JOIN $schema."Basins" USING ("BasinID")
-        INNER JOIN $schema."Reaches" USING ("RiverID")
+            "$schema"."Rivers"
+        INNER JOIN "$schema"."Basins" USING ("BasinID")
+        INNER JOIN "$schema"."Reaches" USING ("RiverID")
         WHERE
             "BasinID" = {$_POST['BasinID']}) AS T
             INNER JOIN
         (SELECT 
             "ReachID", ROUND(AVG("EstTempC")::numeric, 2) AS "EstTempC"
         FROM
-            $schema."ReachData"
+            "$schema"."ReachData"
         WHERE
             "Date" > '{$_POST['StartDate']}'
                 AND "Date" < '{$_POST['EndDate']}'

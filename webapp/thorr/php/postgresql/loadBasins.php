@@ -13,7 +13,7 @@ $pgsql_connection = pg_connect($connStr);
 echo ($_POST['priorityBasinID']);
 
 $sql = <<<QUERY
-SELECT "BasinID", "Name" FROM $schema."Basins" ORDER BY "Name" ASC;
+SELECT "BasinID", "Name" FROM "$schema"."Basins" ORDER BY "Name" ASC;
 QUERY;
 
 $result = pg_query($pgsql_connection, $sql);

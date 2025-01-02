@@ -47,10 +47,10 @@ if ($_POST['DataType'] == "water-temperature") {
                     ),
                     ' week'
                 )::INTERVAL
-            ) AS "Date",
+            )::DATE AS "Date",
             ROUND(AVG("WaterTempC")::numeric, 2) AS "WaterTemperature"
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             "DamID" = {$_POST['DamID']} AND "WaterTempC" IS NOT NULL
         GROUP BY
@@ -102,10 +102,10 @@ if ($_POST['DataType'] == "water-temperature") {
                     LPAD('01', 2, '00')
                 ),
                 'YYYY-MM-DD'
-            ) AS "Date",
+            ) ::DATE AS "Date",
             ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             ("DamID" = {$_POST['DamID']})
             AND ("WaterTempC" IS NOT NULL)
@@ -159,10 +159,10 @@ if ($_POST['DataType'] == "water-temperature") {
                     ),
                     ' week'
                 )::INTERVAL
-            ) AS "Date",
+            ) ::DATE AS "Date",
             ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             "DamID" = {$_POST['DamID']}
             AND "WaterTempC" IS NOT NULL
@@ -199,10 +199,10 @@ if ($_POST['DataType'] == "water-temperature") {
     } elseif ($_POST['TimeScale'] == "irregular") {
         $sql = <<<QUERY
         SELECT
-            "Date" AS "Date",
+            "Date" ::DATE AS "Date",
             ROUND("WaterTempC"::NUMERIC, 2) AS "WaterTemperature"
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             "DamID" = {$_POST['DamID']}
             AND "WaterTempC" IS NOT NULL
@@ -239,10 +239,10 @@ if ($_POST['DataType'] == "water-temperature") {
                     ),
                     ' week'
                 )::INTERVAL
-            ) AS "Date",
+            ) ::DATE AS "Date",
             ROUND(AVG("WaterTempC")::numeric, 2) AS "WaterTemperature"
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             "DamID" = {$_POST['DamID']} AND "WaterTempC" IS NOT NULL
         GROUP BY
@@ -294,10 +294,10 @@ if ($_POST['DataType'] == "water-temperature") {
                     LPAD('01', 2, '00')
                 ),
                 'YYYY-MM-DD'
-            ) AS "Date",
+            ) ::DATE AS "Date",
             ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             ("DamID" = {$_POST['DamID']})
             AND ("WaterTempC" IS NOT NULL)
@@ -351,10 +351,10 @@ if ($_POST['DataType'] == "water-temperature") {
                     ),
                     ' week'
                 )::INTERVAL
-            ) AS "Date",
+            ) ::DATE AS "Date",
             ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             "DamID" = {$_POST['DamID']}
             AND "WaterTempC" IS NOT NULL
@@ -412,10 +412,10 @@ if ($_POST['DataType'] == "water-temperature") {
                     )
                 ),
                 'YYYY-MM-DD'
-            ) AS "Date",
+            ) ::DATE AS "Date",
             ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
         FROM
-            $schema."DamData"
+            "$schema"."DamData"
         WHERE
             ("DamID" = {$_POST['DamID']})
             AND ("WaterTempC" IS NOT NULL)
@@ -450,7 +450,7 @@ if ($_POST['DataType'] == "water-temperature") {
     if ($_POST['TimeScale'] == "weekly") {
         $sql = <<<QUERY
         SELECT
-            EST."Date" AS "Date",
+            EST."Date" ::DATE AS "Date",
             ROUND((EST.WaterTemperature - LTM.WaterTemperature), 2) AS "Deviation"
         FROM
             (
@@ -480,7 +480,7 @@ if ($_POST['DataType'] == "water-temperature") {
                             ),
                             ' week'
                         )::INTERVAL
-                    ) AS "Date",
+                    ) ::DATE AS "Date",
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature,
                     FLOOR(
                         EXTRACT(
@@ -490,7 +490,7 @@ if ($_POST['DataType'] == "water-temperature") {
                         ) / 7
                     ) AS week
                 FROM
-                    $schema."DamData"
+                    "$schema"."DamData"
                 WHERE
                     "DamID" = {$_POST['DamID']}
                     AND "WaterTempC" IS NOT NULL
@@ -558,7 +558,7 @@ if ($_POST['DataType'] == "water-temperature") {
                             ),
                             ' week'
                         )::INTERVAL
-                    ) AS "Date",
+                    ) ::DATE AS "Date",
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature,
                     FLOOR(
                         EXTRACT(
@@ -568,7 +568,7 @@ if ($_POST['DataType'] == "water-temperature") {
                         ) / 7
                     ) AS week
                 FROM
-                    $schema."DamData"
+                    "$schema"."DamData"
                 WHERE
                     "DamID" = {$_POST['DamID']}
                     AND "WaterTempC" IS NOT NULL
@@ -615,7 +615,7 @@ if ($_POST['DataType'] == "water-temperature") {
     } elseif ($_POST['TimeScale'] == "monthly") {
         $sql = <<<QUERY
         SELECT 
-            Est."Date" AS "Date",
+            Est."Date" ::DATE AS "Date",
             Round((Est.WaterTemperature - LTM.WaterTemperature), 2) AS "Deviation"
         FROM
             (
@@ -637,10 +637,10 @@ if ($_POST['DataType'] == "water-temperature") {
                             LPAD('01', 2, '00')
                         ),
                         'YYYY-MM-DD'
-                    ) AS "Date",
+                    ) ::DATE AS "Date",
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
                 FROM
-                    $schema."DamData"
+                    "$schema"."DamData"
                 WHERE
                     ("DamID" = {$_POST['DamID']})
                     AND ("WaterTempC" IS NOT NULL)
@@ -682,10 +682,10 @@ if ($_POST['DataType'] == "water-temperature") {
                             LPAD('01', 2, '00')
                         ),
                         'YYYY-MM-DD'
-                    ) AS "Date",
+                    ) ::DATE AS "Date",
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature
                 FROM
-                    $schema."DamData"
+                    "$schema"."DamData"
                 WHERE
                     ("DamID" = {$_POST['DamID']})
                     AND ("WaterTempC" IS NOT NULL)
@@ -720,7 +720,7 @@ if ($_POST['DataType'] == "water-temperature") {
     } elseif ($_POST['TimeScale'] == "bi-weekly") {
         $sql = <<<QUERY
         SELECT
-            EST."Date" AS "Date",
+            EST."Date" ::DATE AS "Date",
             ROUND((EST.WaterTemperature - LTM.WaterTemperature), 2) AS "Deviation"
         FROM
             (
@@ -750,7 +750,7 @@ if ($_POST['DataType'] == "water-temperature") {
                             ),
                             ' week'
                         )::INTERVAL
-                    ) AS "Date",
+                    ) ::DATE AS "Date",
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature,
                     2 * FLOOR(
                         EXTRACT(
@@ -760,7 +760,7 @@ if ($_POST['DataType'] == "water-temperature") {
                         ) / 14
                     ) AS week
                 FROM
-                    $schema."DamData"
+                    "$schema"."DamData"
                 WHERE
                     "DamID" = {$_POST['DamID']}
                     AND "WaterTempC" IS NOT NULL
@@ -828,7 +828,7 @@ if ($_POST['DataType'] == "water-temperature") {
                             ),
                             ' week'
                         )::INTERVAL
-                    ) AS "Date",
+                    ) ::DATE AS "Date",
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS WaterTemperature,
                     2 * FLOOR(
                         EXTRACT(
@@ -838,7 +838,7 @@ if ($_POST['DataType'] == "water-temperature") {
                         ) / 14
                     ) AS week
                 FROM
-                    $schema."DamData"
+                    "$schema"."DamData"
                 WHERE
                     "DamID" = {$_POST['DamID']}
                     AND "WaterTempC" IS NOT NULL
@@ -885,15 +885,15 @@ if ($_POST['DataType'] == "water-temperature") {
     } elseif ($_POST['TimeScale'] == "irregular") {
         $sql = <<<QUERY
         SELECT
-            EST."Date" AS "Date",
+            EST."Date" ::DATE AS "Date",
             ROUND((EST."WaterTemperature" - LTM."WaterTemperature"), 2) AS "Deviation"
         FROM
             (
                 SELECT
-                    "Date" AS "Date",
+                    "Date" ::DATE AS "Date",
                     ROUND("WaterTempC"::NUMERIC, 2) AS "WaterTemperature"
                 FROM
-                    $schema."DamData"
+                    "$schema"."DamData"
                 WHERE
                     "DamID" = {$_POST['DamID']}
                     AND "WaterTempC" IS NOT NULL
@@ -921,10 +921,10 @@ if ($_POST['DataType'] == "water-temperature") {
                             )
                         ),
                         'YYYY-MM-DD'
-                    ) AS "Date",
+                    ) ::DATE AS "Date",
                     ROUND(AVG("WaterTempC")::NUMERIC, 2) AS "WaterTemperature"
                 FROM
-                    $schema."DamData"
+                    "$schema"."DamData"
                 WHERE
                     ("DamID" = {$_POST['DamID']})
                     AND ("WaterTempC" IS NOT NULL)
