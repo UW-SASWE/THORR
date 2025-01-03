@@ -34,7 +34,7 @@ class Connect:
     def createConnection(self):
         """Connect to database"""
 
-        db_config = cfg.read_config(self.config_file, [self.section])
+        db_config = cfg.read_config(self.config_file, [self.db_type])
         self.connection = None
 
         try:
@@ -44,13 +44,13 @@ class Connect:
                 print("Connecting to database...")
 
             if self.db_type == "mysql":
-                self.database = db_config[self.section]["database"]
+                self.database = db_config["mysql"]["database"]
                 self.connection = self.connect(
-                    user=db_config[self.section]["user"],
-                    database=db_config[self.section]["database"],
-                    password=db_config[self.section]["password"],
-                    host=db_config[self.section]["host"],
-                    port=db_config[self.section]["port"],
+                    user=db_config["mysql"]["user"],
+                    database=db_config["mysql"]["database"],
+                    password=db_config["mysql"]["password"],
+                    host=db_config["mysql"]["host"],
+                    port=db_config["mysql"]["port"],
                 )
 
                 if self.connection.is_connected():
@@ -64,14 +64,14 @@ class Connect:
                     else:
                         print("Database connection failed.")
             elif self.db_type == "postgresql":
-                self.user = db_config[self.section]["user"]
-                self.schema = db_config[self.section]["schema"]
+                self.user = db_config["postgresql"]["user"]
+                self.schema = db_config["postgresql"]["schema"]
                 self.connection = self.connect(
-                    user=db_config[self.section]["user"],
-                    dbname=db_config[self.section]["dbname"],
-                    password=db_config[self.section]["password"],
-                    host=db_config[self.section]["host"],
-                    port=db_config[self.section]["port"],
+                    user=db_config["postgresql"]["user"],
+                    dbname=db_config["postgresql"]["dbname"],
+                    password=db_config["postgresql"]["password"],
+                    host=db_config["postgresql"]["host"],
+                    port=db_config["postgresql"]["port"],
                 )
 
                 if not self.connection.closed:
@@ -288,247 +288,249 @@ def postgresql_setup(config_file):
     user = db.user
     schema = db.schema
     connection = db.connection
-    cursor = connection.cursor()
+    # cursor = connection.cursor()
 
-    # enable postgis extension
-    cursor.execute("CREATE EXTENSION IF NOT EXISTS postgis")
+    with connection.cursor() as cursor:
 
-    # Create database if it doesn't exist
-    cursor.execute(
-        f"""CREATE SCHEMA IF NOT EXISTS {schema}
-    AUTHORIZATION {user};"""
-    )
+        # enable postgis extension
+        cursor.execute("CREATE EXTENSION IF NOT EXISTS postgis")
 
-    # disable all triggers
-    cursor.execute("SET session_replication_role = 'replica'")
+        # Create database if it doesn't exist
+        cursor.execute(
+            f"""CREATE SCHEMA IF NOT EXISTS {schema}
+        AUTHORIZATION {user};"""
+        )
 
-    # Create the Basins table
-    basins_query = f"""
-    CREATE TABLE IF NOT EXISTS {schema}."Basins"
-    (
-        "BasinID" smallint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 32767 CACHE 1 ),
-        "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
-        "DrainageAreaSqKm" double precision,
-        "MajorRiverID" smallint,
-        "geometry" geometry NOT NULL,
-        CONSTRAINT "Basins_pkey" PRIMARY KEY ("BasinID"),
-        CONSTRAINT "BasinID_UNIQUE" UNIQUE ("BasinID")
-    )
+        # disable all triggers
+        cursor.execute("SET session_replication_role = 'replica'")
 
-    TABLESPACE pg_default;
+        # Create the Basins table
+        basins_query = f"""
+        CREATE TABLE IF NOT EXISTS {schema}."Basins"
+        (
+            "BasinID" smallint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 32767 CACHE 1 ),
+            "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
+            "DrainageAreaSqKm" double precision,
+            "MajorRiverID" smallint,
+            "geometry" geometry NOT NULL,
+            CONSTRAINT "Basins_pkey" PRIMARY KEY ("BasinID"),
+            CONSTRAINT "BasinID_UNIQUE" UNIQUE ("BasinID")
+        )
 
-    ALTER TABLE IF EXISTS {schema}."Basins"
-        OWNER to {user};
+        TABLESPACE pg_default;
 
-    COMMENT ON COLUMN {schema}."Basins"."DrainageAreaSqKm"
-        IS 'Drainage area of the Basin in square-kilometers';
-    """
-    cursor.execute(basins_query)
+        ALTER TABLE IF EXISTS {schema}."Basins"
+            OWNER to {user};
 
-    # Create the Rivers table
-    rivers_query = f"""
-    CREATE TABLE IF NOT EXISTS {schema}."Rivers"
-    (
-        "RiverID" smallint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 32767 CACHE 1 ),
-        "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
-        "LengthKm" double precision,
-        "WidthM" double precision,
-        "BasinID" smallint,
-        "geometry" geometry NOT NULL,
-        CONSTRAINT "Rivers_pkey" PRIMARY KEY ("RiverID"),
-        CONSTRAINT "RiverID_UNIQUE" UNIQUE ("RiverID"),
-        CONSTRAINT "Fk_Basin" FOREIGN KEY ("BasinID")
-            REFERENCES {schema}."Basins" ("BasinID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE SET NULL
-            NOT VALID
-    )
+        COMMENT ON COLUMN {schema}."Basins"."DrainageAreaSqKm"
+            IS 'Drainage area of the Basin in square-kilometers';
+        """
+        cursor.execute(basins_query)
 
-    TABLESPACE pg_default;
+        # Create the Rivers table
+        rivers_query = f"""
+        CREATE TABLE IF NOT EXISTS {schema}."Rivers"
+        (
+            "RiverID" smallint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 32767 CACHE 1 ),
+            "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
+            "LengthKm" double precision,
+            "WidthM" double precision,
+            "BasinID" smallint,
+            "geometry" geometry NOT NULL,
+            CONSTRAINT "Rivers_pkey" PRIMARY KEY ("RiverID"),
+            CONSTRAINT "RiverID_UNIQUE" UNIQUE ("RiverID"),
+            CONSTRAINT "Fk_Basin" FOREIGN KEY ("BasinID")
+                REFERENCES {schema}."Basins" ("BasinID") MATCH SIMPLE
+                ON UPDATE CASCADE
+                ON DELETE SET NULL
+                NOT VALID
+        )
 
-    ALTER TABLE IF EXISTS {schema}."Rivers"
-        OWNER to {user};
+        TABLESPACE pg_default;
 
-    COMMENT ON COLUMN {schema}."Rivers"."LengthKm"
-        IS 'Length of the river in kilometers';
+        ALTER TABLE IF EXISTS {schema}."Rivers"
+            OWNER to {user};
 
-    COMMENT ON COLUMN {schema}."Rivers"."WidthM"
-        IS 'Width in meters';
+        COMMENT ON COLUMN {schema}."Rivers"."LengthKm"
+            IS 'Length of the river in kilometers';
 
-    COMMENT ON COLUMN {schema}."Rivers"."BasinID"
-        IS 'ID for the basin in which this river lies';
-    """
-    cursor.execute(rivers_query)
+        COMMENT ON COLUMN {schema}."Rivers"."WidthM"
+            IS 'Width in meters';
 
-    # # add foreign key constraint to basin
-    # print(
-    #     f"""
-    #     IF NOT EXISTS (SELECT *
-    #         FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
-    #         WHERE "constraint_name" = 'Fk_MajorRiver' AND "constraint_schema" = '{schema}')
-    #     ALTER TABLE {schema}."Basins"
-    #         ADD CONSTRAINT "Fk_MajorRiver" FOREIGN KEY ("MajorRiverID")
-    #         REFERENCES {schema}."Rivers" ("RiverID") MATCH SIMPLE
-    #         ON UPDATE CASCADE
-    #         ON DELETE SET NULL
-    #         NOT VALID
-    # """
-    # )
+        COMMENT ON COLUMN {schema}."Rivers"."BasinID"
+            IS 'ID for the basin in which this river lies';
+        """
+        cursor.execute(rivers_query)
 
-    cursor.execute(
-        f"""
-        ALTER TABLE {schema}."Basins"
-            DROP CONSTRAINT IF EXISTS "Fk_MajorRiver";
+        # # add foreign key constraint to basin
+        # print(
+        #     f"""
+        #     IF NOT EXISTS (SELECT *
+        #         FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+        #         WHERE "constraint_name" = 'Fk_MajorRiver' AND "constraint_schema" = '{schema}')
+        #     ALTER TABLE {schema}."Basins"
+        #         ADD CONSTRAINT "Fk_MajorRiver" FOREIGN KEY ("MajorRiverID")
+        #         REFERENCES {schema}."Rivers" ("RiverID") MATCH SIMPLE
+        #         ON UPDATE CASCADE
+        #         ON DELETE SET NULL
+        #         NOT VALID
+        # """
+        # )
 
-        ALTER TABLE {schema}."Basins"
-            ADD CONSTRAINT "Fk_MajorRiver" FOREIGN KEY ("MajorRiverID")
-            REFERENCES {schema}."Rivers" ("RiverID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE SET NULL
-            NOT VALID;
-    """
-    )
+        cursor.execute(
+            f"""
+            ALTER TABLE {schema}."Basins"
+                DROP CONSTRAINT IF EXISTS "Fk_MajorRiver";
 
-    # Create the Dams table
-    dams_query = f"""
-    CREATE TABLE IF NOT EXISTS {schema}."Dams"
-    (
-        "DamID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-        "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
-        "Reservoir" character varying(255) COLLATE pg_catalog."default",
-        "AltName" character varying(255) COLLATE pg_catalog."default",
-        "RiverID" smallint,
-        "BasinID" smallint,
-        "Country" character varying(255) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
-        "Year" integer,
-        "AreaSqKm" double precision,
-        "CapacityMCM" double precision,
-        "DepthM" double precision,
-        "ElevationMASL" integer,
-        "MainUse" character varying(255) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
-        "LONG_DD" double precision,
-        "LAT_DD" double precision,
-        "DamGeometry" geometry NOT NULL,
-        "ReservoirGeometry" geometry,
-        CONSTRAINT "Dams_pkey" PRIMARY KEY ("DamID"),
-        CONSTRAINT "DamID_UNIQUE" UNIQUE ("DamID"),
-        CONSTRAINT "Fk_basin_dams" FOREIGN KEY ("BasinID")
-            REFERENCES {schema}."Basins" ("BasinID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE SET NULL
-            NOT VALID,
-        CONSTRAINT "Fk_river_dams" FOREIGN KEY ("RiverID")
-            REFERENCES {schema}."Rivers" ("RiverID") MATCH SIMPLE
-            ON UPDATE NO ACTION
-            ON DELETE NO ACTION
-            NOT VALID
-    )
+            ALTER TABLE {schema}."Basins"
+                ADD CONSTRAINT "Fk_MajorRiver" FOREIGN KEY ("MajorRiverID")
+                REFERENCES {schema}."Rivers" ("RiverID") MATCH SIMPLE
+                ON UPDATE CASCADE
+                ON DELETE SET NULL
+                NOT VALID;
+        """
+        )
 
-    TABLESPACE pg_default;
+        # Create the Dams table
+        dams_query = f"""
+        CREATE TABLE IF NOT EXISTS {schema}."Dams"
+        (
+            "DamID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+            "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
+            "Reservoir" character varying(255) COLLATE pg_catalog."default",
+            "AltName" character varying(255) COLLATE pg_catalog."default",
+            "RiverID" smallint,
+            "BasinID" smallint,
+            "Country" character varying(255) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+            "Year" integer,
+            "AreaSqKm" double precision,
+            "CapacityMCM" double precision,
+            "DepthM" double precision,
+            "ElevationMASL" integer,
+            "MainUse" character varying(255) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+            "LONG_DD" double precision,
+            "LAT_DD" double precision,
+            "DamGeometry" geometry NOT NULL,
+            "ReservoirGeometry" geometry,
+            CONSTRAINT "Dams_pkey" PRIMARY KEY ("DamID"),
+            CONSTRAINT "DamID_UNIQUE" UNIQUE ("DamID"),
+            CONSTRAINT "Fk_basin_dams" FOREIGN KEY ("BasinID")
+                REFERENCES {schema}."Basins" ("BasinID") MATCH SIMPLE
+                ON UPDATE CASCADE
+                ON DELETE SET NULL
+                NOT VALID,
+            CONSTRAINT "Fk_river_dams" FOREIGN KEY ("RiverID")
+                REFERENCES {schema}."Rivers" ("RiverID") MATCH SIMPLE
+                ON UPDATE NO ACTION
+                ON DELETE NO ACTION
+                NOT VALID
+        )
 
-    ALTER TABLE IF EXISTS {schema}."Dams"
-        OWNER to {user};
+        TABLESPACE pg_default;
 
-    COMMENT ON COLUMN {schema}."Dams"."DamGeometry"
-        IS 'Point geometry for the dam';
+        ALTER TABLE IF EXISTS {schema}."Dams"
+            OWNER to {user};
 
-    COMMENT ON COLUMN {schema}."Dams"."ReservoirGeometry"
-        IS 'Polygon geometry for the reservoir';
-    """
-    cursor.execute(dams_query)
+        COMMENT ON COLUMN {schema}."Dams"."DamGeometry"
+            IS 'Point geometry for the dam';
 
-    # create the Reaches table
-    reaches_query = f"""
-    CREATE TABLE IF NOT EXISTS {schema}."Reaches"
-    (
-        "ReachID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-        "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
-        "RiverID" smallint,
-        "ClimateClass" smallint,
-        "WidthMin" double precision,
-        "WidthMean" double precision,
-        "WidthMax" double precision,
-        "RKm" smallint,
-        "geometry" geometry NOT NULL,
-        CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
-        CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
-        CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
-            REFERENCES {schema}."Rivers" ("RiverID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE CASCADE
-            NOT VALID
-    )
+        COMMENT ON COLUMN {schema}."Dams"."ReservoirGeometry"
+            IS 'Polygon geometry for the reservoir';
+        """
+        cursor.execute(dams_query)
 
-    TABLESPACE pg_default;
+        # create the Reaches table
+        reaches_query = f"""
+        CREATE TABLE IF NOT EXISTS {schema}."Reaches"
+        (
+            "ReachID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+            "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
+            "RiverID" smallint,
+            "ClimateClass" smallint,
+            "WidthMin" double precision,
+            "WidthMean" double precision,
+            "WidthMax" double precision,
+            "RKm" smallint,
+            "geometry" geometry NOT NULL,
+            CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
+            CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
+            CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
+                REFERENCES {schema}."Rivers" ("RiverID") MATCH SIMPLE
+                ON UPDATE CASCADE
+                ON DELETE CASCADE
+                NOT VALID
+        )
 
-    ALTER TABLE IF EXISTS {schema}."Reaches"
-        OWNER to {user};
-    """
-    cursor.execute(reaches_query)
+        TABLESPACE pg_default;
 
-    # Create the DamData table
-    dam_data_query = f"""
-    CREATE TABLE IF NOT EXISTS {schema}."DamData"
-    (
-        "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-        "Date" date NOT NULL,
-        "DamID" smallint NOT NULL,
-        "WaterTempC" double precision NOT NULL,
-        "Mission" character varying(4) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
-        CONSTRAINT "DamData_pkey" PRIMARY KEY ("ID"),
-        CONSTRAINT "DamDataID_UNIQUE" UNIQUE ("ID"),
-        CONSTRAINT "Fk_water_temp_dam" FOREIGN KEY ("DamID")
-            REFERENCES {schema}."Dams" ("DamID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE CASCADE
-            NOT VALID
-    )
+        ALTER TABLE IF EXISTS {schema}."Reaches"
+            OWNER to {user};
+        """
+        cursor.execute(reaches_query)
 
-    TABLESPACE pg_default;
+        # Create the DamData table
+        dam_data_query = f"""
+        CREATE TABLE IF NOT EXISTS {schema}."DamData"
+        (
+            "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+            "Date" date NOT NULL,
+            "DamID" smallint NOT NULL,
+            "WaterTempC" double precision NOT NULL,
+            "Mission" character varying(4) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+            CONSTRAINT "DamData_pkey" PRIMARY KEY ("ID"),
+            CONSTRAINT "DamDataID_UNIQUE" UNIQUE ("ID"),
+            CONSTRAINT "Fk_water_temp_dam" FOREIGN KEY ("DamID")
+                REFERENCES {schema}."Dams" ("DamID") MATCH SIMPLE
+                ON UPDATE CASCADE
+                ON DELETE CASCADE
+                NOT VALID
+        )
 
-    ALTER TABLE IF EXISTS {schema}."DamData"
-        OWNER to {user};
-    """
-    cursor.execute(dam_data_query)
+        TABLESPACE pg_default;
 
-    # Create the ReachData table
-    query = f"""
-    CREATE TABLE IF NOT EXISTS {schema}."ReachData"
-    (
-        "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-        "Date" date NOT NULL,
-        "ReachID" smallint NOT NULL,
-        "LandTempC" double precision,
-        "WaterTempC" double precision,
-        "NDVI" double precision,
-        "Mission" character varying(4) COLLATE pg_catalog."default",
-        "EstTempC" double precision,
-        CONSTRAINT "ReachData_pkey" PRIMARY KEY ("ID"),
-        CONSTRAINT "ReachDataID_UNIQUE" UNIQUE ("ID"),
-        CONSTRAINT "Fk_data_reach" FOREIGN KEY ("ReachID")
-            REFERENCES {schema}."Reaches" ("ReachID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE CASCADE
-            NOT VALID
-    )
+        ALTER TABLE IF EXISTS {schema}."DamData"
+            OWNER to {user};
+        """
+        cursor.execute(dam_data_query)
 
-    TABLESPACE pg_default;
+        # Create the ReachData table
+        query = f"""
+        CREATE TABLE IF NOT EXISTS {schema}."ReachData"
+        (
+            "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+            "Date" date NOT NULL,
+            "ReachID" smallint NOT NULL,
+            "LandTempC" double precision,
+            "WaterTempC" double precision,
+            "NDVI" double precision,
+            "Mission" character varying(4) COLLATE pg_catalog."default",
+            "EstTempC" double precision,
+            CONSTRAINT "ReachData_pkey" PRIMARY KEY ("ID"),
+            CONSTRAINT "ReachDataID_UNIQUE" UNIQUE ("ID"),
+            CONSTRAINT "Fk_data_reach" FOREIGN KEY ("ReachID")
+                REFERENCES {schema}."Reaches" ("ReachID") MATCH SIMPLE
+                ON UPDATE CASCADE
+                ON DELETE CASCADE
+                NOT VALID
+        )
 
-    ALTER TABLE IF EXISTS {schema}."ReachData"
-        OWNER to {user};
-    """
-    cursor.execute(query)
+        TABLESPACE pg_default;
 
-    # enable all triggers
-    cursor.execute("SET session_replication_role = 'origin'")
+        ALTER TABLE IF EXISTS {schema}."ReachData"
+            OWNER to {user};
+        """
+        cursor.execute(query)
 
-    connection.commit()
+        # enable all triggers
+        cursor.execute("SET session_replication_role = 'origin'")
+
+        connection.commit()
 
     pass
 
 
 # function to set up a fresh database
-def db_setup(config_file, db_name, section="mysql", db_type="mysql"):
+def db_setup(config_file, section="mysql", db_type="mysql"):
     if db_type == "mysql":
         mysql_setup(config_file)
     elif db_type == "postgresql":
@@ -539,117 +541,136 @@ def mysql_upload_gis(config_file, section="mysql", db_type="mysql"):
     pass
 
 
-def postgresql_upload_gis(config_file, data_paths):
+def postgresql_upload_gis(config_file, data_paths, use_gpkg=False):
     db = Connect(config_file, section="postgresql", db_type="postgresql")
     user = db.user
     schema = db.schema
     connection = db.connection
-    cursor = connection.cursor()
+    # cursor = connection.cursor()
 
-    data_paths = data_paths
+    with connection.cursor() as cursor:
 
-    if "basins_shp" in data_paths:
-        basins_gdf = gpd.read_file(data_paths["basins_shp"])
-        print(data_paths["basins_shp"])
-        srid = basins_gdf.crs.to_epsg()
+        data_paths = data_paths
 
-        for i, basin in basins_gdf.iterrows():
-            query = f"""
-                INSERT INTO {schema}."Basins" ("Name", "DrainageAreaSqKm", "geometry")
-                SELECT '{basin['Name']}', {basin['AreaSqKm']}, 'SRID={srid};{basin['geometry'].wkt}'
-                WHERE NOT EXISTS (SELECT * FROM {schema}."Basins" WHERE "Name" = '{basin['Name']}')
-                """
-
-            cursor.execute(query)
-            connection.commit()
-
-    if "rivers_shp" in data_paths:
-        rivers_gdf = gpd.read_file(data_paths["rivers_shp"])
-        srid = rivers_gdf.crs.to_epsg()
-
-        for i, river in rivers_gdf.iterrows():
-            query = f"""
-                INSERT INTO {schema}."Rivers" ("Name", "LengthKm", "geometry")
-                SELECT '{river['GNIS_Name']}', {river['LengthKM']}, 'SRID={srid};{river['geometry'].wkt}'
-                WHERE NOT EXISTS (SELECT * FROM {schema}."Rivers" WHERE "Name" = '{river['GNIS_Name']}')
-                """
-
-            cursor.execute(query)
-            connection.commit()
-
-            query2 = f"""
-            UPDATE {schema}."Rivers"
-            SET "BasinID" = (SELECT "BasinID" FROM {schema}."Basins" WHERE "Name" = '{river['Basin']}'), "LengthKm" = {river['LengthKM']}
-            WHERE "Name" = '{river['GNIS_Name']}'
-            """
-
-            cursor.execute(query2)
-            connection.commit()
-
-        # Update the MajorRiverID column if the river exists in the Rivers table
         if "basins_shp" in data_paths:
             basins_gdf = gpd.read_file(data_paths["basins_shp"])
+            print(data_paths["basins_shp"])
+            srid = basins_gdf.crs.to_epsg()
 
             for i, basin in basins_gdf.iterrows():
                 query = f"""
-                UPDATE {schema}."Basins"
-                SET "MajorRiverID" = (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = '{basin['MajorRiver']}')
-                WHERE "Name" = '{basin['Name']}'
+                    INSERT INTO {schema}."Basins" ("Name", "DrainageAreaSqKm", "geometry")
+                    SELECT '{basin['Name']}', {basin['AreaSqKm']}, 'SRID={srid};{basin['geometry'].wkt}'
+                    WHERE NOT EXISTS (SELECT * FROM {schema}."Basins" WHERE "Name" = '{basin['Name']}')
+                    """
+
+                cursor.execute(query)
+                connection.commit()
+
+        if "rivers_shp" in data_paths:
+            rivers_gdf = gpd.read_file(data_paths["rivers_shp"])
+            srid = rivers_gdf.crs.to_epsg()
+
+            for i, river in rivers_gdf.iterrows():
+                query = f"""
+                    INSERT INTO {schema}."Rivers" ("Name", "LengthKm", "geometry")
+                    SELECT '{river['GNIS_Name']}', {river['LengthKM']}, 'SRID={srid};{river['geometry'].wkt}'
+                    WHERE NOT EXISTS (SELECT * FROM {schema}."Rivers" WHERE "Name" = '{river['GNIS_Name']}')
+                    """
+
+                cursor.execute(query)
+                connection.commit()
+
+                query2 = f"""
+                UPDATE {schema}."Rivers"
+                SET "BasinID" = (SELECT "BasinID" FROM {schema}."Basins" WHERE "Name" = '{river['Basin']}'), "LengthKm" = {river['LengthKM']}
+                WHERE "Name" = '{river['GNIS_Name']}'
                 """
 
-            cursor.execute(query)
-            connection.commit()
+                cursor.execute(query2)
+                connection.commit()
 
-    if "dams_shp" in data_paths:
-        dams_gdf = gpd.read_file(data_paths["dams_shp"])
-        srid = dams_gdf.crs.to_epsg()
-        dams_gdf.fillna("", inplace=True)
+            # Update the MajorRiverID column if the river exists in the Rivers table
+            if "basins_shp" in data_paths:
+                basins_gdf = gpd.read_file(data_paths["basins_shp"])
 
-        for i, dam in dams_gdf.iterrows():
-            query = f"""
+                for i, basin in basins_gdf.iterrows():
+                    query = f"""
+                    UPDATE {schema}."Basins"
+                    SET "MajorRiverID" = (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = '{basin['MajorRiver']}')
+                    WHERE "Name" = '{basin['Name']}'
+                    """
 
-                INSERT INTO {schema}."Dams" ("Name", "Reservoir", "AltName", "Country", "Year", "AreaSqKm", "CapacityMCM", "DepthM", "ElevationMASL", "MainUse", "LONG_DD", "LAT_DD", "DamGeometry")
-                SELECT '{str(dam['DAM_NAME']).replace("'", "''")}', NULLIF('{str(dam['RES_NAME']).replace("'", "''")}', ''), NULLIF('{str(dam['ALT_NAME'])}',''), '{dam['COUNTRY']}', {dam['YEAR']}, {dam['AREA_SKM']}, {dam['CAP_MCM']}, {dam['DEPTH_M']}, {dam['ELEV_MASL']}, '{dam['MAIN_USE']}', {dam['LONG_DD']}, {dam['LAT_DD']}, 'SRID={srid};{dam['geometry'].wkt}'
-                WHERE NOT EXISTS (SELECT * FROM {schema}."Dams" WHERE "Name" = '{str(dam['DAM_NAME']).replace("'", "''")}');
-                """
+                cursor.execute(query)
+                connection.commit()
 
-            cursor.execute(query)
-            connection.commit()
+        if "dams_shp" in data_paths:
+            dams_gdf = gpd.read_file(data_paths["dams_shp"])
+            srid = dams_gdf.crs.to_epsg()
+            dams_gdf.fillna("NULL", inplace=True)
 
-            # Update the RiverID column if the river exists in the Rivers table
-            query2 = f"""
-            UPDATE {schema}."Dams"
-            SET "RiverID" = (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = '{dam['RIVER']}')
-            WHERE "Name" = '{str(dam['DAM_NAME']).replace("'", "''")}'
-            """
+            for i, dam in dams_gdf.iterrows():
+                query = f"""
 
-            cursor.execute(query2)
-            connection.commit()
+                    INSERT INTO {schema}."Dams" ("Name", "Reservoir", "AltName", "Country", "Year", "AreaSqKm", "CapacityMCM", "DepthM", "ElevationMASL", "MainUse", "LONG_DD", "LAT_DD", "DamGeometry")
+                    SELECT '{str(dam['DAM_NAME']).replace("'", "''")}', NULLIF('{str(dam['RES_NAME']).replace("'", "''")}', ''), NULLIF('{str(dam['ALT_NAME'])}',''), '{dam['COUNTRY']}', {dam['YEAR']}, {dam['AREA_SKM']}, {dam['CAP_MCM']}, {dam['DEPTH_M']}, {dam['ELEV_MASL']}, '{dam['MAIN_USE']}', {dam['LONG_DD']}, {dam['LAT_DD']}, 'SRID={srid};{dam['geometry'].wkt}'
+                    WHERE NOT EXISTS (SELECT * FROM {schema}."Dams" WHERE "Name" = '{str(dam['DAM_NAME']).replace("'", "''")}');
+                    """
 
-            # Update the BasinID column if the basin exists in the Basins table
-            query3 = f"""
-            UPDATE {schema}."Dams"
-            SET "BasinID" = (SELECT "BasinID" FROM {schema}."Basins" WHERE "Name" = 'Columbia River Basin')
-            WHERE "Name" = '{str(dam['DAM_NAME']).replace("'", "''")}'
-            """
+                cursor.execute(query)
+                connection.commit()
 
-            cursor.execute(query3)
-            connection.commit()
-
-    if "reservoirs_shp2" in data_paths:
-        reservoirs_gdf = gpd.read_file(data_paths["reservoirs_shp2"])
-        srid = reservoirs_gdf.crs.to_epsg()
-        dams_gdf.fillna("", inplace=True)
-
-        for i, reservoir in reservoirs_gdf.iterrows():
-            query = f"""
+                # Update the RiverID column if the river exists in the Rivers table
+                query2 = f"""
                 UPDATE {schema}."Dams"
-                SET "ReservoirGeometry" = 'SRID={srid};{reservoir['geometry'].wkt}'
-                WHERE "Name" = '{str(reservoir['DAM_NAME']).replace("'", "''")}'
+                SET "RiverID" = (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = '{dam['RIVER']}')
+                WHERE "Name" = '{str(dam['DAM_NAME']).replace("'", "''")}'
                 """
 
-            cursor.execute(query)
-            connection.commit()
+                cursor.execute(query2)
+                connection.commit()
+
+                # Update the BasinID column if the basin exists in the Basins table
+                query3 = f"""
+                UPDATE {schema}."Dams"
+                SET "BasinID" = (SELECT "BasinID" FROM {schema}."Basins" WHERE "Name" = 'Columbia River Basin')
+                WHERE "Name" = '{str(dam['DAM_NAME']).replace("'", "''")}'
+                """
+
+                cursor.execute(query3)
+                connection.commit()
+
+        if "reservoirs_shp" in data_paths:
+            reservoirs_gdf = gpd.read_file(data_paths["reservoirs_shp"])
+            srid = reservoirs_gdf.crs.to_epsg()
+            dams_gdf.fillna("", inplace=True)
+
+            for i, reservoir in reservoirs_gdf.iterrows():
+                query = f"""
+                    UPDATE {schema}."Dams"
+                    SET "ReservoirGeometry" = 'SRID={srid};{reservoir['geometry'].wkt}'
+                    WHERE "Name" = '{str(reservoir['DAM_NAME']).replace("'", "''")}'
+                    """
+
+                cursor.execute(query)
+                connection.commit()
+
+        if "reaches_shp" in data_paths:
+            reaches_gdf = gpd.read_file(data_paths["reaches_shp"])
+            srid = reaches_gdf.crs.to_epsg()
+
+            # for i, reach in reaches_gdf.iterrows():
+            #     # Iinsert reach data into the table if the entry doesn't already exist
+            for i, reach in reaches_gdf.iterrows():
+
+                query = f"""
+                    INSERT INTO {schema}."Reaches" ("Name", "RiverID", "ClimateClass", "WidthMin", "WidthMean", "WidthMax", "RKm", "geometry")
+                    SELECT '{reach['reach_id']}', (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = '{reach['GNIS_Name']}'), {reach['koppen']}, CAST(NULLIF('{str(reach['WidthMin'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMean'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMax'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['RKm'])}','NaN') AS double precision), 'SRID={srid};{reach['geometry'].wkt}'
+                    WHERE NOT EXISTS (SELECT * FROM {schema}."Reaches" WHERE "Name" = '{reach['reach_id']}')
+                    """
+
+                cursor.execute(query)
+                connection.commit()
 
 
 def upload_gis(config_file, data_paths, db_type="mysql"):
