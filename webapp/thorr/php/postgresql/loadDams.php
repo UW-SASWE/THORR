@@ -12,7 +12,7 @@ $pgsql_connection = pg_connect($connStr);
 // }
 
 if ($_POST['BasinID']) {
-    if ($_POST['RiverID']) {
+    if (isset($_POST['RiverID'])) {
         $sql = <<<QUERY
         SELECT * 
         FROM (SELECT
@@ -54,7 +54,7 @@ if ($_POST['BasinID']) {
 }
 // echo $sql;
 
-$result = $mysqli_connection->query($sql);
+$result = pg_query($pgsql_connection, $sql);
 echo '<option value="" selected disabled>Select Dam</option>';
 
 if (pg_num_rows($result) > 0) {
