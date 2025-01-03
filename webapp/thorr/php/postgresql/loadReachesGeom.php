@@ -2,7 +2,8 @@
 
 require_once('dbConfig.php');
 
-$mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
+$connStr = "host=$host port=$port dbname=$dbname user=$username password=$password";
+$pgsql_connection = pg_connect($connStr);
 
 // if ($mysqli_connection->connect_error) {
 //     echo "Not connected, error: " . $mysqli_connection->connect_error;
@@ -10,76 +11,79 @@ $mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
 
 // echo ($_POST['row_count'] and $_POST['offset']);
 
-if ($_POST['offset'] || $_POST['row_count']) {
+if (isset($_POST['offset']) || isset($_POST['row_count'])) {
     $sql = <<<QUERY
-            SELECT 
-            ReachData.Date,
-            EstTempC,
-            R.ReachID,
-            RiverID,
-            Name,
-            RKm,
-            geometry
+        SELECT 
+            "ReachData"."Date"::Date as "Date",
+            "EstTempC",
+            R."ReachID",
+            "RiverID",
+            "Name",
+            "RKm",
+            "geometry"
         FROM
             (SELECT 
-                ReachID,
-                    RiverID,
-                    Rivers.Name AS Name,
-                    Reaches.RKm AS RKm,
-                    ST_ASGEOJSON(Reaches.geometry) AS geometry
+                "ReachID",
+                    "RiverID",
+                    "Rivers"."Name" AS "Name",
+                    "Reaches"."RKm" AS "RKm",
+                    ST_ASGEOJSON("Reaches"."geometry") AS "geometry"
             FROM
-                thorr.Rivers
-            INNER JOIN Basins USING (BasinID)
-            INNER JOIN Reaches USING (RiverID)
+                "$schema"."Rivers"
+            INNER JOIN "$schema"."Basins" USING ("BasinID")
+            INNER JOIN "$schema"."Reaches" USING ("RiverID")
             WHERE
-                Basins.BasinID = {$_POST['BasinID']}) AS R
+                "Basins"."BasinID" = {$_POST['BasinID']}) AS R
                 INNER JOIN
-            ReachData USING (ReachID)
+            "$schema"."ReachData" USING ("ReachID")
                 INNER JOIN
             (SELECT 
-                ReachID, MAX(Date) AS Date
+                "ReachID", MAX("Date") AS "Date"
             FROM
-                ReachData
+                "$schema"."ReachData"
             WHERE
-                EstTempC IS NOT NULL
-            GROUP BY ReachID) AS latestEstimate ON latestEstimate.Date = ReachData.Date
-                AND latestEstimate.ReachID = ReachData.ReachID
-        LIMIT {$_POST['offset']}, {$_POST['row_count']};
+                "EstTempC" IS NOT NULL
+            GROUP BY "ReachID") AS latestEstimate ON latestEstimate."Date" = "$schema"."ReachData"."Date"
+                AND latestEstimate."ReachID" = "$schema"."ReachData"."ReachID"
+        OFFSET
+            {$_POST['offset']}
+        LIMIT
+            {$_POST['row_count']};
         QUERY;
 } else {
     $sql = <<<QUERY
-            SELECT 
-            ReachData.Date,
-            EstTempC,
-            R.ReachID,
-            RiverID,
-            Name,
-            RKm,
-            geometry
+        SELECT 
+            "ReachData"."Date"::Date as "Date",
+            "EstTempC",
+            R."ReachID",
+            "RiverID",
+            "Name",
+            "RKm",
+            "geometry"
         FROM
             (SELECT 
-                ReachID,
-                    RiverID,
-                    Rivers.Name AS Name,
-                    Reaches.RKm AS RKm,
-                    ST_ASGEOJSON(Reaches.geometry) AS geometry
+                "ReachID",
+                    "RiverID",
+                    "Rivers"."Name" AS "Name",
+                    "Reaches"."RKm" AS "RKm",
+                    ST_ASGEOJSON("Reaches"."geometry") AS "geometry"
             FROM
-                thorr.Rivers
-            INNER JOIN Basins USING (BasinID)
-            INNER JOIN Reaches USING (RiverID)
+                "$schema"."Rivers"
+            INNER JOIN "$schema"."Basins" USING ("BasinID")
+            INNER JOIN "$schema"."Reaches" USING ("RiverID")
             WHERE
-                Basins.BasinID = {$_POST['BasinID']}) AS R
+                "Basins"."BasinID" = {$_POST['BasinID']}) AS R
                 INNER JOIN
-            ReachData USING (ReachID)
+            "$schema"."ReachData" USING ("ReachID")
                 INNER JOIN
             (SELECT 
-                ReachID, MAX(Date) AS Date
+                "ReachID", MAX("Date") AS "Date"
             FROM
-                ReachData
+                "$schema"."ReachData"
             WHERE
-                EstTempC IS NOT NULL
-            GROUP BY ReachID) AS latestEstimate ON latestEstimate.Date = ReachData.Date
-                AND latestEstimate.ReachID = ReachData.ReachID
+                "EstTempC" IS NOT NULL
+            GROUP BY "ReachID") AS latestEstimate ON latestEstimate."Date" = "$schema"."ReachData"."Date"
+                AND latestEstimate."ReachID" = "$schema"."ReachData"."ReachID"
         QUERY;
 };
 
@@ -87,7 +91,7 @@ if ($_POST['offset'] || $_POST['row_count']) {
 
 // echo $sql;
 
-$result = $mysqli_connection->query($sql);
+$result = pg_query($pgsql_connection, $sql);
 
 # Build GeoJSON feature collection array
 $geojson = array(
@@ -96,7 +100,7 @@ $geojson = array(
 );
 
 # Loop through rows to build feature arrays
-while ($row = $result->fetch_assoc()) {
+while ($row = pg_fetch_assoc($result)) {
     // echo $row['geometry'];
     $properties = $row;
     # Remove wkb and geometry fields from properties
@@ -113,5 +117,4 @@ while ($row = $result->fetch_assoc()) {
 // // header('Content-type: application/json');
 echo json_encode($geojson, JSON_NUMERIC_CHECK);
 
-
-$mysqli_connection->close();
+pg_close($pgsql_connection);
