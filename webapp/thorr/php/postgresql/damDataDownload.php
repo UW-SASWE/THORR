@@ -901,13 +901,7 @@ if ($_POST['DataType'] == "water-temperature") {
             LEFT JOIN (
                 SELECT
                     TO_DATE(
-                        CONCAT(
-                            EXTRACT(
-                                YEAR
-                                FROM
-                                    CURRENT_DATE
-                            ),
-                            '-',
+                        CONCAT('2000-',
                             EXTRACT(
                                 MONTH
                                 FROM
@@ -930,13 +924,7 @@ if ($_POST['DataType'] == "water-temperature") {
                     AND ("WaterTempC" IS NOT NULL)
                 GROUP BY
                     TO_DATE(
-                        CONCAT(
-                            EXTRACT(
-                                YEAR
-                                FROM
-                                    CURRENT_DATE
-                            ),
-                            '-',
+                        CONCAT('2000-',
                             EXTRACT(
                                 MONTH
                                 FROM
