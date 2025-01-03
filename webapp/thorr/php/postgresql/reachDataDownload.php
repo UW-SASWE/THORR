@@ -2,7 +2,8 @@
 
 require_once('dbConfig.php');
 
-$mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
+$connStr = "host=$host port=$port dbname=$dbname user=$username password=$password";
+$pgsql_connection = pg_connect($connStr);
 
 // The name of the text file
 $filename = "temp_download.csv";
@@ -852,19 +853,20 @@ if ($_POST['DataType'] == "water-temperature") {
     }
 }
 
-$result = $mysqli_connection->query($sql);
+$result = pg_query($pgsql_connection, $sql);
 
 // write the query results to the file
 if ($_POST['DataType'] == "deviations") {
-    while ($row = $result->fetch_assoc()) {
+    while ($row = pg_fetch_assoc($result)) {
         fputcsv($fp, array($row['Date'], $row['Deviation']));
     }
 } else {
-    while ($row = $result->fetch_assoc()) {
+    while ($row = pg_fetch_assoc($result)) {
         fputcsv($fp, array($row['Date'], $row['WaterTemperature']));
     }
 }
 
+pg_close($pgsql_connection);
 
 // Close the file
 fclose($fp);
