@@ -227,47 +227,107 @@ if ($_POST['DataType'] == "water-temperature") {
     } elseif ($_POST['TimeScale'] == "monthly") {
         $sql = <<<QUERY
         SELECT 
-            Est.Date AS Date,
-            Round((Est.WaterTemperature - LTM.WaterTemperature), 2) AS Deviation
+            Est."Date"::DATE AS "Date",
+            Round((Est.WaterTemperature - LTM.WaterTemperature), 2) AS "Deviation"
         FROM
-            (SELECT 
-                STR_TO_DATE(CONCAT(YEAR(Date),
-                                '-',
-                                LPAD(MONTH(Date), 2, '00'),
-                                '-',
-                                LPAD(01, 2, '00')),
-                        '%Y-%m-%d') AS Date,
-                ROUND(AVG(EstTempC), 2) AS WaterTemperature
-            FROM
-                ReachData
-            WHERE
-                ReachID = {$_POST['ReachID']} AND EstTempC IS NOT NULL
-            GROUP BY STR_TO_DATE(CONCAT(YEAR(Date),
+            (
+                SELECT
+                    TO_DATE(
+                        CONCAT(
+                            EXTRACT(
+                                YEAR
+                                FROM
+                                    "Date"
+                            ),
                             '-',
-                            LPAD(MONTH(Date), 2, '00'),
+                            EXTRACT(
+                                MONTH
+                                FROM
+                                    "Date"
+                            ),
                             '-',
-                            LPAD(01, 2, '00')),
-                    '%Y-%m-%d')) AS Est
-                LEFT JOIN
-            (SELECT 
-            STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE),
+                            LPAD('01', 2, '00')
+                        ),
+                        'YYYY-MM-DD'
+                    )::DATE AS "Date",
+                    ROUND(AVG("EstTempC")::NUMERIC, 2) AS WaterTemperature
+                FROM
+                    "$schema"."ReachData"
+                WHERE
+                    ("ReachID" = {$_POST['ReachID']})
+                    AND ("EstTempC" IS NOT NULL)
+                GROUP BY
+                    TO_DATE(
+                        CONCAT(
+                            EXTRACT(
+                                YEAR
+                                FROM
+                                    "Date"
+                            ),
                             '-',
-                            LPAD(MONTH(Date), 2, '00'),
+                            EXTRACT(
+                                MONTH
+                                FROM
+                                    "Date"
+                            ),
                             '-',
-                            LPAD(01, 2, '00')),
-                    '%Y-%m-%d') AS Date,
-            ROUND(AVG(EstTempC), 2) AS WaterTemperature
-        FROM
-            ReachData
-        WHERE
-            ReachID = {$_POST['ReachID']} AND EstTempC IS NOT NULL
-        GROUP BY STR_TO_DATE(CONCAT(YEAR(CURRENT_DATE),
-                        '-',
-                        LPAD(MONTH(Date), 2, '00'),
-                        '-',
-                        LPAD(01, 2, '00')),
-                '%Y-%m-%d')) AS LTM ON (MONTH(LTM.Date) = MONTH(Est.Date))
-        ORDER BY Est.Date;
+                            LPAD('01', 2, '00')
+                        ),
+                        'YYYY-MM-DD'
+                    )) AS Est
+                        LEFT JOIN
+                    (SELECT
+                    TO_DATE(
+                        CONCAT(
+                            EXTRACT(
+                                YEAR
+                                FROM
+                                    CURRENT_DATE
+                            ),
+                            '-',
+                            EXTRACT(
+                                MONTH
+                                FROM
+                                    "Date"
+                            ),
+                            '-',
+                            LPAD('01', 2, '00')
+                        ),
+                        'YYYY-MM-DD'
+                    )::DATE AS "Date",
+                    ROUND(AVG("EstTempC")::NUMERIC, 2) AS WaterTemperature
+                FROM
+                    "$schema"."ReachData"
+                WHERE
+                    ("ReachID" = {$_POST['ReachID']})
+                    AND ("EstTempC" IS NOT NULL)
+                GROUP BY
+                    TO_DATE(
+                        CONCAT(
+                            EXTRACT(
+                                YEAR
+                                FROM
+                                    CURRENT_DATE
+                            ),
+                            '-',
+                            EXTRACT(
+                                MONTH
+                                FROM
+                                    "Date"
+                            ),
+                            '-',
+                            LPAD('01', 2, '00')
+                        ),
+                        'YYYY-MM-DD'
+                    )) AS LTM ON (EXTRACT(
+                                MONTH
+                                FROM
+                                    LTM."Date") = EXTRACT(
+                                MONTH
+                                FROM
+                                    Est."Date"))
+        ORDER BY 
+            "Date";
         QUERY;
     } elseif ($_POST['TimeScale'] == "bi-weekly") {
         $sql = <<<QUERY
