@@ -12,7 +12,7 @@ $filename = "temp_download.csv";
 $fp = fopen($filename, 'w');
 
 // Write the column headers to the file
-fputcsv($fp, array('ReachID', 'RiverID', 'Name', 'geometry', 'EstTempC'));
+// fputcsv($fp, array('ReachID', 'RiverID', 'Name', 'geometry', 'EstTempC'));
 
 
 if ($_POST['ReachID']) {
