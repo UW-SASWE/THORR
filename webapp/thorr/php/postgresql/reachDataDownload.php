@@ -13,9 +13,9 @@ $fp = fopen($filename, 'w');
 
 // Write the column headers to the file
 if ($_POST['DataType'] == "deviations") {
-    fputcsv($fp, array('Date', 'deviation(C)'));
+    fputcsv($fp, array('Date', 'deviation(C)'), ',', '"', '');
 } else {
-    fputcsv($fp, array('Date', 'WaterTemperature(C)'));
+    fputcsv($fp, array('Date', 'WaterTemperature(C)'), ',', '"', '');
 }
 
 if ($_POST['DataType'] == "water-temperature") {
@@ -858,11 +858,11 @@ $result = pg_query($pgsql_connection, $sql);
 // write the query results to the file
 if ($_POST['DataType'] == "deviations") {
     while ($row = pg_fetch_assoc($result)) {
-        fputcsv($fp, array($row['Date'], $row['Deviation']));
+        fputcsv($fp, array($row['Date'], $row['Deviation']), ',', '"', '');
     }
 } else {
     while ($row = pg_fetch_assoc($result)) {
-        fputcsv($fp, array($row['Date'], $row['WaterTemperature']));
+        fputcsv($fp, array($row['Date'], $row['WaterTemperature']), ',', '"', '');
     }
 }
 

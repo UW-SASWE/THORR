@@ -19,11 +19,11 @@ QUERY;
 $result = pg_query($pgsql_connection, $sql);
 
 // write column headers
-fputcsv($fp, array_keys(pg_fetch_assoc($result)));
+fputcsv($fp, array_keys(pg_fetch_assoc($result)), ',', '"', '');
 
 // write the query results to the file
 while ($row = pg_fetch_assoc($result)) {
-    fputcsv($fp, $row);
+    fputcsv($fp, $row, ',', '"', '');
 }
 
 pg_close($pgsql_connection);
