@@ -1,7 +1,9 @@
 <?php
 
 require_once('dbConfig.php');
-$mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
+
+$connStr = "host=$host port=$port dbname=$dbname user=$username password=$password";
+$pgsql_connection = pg_connect($connStr);
 
 // if ($mysqli_connection->connect_error) {
 //     echo "Not connected, error: " . $mysqli_connection->connect_error;
@@ -10,9 +12,27 @@ $mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
 // }
 
 if ($_POST['BasinID']) {
-    $sql = "SELECT RiverID, Name FROM Rivers WHERE BasinID = " . $_POST['BasinID'] . " ORDER BY Name ASC";
+    $sql = <<<QUERY
+    SELECT
+        "RiverID",
+        "Name"
+    FROM
+        "$schema"."Rivers"
+    WHERE
+        "BasinID" = {$_POST['BasinID']}
+    ORDER BY
+        "Name" ASC;
+    QUERY;
 } else {
-    $sql = "SELECT RiverID, Name FROM Rivers ORDER BY Name ASC";
+    $sql = <<<QUERY
+    SELECT
+        "RiverID",
+        "Name"
+    FROM
+        "$schema"."Rivers"
+    ORDER BY
+        "Name" ASC;
+    QUERY;
 }
 
 echo '<option value="" selected disabled>Select River</option>';
@@ -34,13 +54,13 @@ switch ($_POST['BasinID']) {
         break;
 }
 
-$result = $mysqli_connection->query($sql);
+$result = pg_query($pgsql_connection, $sql);
 
-if ($result->num_rows > 0) {
+if (pg_num_rows($result) > 0) {
     // output data of each row
-    while ($row = $result->fetch_assoc()) {
+    while ($row = pg_fetch_assoc($result)) {
         echo "<option value=" . $row["RiverID"] . ">" . $row["Name"] . "</option>";
     }
 }
 
-$mysqli_connection->close();
+pg_close($pgsql_connection);
