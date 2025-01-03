@@ -20,83 +20,193 @@ if ($_POST['DataType'] == "deviations") {
 if ($_POST['DataType'] == "water-temperature") {
     if ($_POST['TimeScale'] == "weekly") {
         $sql = <<<QUERY
-        SELECT 
-            DATE_ADD(STR_TO_DATE(CONCAT(YEAR(Date),
-                                '-',
-                                LPAD(01, 2, '00'),
-                                '-',
-                                LPAD(01, 2, '00')),
-                        '%Y-%m-%d'),
-                INTERVAL (FLOOR(DAYOFYEAR(Date) / 7)) WEEK) AS Date,
-            ROUND(AVG(EstTempC), 2) AS WaterTemperature
+        SELECT
+            DATE_ADD (
+                TO_DATE(
+                    CONCAT(
+                        EXTRACT(
+                            YEAR
+                            FROM
+                                "Date"
+                        ),
+                        '-',
+                        LPAD('01', 2, '00'),
+                        '-',
+                        LPAD('01', 2, '00')
+                    ),
+                    'YYYY-MM-DD'
+                ),
+                CONCAT(
+                    FLOOR(
+                        EXTRACT(
+                            DOY
+                            FROM
+                                "Date"
+                        ) / 7
+                    ),
+                    ' week'
+                )::INTERVAL
+            )::DATE AS "Date",
+            ROUND(AVG("EstTempC")::numeric, 2) AS "WaterTemperature"
         FROM
-            ReachData
+            "$schema"."ReachData"
         WHERE
-            ReachID = {$_POST['ReachID']} AND EstTempC IS NOT NULL
-        GROUP BY DATE_ADD(STR_TO_DATE(CONCAT(YEAR(Date),
-                            '-',
-                            LPAD(01, 2, '00'),
-                            '-',
-                            LPAD(01, 2, '00')),
-                    '%Y-%m-%d'),
-            INTERVAL ( FLOOR(DAYOFYEAR(Date) / 7)) WEEK)
-        ORDER BY Date;
+            "ReachID" = {$_POST['ReachID']} AND "EstTempC" IS NOT NULL
+        GROUP BY
+            DATE_ADD (
+                TO_DATE(
+                    CONCAT(
+                        EXTRACT(
+                            YEAR
+                            FROM
+                                "Date"
+                        ),
+                        '-',
+                        LPAD('01', 2, '00'),
+                        '-',
+                        LPAD('01', 2, '00')
+                    ),
+                    'YYYY-MM-DD'
+                ),
+                CONCAT(
+                    FLOOR(
+                        EXTRACT(
+                            DOY
+                            FROM
+                                "Date"
+                        ) / 7
+                    ),
+                    ' week'
+                )::INTERVAL
+            )
+        ORDER BY "Date";
         QUERY;
     } elseif ($_POST['TimeScale'] == "monthly") {
         $sql = <<<QUERY
-        SELECT 
-            STR_TO_DATE(CONCAT(YEAR(Date),
-                            '-',
-                            LPAD(MONTH(Date), 2, '00'),
-                            '-',
-                            LPAD(01, 2, '00')),
-                    '%Y-%m-%d') AS Date,
-            ROUND(AVG(EstTempC), 2) AS WaterTemperature
+        SELECT
+            TO_DATE(
+                CONCAT(
+                    EXTRACT(
+                        YEAR
+                        FROM
+                            "Date"
+                    ),
+                    '-',
+                    EXTRACT(
+                        MONTH
+                        FROM
+                            "Date"
+                    ),
+                    '-',
+                    LPAD('01', 2, '00')
+                ),
+                'YYYY-MM-DD'
+            )::DATE AS "Date",
+            ROUND(AVG("EstTempC")::NUMERIC, 2) AS "WaterTemperature"
         FROM
-            ReachData
+            "$schema"."ReachData"
         WHERE
-            ReachID = {$_POST['ReachID']} AND EstTempC IS NOT NULL
-        GROUP BY STR_TO_DATE(CONCAT(YEAR(Date),
-                        '-',
-                        LPAD(MONTH(Date), 2, '00'),
-                        '-',
-                        LPAD(01, 2, '00')),
-                '%Y-%m-%d')
-        ORDER BY Date;
+            ("ReachID" = {$_POST['ReachID']})
+            AND ("EstTempC" IS NOT NULL)
+        GROUP BY
+            TO_DATE(
+                CONCAT(
+                    EXTRACT(
+                        YEAR
+                        FROM
+                            "Date"
+                    ),
+                    '-',
+                    EXTRACT(
+                        MONTH
+                        FROM
+                            "Date"
+                    ),
+                    '-',
+                    LPAD('01', 2, '00')
+                ),
+                'YYYY-MM-DD'
+            )
+        ORDER BY
+            "Date";
         QUERY;
     } elseif ($_POST['TimeScale'] == "bi-weekly") {
         $sql = <<<QUERY
-        SELECT 
-            DATE_ADD(STR_TO_DATE(CONCAT(YEAR(Date),
-                                '-',
-                                LPAD(01, 2, '00'),
-                                '-',
-                                LPAD(01, 2, '00')),
-                        '%Y-%m-%d'),
-                INTERVAL (2 * FLOOR(DAYOFYEAR(Date) / 14)) WEEK) AS Date,
-            ROUND(AVG(EstTempC), 2) AS WaterTemperature
+        SELECT
+            DATE_ADD (
+                TO_DATE(
+                    CONCAT(
+                        EXTRACT(
+                            YEAR
+                            FROM
+                                "Date"
+                        ),
+                        '-',
+                        LPAD('01', 2, '00'),
+                        '-',
+                        LPAD('01', 2, '00')
+                    ),
+                    'YYYY-MM-DD'
+                ),
+                CONCAT(
+                    2 * FLOOR(
+                        EXTRACT(
+                            DOY
+                            FROM
+                                "Date"
+                        ) / 14
+                    ),
+                    ' week'
+                )::INTERVAL
+            )::DATE AS "Date",
+            ROUND(AVG("EstTempC")::NUMERIC, 2) AS "WaterTemperature"
         FROM
-            ReachData
+            "$schema"."ReachData"
         WHERE
-            ReachID = {$_POST['ReachID']} AND EstTempC IS NOT NULL
-        GROUP BY DATE_ADD(STR_TO_DATE(CONCAT(YEAR(Date),
-                            '-',
-                            LPAD(01, 2, '00'),
-                            '-',
-                            LPAD(01, 2, '00')),
-                    '%Y-%m-%d'),
-            INTERVAL (2 * FLOOR(DAYOFYEAR(Date) / 14)) WEEK)
-        ORDER BY Date;
+            "ReachID" = {$_POST['ReachID']}
+            AND "EstTempC" IS NOT NULL
+        GROUP BY
+            DATE_ADD (
+                TO_DATE(
+                    CONCAT(
+                        EXTRACT(
+                            YEAR
+                            FROM
+                                "Date"
+                        ),
+                        '-',
+                        LPAD('01', 2, '00'),
+                        '-',
+                        LPAD('01', 2, '00')
+                    ),
+                    'YYYY-MM-DD'
+                ),
+                CONCAT(
+                    2 * FLOOR(
+                        EXTRACT(
+                            DOY
+                            FROM
+                                "Date"
+                        ) / 14
+                    ),
+                    ' week'
+                )::INTERVAL
+            )
+        ORDER BY
+            "Date";
         QUERY;
     } elseif ($_POST['TimeScale'] == "irregular") {
         $sql = <<<QUERY
-        SELECT 
-            Date AS Date, EstTempC AS WaterTemperature
+        SELECT
+            "Date"::DATE AS "Date",
+            ROUND("EstTempC"::NUMERIC, 2) AS "WaterTemperature"
         FROM
-            ReachData
+            "$schema"."ReachData"
         WHERE
-            ReachID = {$_POST['ReachID']} AND EstTempC IS NOT NULL
-        ORDER BY Date;
+            "ReachID" = {$_POST['ReachID']}
+            AND "EstTempC" IS NOT NULL
+        ORDER BY
+            "Date";
         QUERY;
     }
 } elseif ($_POST['DataType'] == "long-term-mean") {
