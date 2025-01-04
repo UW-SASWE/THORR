@@ -192,6 +192,7 @@ Results/2.WaterTempEst/2.RandomForestRegression/*.pkl
 .Rproj.user
 *project_outline*
 
+data/GEE/*
 data/ml_model/RFR1.joblib
 /methods/04-ml_development/var1/ann_*_tuning
 *RFR*.joblib
