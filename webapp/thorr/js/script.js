@@ -1,6 +1,5 @@
 var map = L.map("map", { maxZoom: 30 }).setView([46, -119], 6);
-const apiKey =
-  "AAPK229cfc7dca79439eb54c8254d040ad87zKPnxtgMrhMyWJxWoy2R-aE-hw-a8e9qTXhWBe91aI0ljMQoHb6IxAiJ_5Lu2ri7";
+
 // const apiKey = esriApiKey;
 
 function getV2Basemap(style) {
