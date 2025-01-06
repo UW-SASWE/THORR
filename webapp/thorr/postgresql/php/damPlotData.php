@@ -270,19 +270,18 @@ $LTMQuery = <<<QUERY
 SELECT
     TO_DATE(
         CONCAT(
-            EXTRACT(
-                YEAR
-                FROM
-                    CURRENT_DATE
-            ),
-            '-',
+            '2000-',
             EXTRACT(
                 MONTH
                 FROM
                     "Date"
             ),
             '-',
-            LPAD('01', 2, '00')
+            EXTRACT(
+                DAY
+                FROM
+                    "Date"
+            )
         ),
         'YYYY-MM-DD'
     )::DATE AS "Date",
@@ -295,19 +294,18 @@ WHERE
 GROUP BY
     TO_DATE(
         CONCAT(
-            EXTRACT(
-                YEAR
-                FROM
-                    CURRENT_DATE
-            ),
-            '-',
+            '2000-',
             EXTRACT(
                 MONTH
                 FROM
                     "Date"
             ),
             '-',
-            LPAD('01', 2, '00')
+            EXTRACT(
+                DAY
+                FROM
+                    "Date"
+            )
         ),
         'YYYY-MM-DD'
     )
@@ -357,7 +355,7 @@ SELECT
 FROM
     "$schema"."DamData"
 WHERE
-    "DamID" = 1 AND "WaterTempC" IS NOT NULL
+    "DamID" = {$_POST['DamID']} AND "WaterTempC" IS NOT NULL
 GROUP BY
     DATE_ADD (
         TO_DATE(
@@ -551,12 +549,7 @@ FROM
         SELECT
             TO_DATE(
                 CONCAT(
-                    EXTRACT(
-                        YEAR
-                        FROM
-                            CURRENT_DATE
-                    ),
-                    '-',
+                    '2000-',
                     EXTRACT(
                         MONTH
                         FROM
@@ -580,12 +573,7 @@ FROM
         GROUP BY
             TO_DATE(
                 CONCAT(
-                    EXTRACT(
-                        YEAR
-                        FROM
-                            CURRENT_DATE
-                    ),
-                    '-',
+                    '2000-',
                     EXTRACT(
                         MONTH
                         FROM

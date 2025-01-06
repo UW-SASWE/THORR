@@ -9,6 +9,7 @@ $mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);
 // }
 $sql = "SELECT BasinID, Name, ST_AsGeoJSON(ST_Simplify(geometry, 0.005), 2) AS geometry FROM Basins WHERE BasinID = " . $_POST['BasinID'] . " ORDER BY Name ASC";
 // echo $sql;
+// $sql = "SELECT BasinID, Name, ST_AsGeoJSON(ST_Simplify(geometry, 0.005), 2) AS geometry, ST_SRID(geometry) as SRID FROM Basins WHERE BasinID = " . $_POST['BasinID'] . " ORDER BY Name ASC";
 
 $result = $mysqli_connection->query($sql);
 

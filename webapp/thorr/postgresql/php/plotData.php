@@ -1,5 +1,6 @@
 <?php
 
+// TODO: determine if it's a redundant file or not
 require_once('dbConfig.php');
 
 $mysqli_connection = new MySQLi($host, $username, $password, $dbname, $port);

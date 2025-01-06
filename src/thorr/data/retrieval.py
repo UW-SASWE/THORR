@@ -1626,8 +1626,8 @@ def fetch_reach_gdf(db, db_type="postgresql"):
             "ReachID" AS reach_id,
             "Name" AS reach_name,
             "RiverID" AS river_id,
-            ST_AsBinary("geometry") AS geometry,
-            ST_SRID("geometry") AS srid
+            ST_AsBinary("buffered_geometry") AS geometry,
+            ST_SRID("buffered_geometry") AS srid
         FROM
             {schema}."Reaches"
         ORDER By
