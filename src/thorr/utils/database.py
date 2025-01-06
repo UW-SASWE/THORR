@@ -453,6 +453,7 @@ def postgresql_setup(config_file):
         "WidthMax" double precision,
         "RKm" smallint,
         "geometry" geometry NOT NULL,
+        "buffered_geometry" geometry,
         CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
         CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
         CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
@@ -531,7 +532,7 @@ def postgresql_setup(config_file):
 
 
 # function to set up a fresh database
-def db_setup(config_file, db_name, section="mysql", db_type="mysql"):
+def db_setup(config_file, section="mysql", db_type="mysql"):
     if db_type == "mysql":
         mysql_setup(config_file)
     elif db_type == "postgresql":
@@ -542,23 +543,24 @@ def mysql_upload_gis(config_file, section="mysql", db_type="mysql"):
     pass
 
 
-def postgresql_upload_gis(config_file, data_paths):
+def postgresql_upload_gis(config_file, data_paths, gpkg_layers):
     db = Connect(config_file, section="postgresql", db_type="postgresql")
     user = db.user
     schema = db.schema
     connection = db.connection
     cursor = connection.cursor()
 
-    data_paths = data_paths
-    if "geopackage" in data_paths:
-        use_gpkg = True
-        gpkg_path = data_paths["geopackage"]
-    else:
-        use_gpkg = False
+    # print( gpkg, gpkg_layers)
 
-    if "basins_shp" in data_paths:
-        basins_gdf = gpd.read_file(data_paths["basins_shp"])
-        print(data_paths["basins_shp"])
+    # # data_paths = data_paths
+    gpkg = data_paths["gis_geopackage"]
+    # gpkg_layers = data_paths["data.geopackage_layers"]
+    
+    if "basins" in gpkg_layers:
+
+        # print( gpkg, gpkg_layers)
+        basins_gdf = gpd.read_file(gpkg, layer=gpkg_layers["basins"])
+        # print(basins_gdf)
         srid = basins_gdf.crs.to_epsg()
 
         for i, basin in basins_gdf.iterrows():
@@ -571,8 +573,8 @@ def postgresql_upload_gis(config_file, data_paths):
             cursor.execute(query)
             connection.commit()
 
-    if "rivers_shp" in data_paths:
-        rivers_gdf = gpd.read_file(data_paths["rivers_shp"])
+    if "rivers" in gpkg_layers:
+        rivers_gdf = gpd.read_file(gpkg, layer=gpkg_layers["rivers"])
         srid = rivers_gdf.crs.to_epsg()
 
         for i, river in rivers_gdf.iterrows():
@@ -595,8 +597,8 @@ def postgresql_upload_gis(config_file, data_paths):
             connection.commit()
 
         # Update the MajorRiverID column if the river exists in the Rivers table
-        if "basins_shp" in data_paths:
-            basins_gdf = gpd.read_file(data_paths["basins_shp"])
+        if "basins" in gpkg_layers:
+            basins_gdf = gpd.read_file(gpkg, layer=gpkg_layers["basins"])
 
             for i, basin in basins_gdf.iterrows():
                 query = f"""
@@ -608,8 +610,8 @@ def postgresql_upload_gis(config_file, data_paths):
             cursor.execute(query)
             connection.commit()
 
-    if "dams_shp" in data_paths:
-        dams_gdf = gpd.read_file(data_paths["dams_shp"])
+    if "dams" in gpkg_layers:
+        dams_gdf = gpd.read_file(gpkg, layer=gpkg_layers["dams"])
         srid = dams_gdf.crs.to_epsg()
         dams_gdf.fillna("", inplace=True)
 
@@ -644,8 +646,8 @@ def postgresql_upload_gis(config_file, data_paths):
             cursor.execute(query3)
             connection.commit()
 
-    if "reservoirs_shp" in data_paths:
-        reservoirs_gdf = gpd.read_file(data_paths["reservoirs_shp"])
+    if "reservoirs" in gpkg_layers:
+        reservoirs_gdf = gpd.read_file(gpkg, layer=gpkg_layers["reservoirs"])
         srid = reservoirs_gdf.crs.to_epsg()
         dams_gdf.fillna("", inplace=True)
 
@@ -659,8 +661,8 @@ def postgresql_upload_gis(config_file, data_paths):
             cursor.execute(query)
             connection.commit()
 
-    if "reaches_shp" in data_paths:
-        reaches_gdf = gpd.read_file(data_paths["reaches_shp"])
+    if "reaches" in gpkg_layers:
+        reaches_gdf = gpd.read_file(gpkg, layer=gpkg_layers["reaches"])
         srid = reaches_gdf.crs.to_epsg()
 
         # for i, reach in reaches_gdf.iterrows():
@@ -675,14 +677,29 @@ def postgresql_upload_gis(config_file, data_paths):
 
             cursor.execute(query)
             connection.commit()
+        
+        if "buffered_reaches" in gpkg_layers:
+            buffered_reaches_gdf = gpd.read_file(gpkg, layer=gpkg_layers["buffered_reaches"])
+            srid = buffered_reaches_gdf.crs.to_epsg()
+
+            for i, buffered_reach in buffered_reaches_gdf.iterrows():
+                query = f"""
+                    UPDATE {schema}."Reaches"
+                    SET "buffered_geometry" = 'SRID={srid};{buffered_reach['geometry'].wkt}'
+                    WHERE "Name" = '{buffered_reach['reach_id']}'
+                    """
+
+                cursor.execute(query)
+                connection.commit()
 
 
-def upload_gis(config_file, data_paths, db_type="mysql"):
+def upload_gis(config_file, gpkg, gpkg_layers, db_type="mysql"):
     print("Uploading data...")
     if db_type == "mysql":
-        mysql_upload_gis(config_file, data_paths)
+        # TODO: Implement mysql_upload_gis
+        mysql_upload_gis(config_file,)
     elif db_type == "postgresql":
-        postgresql_upload_gis(config_file, data_paths)
+        postgresql_upload_gis(config_file, gpkg, gpkg_layers,)
     print("Data uploaded successfully.")
     pass
 
