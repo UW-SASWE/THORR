@@ -550,6 +550,11 @@ def postgresql_upload_gis(config_file, data_paths):
     cursor = connection.cursor()
 
     data_paths = data_paths
+    if "geopackage" in data_paths:
+        use_gpkg = True
+        gpkg_path = data_paths["geopackage"]
+    else:
+        use_gpkg = False
 
     if "basins_shp" in data_paths:
         basins_gdf = gpd.read_file(data_paths["basins_shp"])
