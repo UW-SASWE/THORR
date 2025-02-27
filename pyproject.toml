@@ -20,14 +20,15 @@ keywords = [
   "thermal infrared",
 ]
 dependencies = [
+  "geemap",
   "geopandas",
-  "mysql-connector-python",
-  "psycopg",
-  "pandas",
   "matplotlib",
+  "mysql-connector-python",
   "numpy",
-  "shapely",
+  "pandas",
+  "psycopg",
   "rasterio",
+  "shapely",
 ]
 classifiers = [
   "Programming Language :: Python :: 3",
