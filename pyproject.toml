@@ -29,6 +29,7 @@ dependencies = [
   "psycopg",
   "rasterio",
   "shapely",
+  "typer"
 ]
 classifiers = [
   "Programming Language :: Python :: 3",
