@@ -14,7 +14,7 @@ The main interface of the THORR web application inclueds thefollowing features:
     * :ref:`time-series-panel`
     * :ref:`info-panel` and :ref:`display-tools`
 
-.. image:: resources/THORR_web.png
+.. image:: resources/THORR_web_96dpi.png
 
 .. _map-view:
 Map view
