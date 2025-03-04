@@ -14,7 +14,7 @@ THORR is designed to be scalable, allowing users to apply it in any  river netwo
 ..    This project is under active development.
 
 .. toctree::
-   .. :hidden:
+   :hidden:
    :maxdepth: 2
 
    getting_started
