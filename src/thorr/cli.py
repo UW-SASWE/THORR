@@ -33,8 +33,14 @@ def download_data(
     #     print("Failed to download file")
 
     # extract the models to the download folder
-    with zipfile.ZipFile(file_Path, "r") as zip_ref:
-        zip_ref.extractall(download_folder)
+    if region == "global":
+        with zipfile.ZipFile(file_Path, "r") as zip_ref:
+            zip_ref.extractall(download_folder)
+    else:
+        with zipfile.ZipFile(file_Path, "r") as zip_ref:
+            for file in zip_ref.namelist():
+                if region in file:
+                    zip_ref.extract(file, download_folder)
     # print("Data extracted successfully")
 
 
