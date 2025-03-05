@@ -18,6 +18,8 @@ THORR is designed to be scalable, allowing users to apply it in any  river netwo
    :maxdepth: 2
 
    getting_started
+   database
+   gis
    modules
    webapp
 
