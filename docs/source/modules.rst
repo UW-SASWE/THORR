@@ -18,6 +18,13 @@ Create a new project with the specified name and directory. The project director
 
     .. program-output:: python -m thorr new-project --help
 
+.. _download-data:
+``thorr download-data``
+~~~~~~~~~~~~~~~~~~~~~~~
+Download data from the specified source and save it to the specified directory. THORR's data includes trained machine learning models and GIS data for the various regions.
+
+    .. program-output:: python -m thorr download-data --help
+
 
 Satellite Data Retrieval
 ------------------------
