@@ -23,7 +23,14 @@ Create a new project with the specified name and directory. The project director
 ~~~~~~~~~~~~~~~~~~~~~~~
 Download data from the specified source and save it to the specified directory. THORR's data includes trained machine learning models and GIS data for the various regions.
 
-    .. program-output:: python -m thorr download-data --help
+    .. program-output:: python -m thorr get-thorr-data --help
+
+.. _database-setup:
+``thorr database-setup``
+~~~~~~~~~~~~~~~~~~~~~~~~
+Create the database tables required by THORR to store project data. The database system must be running and accessible to the THORR project.
+
+    .. program-output:: python -m thorr database-setup --help
 
 
 Satellite Data Retrieval
