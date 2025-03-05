@@ -30,9 +30,6 @@ dependencies = [
   "rasterio",
   "shapely",
   "typer",
-  # dependencies for documentation
-  "sphinxcontrib-programoutput",
-  "sphinx-inline-tabs",
 ]
 classifiers = [
   "Programming Language :: Python :: 3",
