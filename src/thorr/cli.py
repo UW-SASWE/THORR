@@ -33,16 +33,24 @@ def download_data(
     #     print("Failed to download file")
 
     # extract the models to the download folder
-    if region == "global":
-        with zipfile.ZipFile(file_Path, "r") as zip_ref:
-            zip_ref.extractall(download_folder)
-    else:
-        with zipfile.ZipFile(file_Path, "r") as zip_ref:
-            for file in zip_ref.namelist():
-                if region in file:
-                    zip_ref.extract(file, download_folder)
-    # print("Data extracted successfully")
-
+    # if region == "global":
+    #     with zipfile.ZipFile(file_Path, "r") as zip_ref:
+    #         zip_ref.extractall(download_folder)
+    # else:
+    #     with zipfile.ZipFile(file_Path, "r") as zip_ref:
+    #         for file in zip_ref.namelist():
+    #             if region in file:
+    #                 zip_ref.extract(file, download_folder)
+    with zipfile.ZipFile(file_Path, "r") as zip_ref:
+        files = zip_ref.namelist()
+        regions = [file.split("/")[-1].split("_")[0] for file in files]
+        if region in regions:
+            zip_ref.extract(files[regions.index(region)], download_folder)
+        else:
+            print("Region not found in the data")
+            print("Available regions are:")
+            print(regions)
+            print("Please try again with one of the available regions")
 
 @app.command()
 def new_project(
@@ -67,6 +75,8 @@ def new_project(
     region: Annotated[str, typer.Option(help="Region of the project")] = "global",
 ):
 
+    print(f"Creating new project {name} in {dir}")
+
     proj_dir = Path(dir) / name
     env_dir = proj_dir / ".env"
     data_dir = proj_dir / "data"
@@ -84,3 +94,5 @@ def new_project(
     # TODO: download data from the internet
     if get_data:
         download_data(str(data_dir / "ml_model"), region=region)
+
+    print("Project created successfully")
