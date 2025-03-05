@@ -52,6 +52,11 @@ def download_data(
             print(regions)
             print("Please try again with one of the available regions")
 
+    # delete the zip file
+    file_Path.unlink()
+    
+    print("Data downloaded successfully")
+
 @app.command()
 def new_project(
     name: Annotated[str, typer.Argument(help="Name of the new project")],
