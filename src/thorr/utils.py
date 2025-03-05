@@ -1,5 +1,7 @@
 from pathlib import Path
 import configparser
+import requests
+import zipfile
 
 
 def create_config_file(proj_dir, config_filepath: Path, name=None, region=None) -> None:
@@ -9,10 +11,10 @@ def create_config_file(proj_dir, config_filepath: Path, name=None, region=None) 
         region = region
     else:
         region = "global"
-        
+
     config = {
         "project": {
-            "title": name,
+            "name": name,
             "project_dir": proj_dir,
             "region": region,
             "description": "",
@@ -28,7 +30,10 @@ def create_config_file(proj_dir, config_filepath: Path, name=None, region=None) 
             "database": "",
             "schema": "",
         },
-        "data": {"gis_geopackage": "data/gis/thorr_gis.gpkg", "ml_model": f"data/ml/{region}_ml.joblib"},
+        "data": {
+            "gis_geopackage": "data/gis/thorr_gis.gpkg",
+            "ml_model": f"data/ml/{region}_ml.joblib",
+        },
         "data.geopackage_layers": {
             "basins": "Basins",
             "rivers": "Rivers",
@@ -37,7 +42,6 @@ def create_config_file(proj_dir, config_filepath: Path, name=None, region=None) 
             "reaches": "Reaches",
             "buffered_reaches": "BufferedReaches",
         },
-        "data.models": {},
         "ee": {
             "private_key_path": "/path/to/earth/engine/private/key.json",
             "service_account": "service_account_email",
@@ -50,6 +54,7 @@ def create_config_file(proj_dir, config_filepath: Path, name=None, region=None) 
             for option, value in options.items():
                 config_obj.set(section, option, value)
         config_obj.write(f)
+
 
 def read_config(config_path, required_sections=[]):
     """
@@ -84,8 +89,33 @@ def read_config(config_path, required_sections=[]):
         }
     else:
         config_dict = {
-            section: dict(config_obj.items(section)) for section in config_obj.sections()
+            section: dict(config_obj.items(section))
+            for section in config_obj.sections()
         }
 
     return config_dict
 
+
+def download_data(url, file_Path, region):
+    download_folder = file_Path.parent
+    download_folder.mkdir(parents=True, exist_ok=True)
+    response = requests.get(url)
+
+    # download the models
+    if response.status_code == 200:
+        with open(file_Path, "wb") as file:
+            file.write(response.content)
+            
+    with zipfile.ZipFile(file_Path, "r") as zip_ref:
+        files = zip_ref.namelist()
+        regions = [file.split("/")[-1].split("_")[0] for file in files]
+        if region in regions:
+            zip_ref.extract(files[regions.index(region)], download_folder)
+        else:
+            print("Region not found in the data")
+            print("Available regions are:")
+            print(regions)
+            print("Please try again with one of the available regions")
+
+    # delete the zip file
+    file_Path.unlink()
