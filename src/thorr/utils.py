@@ -14,10 +14,10 @@ def create_config_file(proj_dir, config_filepath: Path, name=None, region=None) 
         "project": {
             "title": name,
             "project_dir": proj_dir,
-            "start_date": "",
-            "end_date": "",
             "region": region,
             "description": "",
+            "start_date": "",
+            "end_date": "",
         },
         "database": {
             "type": "options: mysql or postgresql",
@@ -28,7 +28,7 @@ def create_config_file(proj_dir, config_filepath: Path, name=None, region=None) 
             "database": "",
             "schema": "",
         },
-        "data": {"gis_geopackage": "data/gis/thorr_gis.gpkg"},
+        "data": {"gis_geopackage": "data/gis/thorr_gis.gpkg", "ml_model": f"data/ml/{region}_ml.joblib"},
         "data.geopackage_layers": {
             "basins": "Basins",
             "rivers": "Rivers",
