@@ -29,7 +29,10 @@ dependencies = [
   "psycopg",
   "rasterio",
   "shapely",
-  "typer"
+  "typer",
+  # dependencies for documentation
+  "sphinxcontrib-programoutput",
+  "sphinx-inline-tabs",
 ]
 classifiers = [
   "Programming Language :: Python :: 3",
