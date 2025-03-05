@@ -33,15 +33,15 @@ Create the database tables required by THORR to store project data. The database
     .. program-output:: python -m thorr database-setup --help
 
 
-Satellite Data Retrieval
-------------------------
+.. Satellite Data Retrieval
+.. ------------------------
 
-Machine Learning
-----------------
+.. Machine Learning
+.. ----------------
 
-Database Management
--------------------
+.. Database Management
+.. -------------------
 
-Data Preprocessing
-------------------
+.. Data Preprocessing
+.. ------------------
 
