@@ -1,61 +1,36 @@
 import typer
 from typing_extensions import Annotated
-from thorr.utils import create_config_file
+from thorr.utils import create_config_file, download_data
 
 from pathlib import Path
-import zipfile
 
 app = typer.Typer(rich_markup_mode=None)
 
+
 @app.command()
-def download_data(
+def get_thorr_data(
     download_folder: Annotated[
         str, typer.Argument(help="Folder to download data to")
     ] = ".",
     region: Annotated[str, typer.Option(help="Region of the project")] = "global",
 ):
-    import requests
 
     download_folder = Path(download_folder)
     download_folder.mkdir(parents=True, exist_ok=True)
 
     models_url = "http://staff.washington.edu/gdarkwah/thorr_ml.zip"
+    gis_url = "http://staff.washington.edu/gdarkwah/thorr_gis.zip"
 
-    response = requests.get(models_url)
-    file_Path = download_folder / models_url.split("/")[-1]
+    model_file_Path = download_folder / "ml_model" / models_url.split("/")[-1]
+    gis_file_Path = download_folder / "gis" / gis_url.split("/")[-1]
 
-    # download the models
-    if response.status_code == 200:
-        with open(file_Path, "wb") as file:
-            file.write(response.content)
-        # print("File downloaded successfully")
-    # else:
-    #     print("Failed to download file")
+    # download the models data
+    download_data(models_url, model_file_Path, region)
+    # download the gis data
+    download_data(gis_url, gis_file_Path, region)
 
-    # extract the models to the download folder
-    # if region == "global":
-    #     with zipfile.ZipFile(file_Path, "r") as zip_ref:
-    #         zip_ref.extractall(download_folder)
-    # else:
-    #     with zipfile.ZipFile(file_Path, "r") as zip_ref:
-    #         for file in zip_ref.namelist():
-    #             if region in file:
-    #                 zip_ref.extract(file, download_folder)
-    with zipfile.ZipFile(file_Path, "r") as zip_ref:
-        files = zip_ref.namelist()
-        regions = [file.split("/")[-1].split("_")[0] for file in files]
-        if region in regions:
-            zip_ref.extract(files[regions.index(region)], download_folder)
-        else:
-            print("Region not found in the data")
-            print("Available regions are:")
-            print(regions)
-            print("Please try again with one of the available regions")
-
-    # delete the zip file
-    file_Path.unlink()
-    
     print("Data downloaded successfully")
+
 
 @app.command()
 def new_project(
@@ -98,6 +73,6 @@ def new_project(
 
     # TODO: download data from the internet
     if get_data:
-        download_data(str(data_dir / "ml_model"), region=region)
+        get_thorr_data(str(data_dir), region=region)
 
     print("Project created successfully")
