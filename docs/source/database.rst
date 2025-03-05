@@ -1,5 +1,5 @@
-Getting Started
-===============
+Database Setup
+==============
 
 Installation
 ------------
