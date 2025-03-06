@@ -1,6 +1,7 @@
 import typer
 from typing_extensions import Annotated
 from thorr.utils import create_config_file, download_data
+from thorr.database import db_setup
 
 from pathlib import Path
 
@@ -31,6 +32,17 @@ def get_thorr_data(
 
     print("Data downloaded successfully")
 
+
+@app.command()
+def database_setup(
+    config_path: Annotated[str, typer.Argument(help="Path to the configuration file")],
+    upload_gis: Annotated[
+        bool, typer.Option(help="Upload GIS data to the database")
+    ] = False,
+):
+    
+    print("setting up the database")
+    db_setup(config_path)
 
 @app.command()
 def new_project(

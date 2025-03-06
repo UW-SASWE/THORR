@@ -31,7 +31,7 @@ def create_config_file(proj_dir, config_filepath: Path, name=None, region=None) 
             "schema": "",
         },
         "data": {
-            "gis_geopackage": "data/gis/thorr_gis.gpkg",
+            "gis_geopackage": f"data/gis/{region}_gis.gpkg",
             "ml_model": f"data/ml/{region}_ml.joblib",
         },
         "data.geopackage_layers": {
