@@ -18,10 +18,11 @@ THORR is designed to be scalable, allowing users to apply it in any  river netwo
 
    getting_started
    database
-   gis
    modules
    webapp
    publications
+
+.. add the gis componenet later. Insert it before the modules section
 
 .. .. caution::
 ..    **Disclaimer**
