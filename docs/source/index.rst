@@ -14,14 +14,15 @@ THORR is designed to be scalable, allowing users to apply it in any  river netwo
 ..    This project is under active development.
 
 .. toctree::
-   :hidden:
    :maxdepth: 2
 
    getting_started
    database
-   gis
    modules
    webapp
+   publications
+
+.. add the gis componenet later. Insert it before the modules section
 
 .. .. caution::
 ..    **Disclaimer**
@@ -33,7 +34,7 @@ How to cite:
 
 If you use THORR, please cite it as follows:
 
-  Darkwah, G. K., Hossain, F., Tchervenski, V., Holtgrieve, G., Graves, D., Seaton, C., Minocha, S., Das, P., Khan, S., & Suresh, S. (2024). Reconstruction of the Hydro-Thermal Behavior of Regulated River Networks of the Columbia River Basin Using Satellite Remote Sensing and Data-Driven Techniques. Earth's Future, 12(10), e2024EF004815. https://doi.org/10.1029/2024EF004815
+   Darkwah, G. K., Hossain, F., Tchervenski, V., Holtgrieve, G., Graves, D., Seaton, C., Minocha, S., Das, P., Khan, S., & Suresh, S. (2024). Reconstruction of the Hydro-Thermal Behavior of Regulated River Networks of the Columbia River Basin Using Satellite Remote Sensing and Data-Driven Techniques. Earth's Future, 12(10), e2024EF004815. https://doi.org/10.1029/2024EF004815
 
 ..
    OUTLINE:

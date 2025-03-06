@@ -178,7 +178,7 @@ See :doc:`gis` for more information on how THORR's GIS data is structured.
 .. _config-gee:
 ``[ee]``
 ~~~~~~~~
-The ``[ee]`` section contains the configuration settings for Google Earth Engine (GEE). THORR obtains satellite information from the GEE platform. Therefore, a GEE service account and private key are required. The following keys are available in the ``[ee]`` section:
+The ``[ee]`` section contains the configuration settings for Google Earth Engine (GEE). THORR obtains satellite information from the GEE platform. Therefore, a `GEE service account and private key <https://developers.google.com/earth-engine/guides/service_account>`_ are required. The following keys are available in the ``[ee]`` section:
 
 +------------------+----------------------------------------+
 |       Key        |                 Value                  |

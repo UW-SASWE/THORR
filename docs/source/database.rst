@@ -34,5 +34,3 @@ Specify the path to the project configuration file in the command above. The dat
 Database Tables
 ---------------
 THORR uses a predefined database tables to store project data. 
-
-    The schema will be created in the specified database using the connection parameters provided in the project configuration file.

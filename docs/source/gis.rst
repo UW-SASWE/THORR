@@ -1,8 +1,2 @@
 GIS Setup
 ==============
-
-Installation
-------------
-
-Configuration
--------------
