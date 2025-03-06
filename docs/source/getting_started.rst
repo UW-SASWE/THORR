@@ -96,23 +96,34 @@ The configuration file contains the following sections: :ref:`config-project`, :
 .. _config-project:
 ``[project]``
 ~~~~~~~~~~~~~~
-The ``[project]`` section contains the project settings, such as the project name, description, and version. The following keys are available in the ``[project]`` section:
+The ``[project]`` section contains the project settings, such as the project name, region, description and time frame. The following keys are available in the ``[project]`` section:
 
-+-------------+--------------------------------------------------+
-|     Key     |                      Value                       |
-+=============+==================================================+
-| name        | The name or title of the project                 |
-+-------------+--------------------------------------------------+
-| project_dir | Path to the project directory                    |
-+-------------+--------------------------------------------------+
-| region      | Region for the project                           |
-+-------------+--------------------------------------------------+
-| description | Brief description of the project                 |
-+-------------+--------------------------------------------------+
-| start_date  | Start date for THORR water temperature estimates |
-+-------------+--------------------------------------------------+
-| end_date    | End date for THORR water temperature estimates   |
-+-------------+--------------------------------------------------+
++-------------+-----------------------------------------------------------------------------+
+|     Key     |                      Value                                                  |
++=============+=============================================================================+
+| name        | The name or title of the project                                            |
++-------------+-----------------------------------------------------------------------------+
+| project_dir | Path to the project directory                                               |
++-------------+-----------------------------------------------------------------------------+
+| region      | Abbreviation of the region for the project (See :ref:`thorr-regions`)       |
++-------------+-----------------------------------------------------------------------------+
+| description | Brief description of the project                                            |
++-------------+-----------------------------------------------------------------------------+
+| start_date  | Start date for THORR water temperature estimates                            |
++-------------+-----------------------------------------------------------------------------+
+| end_date    | End date for THORR water temperature estimates                              |
++-------------+-----------------------------------------------------------------------------+
+
+.. _thorr-regions:
+Regions
+^^^^^^^
+The ``region`` key in the ``[project]`` section specifies the region for the project. THORR has separately trained models for different regions. The following regions are currently available in THORR:
+
++----------------------+---------------------+
+|     Region           |      Abbreviation   |
++======================+=====================+
+| Columbia River Basin | crb                 |
++----------------------+---------------------+
 
 .. _config-database:
 ``[database]``
