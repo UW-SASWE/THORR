@@ -3,7 +3,7 @@ Modules
 
 Command Line Interface
 ----------------------
-THORR has a command line interface (CLI) that allows you to interact with the the package from the terminal. The CLI provides a number of commands that can be used to create new projects, manage existing projects and run other THORR services. The CLI is accessible by running the `python -m thorr` command from the terminal. For example, to create a new project with the :ref:`new-project <new-project>` command, run the following command from the terminal:
+THORR has a command line interface (CLI) that allows you to interact with the the package from the terminal. The CLI provides a number of commands that can be used to create new projects, manage existing projects and run other THORR services. The CLI is accessible by running the ``python -m thorr`` command from the terminal. For example, to create a new project with the :ref:`new-project <new-project>` command, run the following command from the terminal:
 
 .. code-block:: bash
 
