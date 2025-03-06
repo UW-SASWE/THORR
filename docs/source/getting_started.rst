@@ -3,8 +3,6 @@ Getting Started
 
 Installation
 ------------
-Install from PyPI
-~~~~~~~~~~~~~~~~~
 .. TODO: Update the link to the final PyPI package
 THORR is available on `PyPI <https://pypi.org/project/thorr/>`_ and can be installed using pip:
 
