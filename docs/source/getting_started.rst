@@ -6,13 +6,15 @@ Installation
 Install from PyPI
 ~~~~~~~~~~~~~~~~~
 .. TODO: Update the link to the final PyPI package
-THORR is available on `PyPI <https://test.pypi.org/project/thorr/>`_ and can be installed using pip:
+THORR is available on `PyPI <https://pypi.org/project/thorr/>`_ and can be installed using pip:
 
 .. TODO: Update the link to the final PyPI package
 .. code-block:: bash
     :linenos:
 
-    pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ thorr
+    pip install thorr
+
+.. pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ thorr
 
 Initial Setup
 -------------
