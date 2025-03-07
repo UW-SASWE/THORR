@@ -202,7 +202,7 @@ Workflow and Cronjob
 Once the project is set up and configured, you can start using THORR to generate water temperature estimates. THORR's workflow consists of 4 main steps:
 
 1. Read and process GIS information from database
-2. Retrieve and process satellite data from Google Earth Engine
+2. Retrieve and process satellite data from Google Earth Engine (See :ref:`retrieve-data`)
 3. Generate water temeprature estimates using machine learning models
 4. Save the results to the database
 
