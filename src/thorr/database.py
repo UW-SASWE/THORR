@@ -4,6 +4,8 @@ import mysql.connector
 import psycopg
 import pandas as pd
 import geopandas as gpd
+from pathlib import Path
+import numpy as np
 
 from thorr.utils import read_config
 
@@ -534,7 +536,7 @@ def postgresql_setup(config_file, db_type="postgresql"):
 
 
 # function to set up a fresh database
-def db_setup(config_file):
+def db_setup(config_file, upload_gis_=False):
     db_config = read_config(config_file)
     db_type = db_config["database"]["type"].lower()
     if db_type == "mysql":
@@ -542,12 +544,21 @@ def db_setup(config_file):
     elif db_type == "postgresql":
         postgresql_setup(config_file, db_type)
 
+    if upload_gis_:
+        proj_dir = Path(db_config["project"]["project_dir"])
+
+        gpkg = proj_dir / db_config["data"]["gis_geopackage"]
+        gpkg_layers = db_config["data.geopackage_layers"]
+
+        print(gpkg, gpkg_layers)
+        upload_gis(config_file, gpkg, gpkg_layers, db_type)
+
 
 def mysql_upload_gis(config_file, section="mysql", db_type="mysql"):
     pass
 
 
-def postgresql_upload_gis(config_file, data_paths, gpkg_layers):
+def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
     db = Connect(config_file, section="postgresql", db_type="postgresql")
     user = db.user
     schema = db.schema
@@ -555,11 +566,14 @@ def postgresql_upload_gis(config_file, data_paths, gpkg_layers):
     cursor = connection.cursor()
 
     # print( gpkg, gpkg_layers)
-
-    # # data_paths = data_paths
-    gpkg = data_paths["gis_geopackage"]
     # gpkg_layers = data_paths["data.geopackage_layers"]
-    
+
+    def null_or_value(value):
+        if str(value) == "nan":
+            return "NULL"
+        else:
+            return value
+
     if "basins" in gpkg_layers:
 
         # print( gpkg, gpkg_layers)
@@ -617,13 +631,74 @@ def postgresql_upload_gis(config_file, data_paths, gpkg_layers):
     if "dams" in gpkg_layers:
         dams_gdf = gpd.read_file(gpkg, layer=gpkg_layers["dams"])
         srid = dams_gdf.crs.to_epsg()
-        dams_gdf.fillna("", inplace=True)
+
+        # TODO: use the cast feature like the one in the reaches query
+        fill_values = {
+            "RES_NAME": "",
+            "DAM_NAME": "",
+            "ALT_NAME": "",
+            "RIVER": "",
+            "ALT_RIVER": "",
+            "MAIN_BASIN": "",
+            "SUB_BASIN": "",
+            "NEAR_CITY": "",
+            "ALT_CITY": np.nan,
+            "ADMIN_UNIT": "",
+            "SEC_ADMIN": np.nan,
+            "COUNTRY": "",
+            "SEC_CNTRY": np.nan,
+            "YEAR": np.nan,
+            "ALT_YEAR": np.nan,
+            "REM_YEAR": np.nan,
+            "DAM_HGT_M": np.nan,
+            "ALT_HGT_M": np.nan,
+            "DAM_LEN_M": np.nan,
+            "ALT_LEN_M": np.nan,
+            "AREA_SKM": np.nan,
+            "AREA_POLY": np.nan,
+            "AREA_REP": np.nan,
+            "AREA_MAX": np.nan,
+            "AREA_MIN": np.nan,
+            "CAP_MCM": np.nan,
+            "CAP_MAX": np.nan,
+            "CAP_REP": np.nan,
+            "CAP_MIN": np.nan,
+            "DEPTH_M": np.nan,
+            "DIS_AVG_LS": np.nan,
+            "DOR_PC": np.nan,
+            "ELEV_MASL": np.nan,
+            "CATCH_SKM": np.nan,
+            "CATCH_REP": np.nan,
+            "DATA_INFO": np.nan,
+            "USE_IRRI": "",
+            "USE_ELEC": "",
+            "USE_SUPP": "",
+            "USE_FCON": "",
+            "USE_RECR": "",
+            "USE_NAVI": "",
+            "USE_FISH": "",
+            "USE_PCON": np.nan,
+            "USE_LIVE": np.nan,
+            "USE_OTHR": "",
+            "MAIN_USE": "",
+            "LAKE_CTRL": "",
+            "MULTI_DAMS": "",
+            "TIMELINE": np.nan,
+            "COMMENTS": "",
+            "URL": "",
+            "QUALITY": "",
+            "EDITOR": "",
+            "LONG_DD": np.nan,
+            "LAT_DD": np.nan,
+            "POLY_SRC": "",
+        }
+        dams_gdf.fillna(fill_values, inplace=True)
 
         for i, dam in dams_gdf.iterrows():
             query = f"""
 
                 INSERT INTO "{schema}"."Dams" ("Name", "Reservoir", "AltName", "Country", "Year", "AreaSqKm", "CapacityMCM", "DepthM", "ElevationMASL", "MainUse", "LONG_DD", "LAT_DD", "DamGeometry")
-                SELECT '{str(dam['DAM_NAME']).replace("'", "''")}', NULLIF('{str(dam['RES_NAME']).replace("'", "''")}', ''), NULLIF('{str(dam['ALT_NAME'])}',''), '{dam['COUNTRY']}', {dam['YEAR']}, {dam['AREA_SKM']}, {dam['CAP_MCM']}, {dam['DEPTH_M']}, {dam['ELEV_MASL']}, '{dam['MAIN_USE']}', {dam['LONG_DD']}, {dam['LAT_DD']}, 'SRID={srid};{dam['geometry'].wkt}'
+                SELECT '{str(dam['DAM_NAME']).replace("'", "''")}', NULLIF('{str(dam['RES_NAME']).replace("'", "''")}', ''), NULLIF('{str(dam['ALT_NAME'])}',''), '{dam['COUNTRY']}', NULLIF({null_or_value(dam['YEAR'])}, NULL), NULLIF({null_or_value(dam['AREA_SKM'])}, NULL), NULLIF({null_or_value(dam['CAP_MCM'])}, NULL), NULLIF({null_or_value(dam['DEPTH_M'])}, NULL), NULLIF({null_or_value(dam['ELEV_MASL'])}, NULL),  '{dam['MAIN_USE']}', {dam['LONG_DD']}, {dam['LAT_DD']}, 'SRID={srid};{dam['geometry'].wkt}'
                 WHERE NOT EXISTS (SELECT * FROM "{schema}"."Dams" WHERE "Name" = '{str(dam['DAM_NAME']).replace("'", "''")}');
                 """
 
@@ -653,7 +728,7 @@ def postgresql_upload_gis(config_file, data_paths, gpkg_layers):
     if "reservoirs" in gpkg_layers:
         reservoirs_gdf = gpd.read_file(gpkg, layer=gpkg_layers["reservoirs"])
         srid = reservoirs_gdf.crs.to_epsg()
-        dams_gdf.fillna("", inplace=True)
+        # dams_gdf.fillna("", inplace=True)
 
         for i, reservoir in reservoirs_gdf.iterrows():
             query = f"""
@@ -681,9 +756,11 @@ def postgresql_upload_gis(config_file, data_paths, gpkg_layers):
 
             cursor.execute(query)
             connection.commit()
-        
+
         if "buffered_reaches" in gpkg_layers:
-            buffered_reaches_gdf = gpd.read_file(gpkg, layer=gpkg_layers["buffered_reaches"])
+            buffered_reaches_gdf = gpd.read_file(
+                gpkg, layer=gpkg_layers["buffered_reaches"]
+            )
             srid = buffered_reaches_gdf.crs.to_epsg()
 
             for i, buffered_reach in buffered_reaches_gdf.iterrows():
@@ -701,9 +778,15 @@ def upload_gis(config_file, gpkg, gpkg_layers, db_type="mysql"):
     print("Uploading data...")
     if db_type == "mysql":
         # TODO: Implement mysql_upload_gis
-        mysql_upload_gis(config_file,)
+        mysql_upload_gis(
+            config_file,
+        )
     elif db_type == "postgresql":
-        postgresql_upload_gis(config_file, gpkg, gpkg_layers,)
+        postgresql_upload_gis(
+            config_file,
+            gpkg,
+            gpkg_layers,
+        )
     print("Data uploaded successfully.")
     pass
 

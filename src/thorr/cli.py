@@ -42,7 +42,7 @@ def database_setup(
 ):
     
     print("setting up the database")
-    db_setup(config_path)
+    db_setup(config_path, upload_gis)
 
 @app.command()
 def new_project(
