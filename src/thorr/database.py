@@ -48,7 +48,8 @@ class Connect:
             if self.logger is not None:
                 self.logger.info("Connecting to database...")
             else:
-                print("Connecting to database...")
+                # print("Connecting to database...")
+                pass
 
             if self.db_type == "mysql":
                 self.database = db_config["database"]["database"]
@@ -64,7 +65,8 @@ class Connect:
                     if self.logger is not None:
                         self.logger.info("Database connection established.")
                     else:
-                        print("Database connection established.")
+                        # print("Database connection established.")
+                        pass
                 else:
                     if self.logger is not None:
                         self.logger.info("Database connection failed.")
@@ -85,7 +87,8 @@ class Connect:
                     if self.logger is not None:
                         self.logger.info("Database connection established.")
                     else:
-                        print("Database connection established.")
+                        # print("Database connection established.")
+                        pass
                 else:
                     if self.logger is not None:
                         self.logger.info("Database connection failed.")
