@@ -550,7 +550,6 @@ def db_setup(config_file, upload_gis_=False):
         gpkg = proj_dir / db_config["data"]["gis_geopackage"]
         gpkg_layers = db_config["data.geopackage_layers"]
 
-        print(gpkg, gpkg_layers)
         upload_gis(config_file, gpkg, gpkg_layers, db_type)
 
 
@@ -775,7 +774,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
 
 def upload_gis(config_file, gpkg, gpkg_layers, db_type="mysql"):
-    print("Uploading data...")
+    print("Uploading GIS data to database...")
     if db_type == "mysql":
         # TODO: Implement mysql_upload_gis
         mysql_upload_gis(
@@ -787,8 +786,7 @@ def upload_gis(config_file, gpkg, gpkg_layers, db_type="mysql"):
             gpkg,
             gpkg_layers,
         )
-    print("Data uploaded successfully.")
-    pass
+    print("GIS data uploaded successfully!")
 
 
 # if __name__ == '__main__':
