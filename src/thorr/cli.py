@@ -1,6 +1,6 @@
 import typer
 from typing_extensions import Annotated
-from thorr.core import est_temp_reaches
+from thorr.core import *
 from thorr.utils import create_config_file, download_data
 from thorr.database import db_setup
 from thorr.data import retrieval
@@ -55,10 +55,12 @@ def retrieve_data(
 
 @app.command()
 def estimate_temperature(
-    config_path: Annotated[str, typer.Argument(help="Path to the configuration file")]
+    config_path: Annotated[str, typer.Argument(help="Path to the configuration file")], element_type: Annotated[str, typer.Option(help="Type of element to retrieve (reaches or reservoirs)")]="reaches"
 ):
-    print("Estimating water temperature")
-    est_temp_reaches(config_path)
+    if element_type == "reaches":
+        est_temp_reaches(config_path, element_type)
+    elif element_type == "reservoirs":
+        est_temp_reservoirs(config_path, element_type)
 
 @app.command()
 def new_project(
