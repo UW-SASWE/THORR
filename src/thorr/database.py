@@ -1,5 +1,3 @@
-# TODO: module for database operations
-
 import mysql.connector
 import psycopg
 import pandas as pd
@@ -55,11 +53,20 @@ class Connect:
                 self.database = db_config["database"]["database"]
                 self.connection = self.connect(
                     user=db_config["database"]["user"],
-                    database=db_config["database"]["database"],
+                    # database=db_config["database"]["database"],
                     password=db_config["database"]["password"],
                     host=db_config["database"]["host"],
                     port=db_config["database"]["port"],
                 )
+
+                database=db_config["database"]["database"]
+                cursor = self.connection.cursor()
+
+                # Create database if it doesn't exist
+                cursor.execute(
+                    f"CREATE SCHEMA IF NOT EXISTS `{database}` DEFAULT CHARACTER SET utf8mb3"
+                )
+                cursor.execute(f"USE `{database}`")
 
                 if self.connection.is_connected():
                     if self.logger is not None:
@@ -156,15 +163,10 @@ class Connect:
 
 # function to set up mysql database
 def mysql_setup(config_file):
-    db = Connect(config_file, section="mysql", db_type="mysql")
+    db = Connect(config_file, db_type="mysql")
     database = db.database
     connection = db.connection
     cursor = connection.cursor()
-
-    # Create database if it doesn't exist
-    cursor.execute(
-        f"CREATE SCHEMA IF NOT EXISTS `{database}` DEFAULT CHARACTER SET utf8mb3"
-    )
 
     # turn off foreign key checks
     cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
@@ -244,6 +246,7 @@ def mysql_setup(config_file):
         `WidthMax` float DEFAULT NULL COMMENT 'Maximum width (meters)',
         `RKm` SMALLINT DEFAULT NULL COMMENT 'Distance from the mouth of the river (km)',
         `geometry` geometry NOT NULL /*!80003 SRID 4326 */,
+        `buffered_geometry` geometry /*!80003 SRID 4326 */ DEFAULT NULL,
         PRIMARY KEY (`ReachID`),
         UNIQUE KEY `ReachID_UNIQUE` (`ReachID`),
         KEY `Fk_river` (`RiverID`),
@@ -556,25 +559,228 @@ def db_setup(config_file, upload_gis_=False):
         upload_gis(config_file, gpkg, gpkg_layers, db_type)
 
 
-def mysql_upload_gis(config_file, section="mysql", db_type="mysql"):
-    pass
+def null_or_value(value):
+    if str(value) == "nan":
+        return "NULL"
+    else:
+        return value
+
+
+def mysql_upload_gis(config_file, gpkg, gpkg_layers):
+    db = Connect(config_file, db_type="mysql")
+    database = db.database
+    connection = db.connection
+    cursor = connection.cursor()
+
+    if "basins" in gpkg_layers:
+
+        # print( gpkg, gpkg_layers)
+        basins_gdf = gpd.read_file(gpkg, layer=gpkg_layers["basins"])
+        # print(basins_gdf)
+        srid = basins_gdf.crs.to_epsg()
+
+        for i, basin in basins_gdf.iterrows():
+            query = f"""
+                INSERT INTO `{database}`.`Basins` (Name, DrainageAreaSqKm, geometry)
+                SELECT '{basin['Name']}', {basin['AreaSqKm']}, ST_GeomFromText('{basin['geometry'].wkt}', {srid}, 'axis-order=long-lat')
+                WHERE NOT EXISTS (SELECT * FROM `{database}`.`Basins` WHERE Name = '{basin['Name']}');
+                """
+
+            cursor.execute(query)
+            connection.commit()
+
+    if "rivers" in gpkg_layers:
+        rivers_gdf = gpd.read_file(gpkg, layer=gpkg_layers["rivers"])
+        srid = rivers_gdf.crs.to_epsg()
+
+        for i, river in rivers_gdf.iterrows():
+            query = f"""
+                INSERT INTO  `{database}`.`Rivers` (Name, LengthKm, geometry)
+                SELECT '{river['GNIS_Name']}', {river['LengthKM']}, ST_GeomFromText('{river['geometry'].wkt}', {srid}, 'axis-order=long-lat')
+                WHERE NOT EXISTS (SELECT * FROM  `{database}`.`Rivers` WHERE Name = '{river['GNIS_Name']}');
+                """
+
+            cursor.execute(query)
+            connection.commit()
+
+            query2 = f"""
+                UPDATE `{database}`.`Rivers`
+                SET BasinID = (SELECT BasinID FROM Basins WHERE Name = '{river['Basin']}'), LengthKm = {river['LengthKM']}
+                WHERE Name = "{river['GNIS_Name']}";
+                """
+
+            cursor.execute(query2)
+            connection.commit()
+
+        # Update the MajorRiverID column if the river exists in the Rivers table
+        if "basins" in gpkg_layers:
+            basins_gdf = gpd.read_file(gpkg, layer=gpkg_layers["basins"])
+
+            for i, basin in basins_gdf.iterrows():
+                query = f"""
+                    UPDATE `{database}`.`Basins`
+                    SET MajorRiverID = (SELECT RiverID FROM Rivers WHERE Name = '{basin['MajorRiver']}')
+                    WHERE Name = '{basin['Name']}';
+                    """
+
+            cursor.execute(query)
+            connection.commit()
+
+    if "dams" in gpkg_layers:
+        dams_gdf = gpd.read_file(gpkg, layer=gpkg_layers["dams"])
+        srid = dams_gdf.crs.to_epsg()
+
+        # TODO: use the cast feature like the one in the reaches query
+        fill_values = {
+            "RES_NAME": "",
+            "DAM_NAME": "",
+            "ALT_NAME": "",
+            "RIVER": "",
+            "ALT_RIVER": "",
+            "MAIN_BASIN": "",
+            "SUB_BASIN": "",
+            "NEAR_CITY": "",
+            "ALT_CITY": np.nan,
+            "ADMIN_UNIT": "",
+            "SEC_ADMIN": np.nan,
+            "COUNTRY": "",
+            "SEC_CNTRY": np.nan,
+            "YEAR": np.nan,
+            "ALT_YEAR": np.nan,
+            "REM_YEAR": np.nan,
+            "DAM_HGT_M": np.nan,
+            "ALT_HGT_M": np.nan,
+            "DAM_LEN_M": np.nan,
+            "ALT_LEN_M": np.nan,
+            "AREA_SKM": np.nan,
+            "AREA_POLY": np.nan,
+            "AREA_REP": np.nan,
+            "AREA_MAX": np.nan,
+            "AREA_MIN": np.nan,
+            "CAP_MCM": np.nan,
+            "CAP_MAX": np.nan,
+            "CAP_REP": np.nan,
+            "CAP_MIN": np.nan,
+            "DEPTH_M": np.nan,
+            "DIS_AVG_LS": np.nan,
+            "DOR_PC": np.nan,
+            "ELEV_MASL": np.nan,
+            "CATCH_SKM": np.nan,
+            "CATCH_REP": np.nan,
+            "DATA_INFO": np.nan,
+            "USE_IRRI": "",
+            "USE_ELEC": "",
+            "USE_SUPP": "",
+            "USE_FCON": "",
+            "USE_RECR": "",
+            "USE_NAVI": "",
+            "USE_FISH": "",
+            "USE_PCON": np.nan,
+            "USE_LIVE": np.nan,
+            "USE_OTHR": "",
+            "MAIN_USE": "",
+            "LAKE_CTRL": "",
+            "MULTI_DAMS": "",
+            "TIMELINE": np.nan,
+            "COMMENTS": "",
+            "URL": "",
+            "QUALITY": "",
+            "EDITOR": "",
+            "LONG_DD": np.nan,
+            "LAT_DD": np.nan,
+            "POLY_SRC": "",
+        }
+        dams_gdf.fillna(fill_values, inplace=True)
+
+        for i, dam in dams_gdf.iterrows():
+            query = f"""
+                INSERT INTO `{database}`.`Dams` (Name, Reservoir, AltName, Country, Year, AreaSqKm, CapacityMCM, DepthM, ElevationMASL, MainUse, LONG_DD, LAT_DD, DamGeometry)
+                SELECT '{str(dam['DAM_NAME']).replace("'", "''")}', NULLIF('{str(dam['RES_NAME']).replace("'", "''")}', ''), NULLIF('{str(dam['ALT_NAME'])}',''), '{dam['COUNTRY']}', NULLIF({null_or_value(dam['YEAR'])}, NULL), NULLIF({null_or_value(dam['AREA_SKM'])}, NULL), NULLIF({null_or_value(dam['CAP_MCM'])}, NULL), NULLIF({null_or_value(dam['DEPTH_M'])}, NULL), NULLIF({null_or_value(dam['ELEV_MASL'])}, NULL),  '{dam['MAIN_USE']}', {dam['LONG_DD']}, {dam['LAT_DD']}, ST_PointFromText('{dam['geometry'].wkt}', {srid}, 'axis-order=long-lat')
+                WHERE NOT EXISTS (SELECT * FROM `{database}`.`Dams` WHERE Name = '{str(dam['DAM_NAME']).replace("'", "''")}');
+                """
+
+            cursor.execute(query)
+            connection.commit()
+
+            # Update the RiverID column if the river exists in the Rivers table
+            query2 = f"""
+            UPDATE `{database}`.`Dams`
+            SET RiverID = (SELECT RiverID FROM `{database}`.`Rivers` WHERE Name = '{dam['RIVER']}')
+            WHERE Name = '{str(dam['DAM_NAME']).replace("'", "''")}';
+            """
+
+            cursor.execute(query2)
+            connection.commit()
+
+            # Update the BasinID column if the basin exists in the Basins table
+            query3 = f"""
+            UPDATE `{database}`.`Dams`
+            SET BasinID = (SELECT BasinID FROM `{database}`.`Basins` WHERE Name = 'Columbia River Basin')
+            WHERE Name = '{str(dam['DAM_NAME']).replace("'", "''")}';
+            """
+
+            cursor.execute(query3)
+            connection.commit()
+
+    if "reservoirs" in gpkg_layers:
+        reservoirs_gdf = gpd.read_file(gpkg, layer=gpkg_layers["reservoirs"])
+        srid = reservoirs_gdf.crs.to_epsg()
+        # dams_gdf.fillna("", inplace=True)
+
+        for i, reservoir in reservoirs_gdf.iterrows():
+            query = f"""
+                UPDATE `{database}`.`Dams`
+                SET ReservoirGeometry = ST_GeomFromText('{reservoir['geometry'].wkt}', 4326, 'axis-order=long-lat')
+                WHERE Name = '{str(reservoir['DAM_NAME']).replace("'", "''")}';
+                """
+
+            cursor.execute(query)
+            connection.commit()
+
+    if "reaches" in gpkg_layers:
+        reaches_gdf = gpd.read_file(gpkg, layer=gpkg_layers["reaches"])
+        srid = reaches_gdf.crs.to_epsg()
+
+        # for i, reach in reaches_gdf.iterrows():
+        #     # Iinsert reach data into the table if the entry doesn't already exist
+        for i, reach in reaches_gdf.iterrows():
+
+            query = f"""
+                INSERT INTO `{database}`.`Reaches` (Name, RiverID, ClimateClass, WidthMin, WidthMean, WidthMax, RKm, geometry)
+                SELECT "{reach['reach_id']}",(SELECT RiverID FROM Rivers WHERE Name = '{reach['GNIS_Name']}'), {reach['koppen']}, NULLIF("{str(reach['WidthMin'])}",'nan'), NULLIF("{str(reach['WidthMean'])}",'nan'), NULLIF("{str(reach['WidthMax'])}",'nan'), NULLIF("{str(reach['RKm'])}",'nan'), ST_GeomFromText('{reach['geometry'].wkt}', {srid}, 'axis-order=long-lat')
+                WHERE NOT EXISTS (SELECT * FROM `{database}`.`Reaches` WHERE Name = "{reach['reach_id']}");
+                """
+
+            cursor.execute(query)
+            connection.commit()
+
+        if "buffered_reaches" in gpkg_layers:
+            buffered_reaches_gdf = gpd.read_file(
+                gpkg, layer=gpkg_layers["buffered_reaches"]
+            )
+            srid = buffered_reaches_gdf.crs.to_epsg()
+
+            for i, buffered_reach in buffered_reaches_gdf.iterrows():
+                query = f"""
+                    UPDATE `{database}`.`Reaches`
+                    SET buffered_geometry = ST_GeomFromText('{buffered_reach['geometry'].wkt}', {srid}, 'axis-order=long-lat')
+                    WHERE Name = '{buffered_reach['reach_id']}';
+                    """
+
+                cursor.execute(query)
+                connection.commit()
+            
+
 
 
 def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
-    db = Connect(config_file, section="postgresql", db_type="postgresql")
-    user = db.user
+    db = Connect(config_file, db_type="postgresql")
     schema = db.schema
     connection = db.connection
     cursor = connection.cursor()
 
     # print( gpkg, gpkg_layers)
     # gpkg_layers = data_paths["data.geopackage_layers"]
-
-    def null_or_value(value):
-        if str(value) == "nan":
-            return "NULL"
-        else:
-            return value
 
     if "basins" in gpkg_layers:
 
@@ -698,7 +904,6 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
         for i, dam in dams_gdf.iterrows():
             query = f"""
-
                 INSERT INTO "{schema}"."Dams" ("Name", "Reservoir", "AltName", "Country", "Year", "AreaSqKm", "CapacityMCM", "DepthM", "ElevationMASL", "MainUse", "LONG_DD", "LAT_DD", "DamGeometry")
                 SELECT '{str(dam['DAM_NAME']).replace("'", "''")}', NULLIF('{str(dam['RES_NAME']).replace("'", "''")}', ''), NULLIF('{str(dam['ALT_NAME'])}',''), '{dam['COUNTRY']}', NULLIF({null_or_value(dam['YEAR'])}, NULL), NULLIF({null_or_value(dam['AREA_SKM'])}, NULL), NULLIF({null_or_value(dam['CAP_MCM'])}, NULL), NULLIF({null_or_value(dam['DEPTH_M'])}, NULL), NULLIF({null_or_value(dam['ELEV_MASL'])}, NULL),  '{dam['MAIN_USE']}', {dam['LONG_DD']}, {dam['LAT_DD']}, 'SRID={srid};{dam['geometry'].wkt}'
                 WHERE NOT EXISTS (SELECT * FROM "{schema}"."Dams" WHERE "Name" = '{str(dam['DAM_NAME']).replace("'", "''")}');
@@ -751,7 +956,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
         for i, reach in reaches_gdf.iterrows():
 
             query = f"""
-                INSERT INTO {schema}."Reaches" ("Name", "RiverID", "ClimateClass", "WidthMin", "WidthMean", "WidthMax", "RKm", "geometry")
+                INSERT INTO "{schema}"."Reaches" ("Name", "RiverID", "ClimateClass", "WidthMin", "WidthMean", "WidthMax", "RKm", "geometry")
                 SELECT '{reach['reach_id']}', (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = '{reach['GNIS_Name']}'), {reach['koppen']}, CAST(NULLIF('{str(reach['WidthMin'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMean'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMax'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['RKm'])}','NaN') AS double precision), 'SRID={srid};{reach['geometry'].wkt}'
                 WHERE NOT EXISTS (SELECT * FROM {schema}."Reaches" WHERE "Name" = '{reach['reach_id']}')
                 """
@@ -767,7 +972,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
             for i, buffered_reach in buffered_reaches_gdf.iterrows():
                 query = f"""
-                    UPDATE {schema}."Reaches"
+                    UPDATE "{schema}"."Reaches"
                     SET "buffered_geometry" = 'SRID={srid};{buffered_reach['geometry'].wkt}'
                     WHERE "Name" = '{buffered_reach['reach_id']}'
                     """
@@ -779,9 +984,10 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 def upload_gis(config_file, gpkg, gpkg_layers, db_type="mysql"):
     print("Uploading GIS data to database...")
     if db_type == "mysql":
-        # TODO: Implement mysql_upload_gis
         mysql_upload_gis(
             config_file,
+            gpkg,
+            gpkg_layers,
         )
     elif db_type == "postgresql":
         postgresql_upload_gis(
@@ -790,8 +996,3 @@ def upload_gis(config_file, gpkg, gpkg_layers, db_type="mysql"):
             gpkg_layers,
         )
     print("GIS data uploaded successfully!")
-
-
-# if __name__ == '__main__':
-#     # TODO: Make this a command line argument
-#     Connect()
