@@ -1744,7 +1744,7 @@ def get_reach_data(
         print("All done!")
 
 
-def retrieve(config_path, element="reaches"):
+def retrieve(config_path, element_type="reaches"):
 
     config_dict = read_config(Path(config_path))
 
@@ -1765,10 +1765,10 @@ def retrieve(config_path, element="reaches"):
 
     data_dir = proj_dir / "data" / "GEE"
 
-    if element == "reaches":
+    if element_type == "reaches":
         reaches_dir = data_dir / "reaches"
         reaches_dir.mkdir(parents=True, exist_ok=True)
-    elif element == "reservoirs":
+    elif element_type == "reservoirs":
         reservoirs_dir = data_dir / "reservoirs"
         reservoirs_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1793,13 +1793,13 @@ def retrieve(config_path, element="reaches"):
     # validate start and end dates
     start_date, end_date = validate_start_end_dates(start_date, end_date, logger=log)
 
-    if element == "reaches":
+    if element_type == "reaches":
         get_reach_data(
             db, db_type, data_dir, ee_credentials, start_date, end_date, logger=log
         )
         # print("Retrieving reaches data")
         # pass
-    elif element == "reservoirs":
+    elif element_type == "reservoirs":
         get_reservoir_data(
             db, db_type, data_dir, ee_credentials, start_date, end_date, logger=log
         )

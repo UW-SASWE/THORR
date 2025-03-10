@@ -49,12 +49,12 @@ def database_setup(
 
 @app.command()
 def retrieve_data(
-    config_path: Annotated[str, typer.Argument(help="Path to the configuration file")], data_type: Annotated[str, typer.Option(help="Type of element to retrieve (reaches or reservoirs)")]="reaches"
+    config_path: Annotated[str, typer.Argument(help="Path to the configuration file")], element_type: Annotated[str, typer.Option(help="Type of element to retrieve (reaches or reservoirs)")]="reaches"
 ):
-    retrieval.retrieve(config_path, data_type)
+    retrieval.retrieve(config_path, element_type)
 
 @app.command()
-def estimate(
+def estimate_temperature(
     config_path: Annotated[str, typer.Argument(help="Path to the configuration file")]
 ):
     print("Estimating water temperature")
