@@ -2,6 +2,7 @@ import typer
 from typing_extensions import Annotated
 from thorr.utils import create_config_file, download_data
 from thorr.database import db_setup
+from thorr.data import retrieval
 
 from pathlib import Path
 
@@ -40,9 +41,16 @@ def database_setup(
         bool, typer.Option(help="Upload GIS data to the database")
     ] = False,
 ):
-    
+
     print("setting up the database")
     db_setup(config_path, upload_gis)
+
+
+@app.command()
+def retrieve_data(
+    config_path: Annotated[str, typer.Argument(help="Path to the configuration file")], data_type: Annotated[str, typer.Option(help="Type of element to retrieve (reaches or reservoirs)")]="reaches"
+):
+    retrieval.retrieve(config_path, data_type)
 
 @app.command()
 def new_project(
