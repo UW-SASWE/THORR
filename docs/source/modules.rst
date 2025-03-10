@@ -40,6 +40,13 @@ Retrieve satellite data from Google Earth Engine (GEE) and save it to a specifie
 
     .. program-output:: python -m thorr retrieve-data --help
 
+.. _estimate-temperature:
+``thorr estimate-temperature``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Estimate water temperature using a trained machine learning model.
+
+    .. program-output:: python -m thorr estimate-temperature --help
+
 
 .. Satellite Data Retrieval
 .. ------------------------
