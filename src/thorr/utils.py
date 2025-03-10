@@ -38,7 +38,7 @@ def create_config_file(proj_dir, config_filepath: Path, name=None, region=None) 
         },
         "data": {
             "gis_geopackage": f"data/gis/{region}_gis.gpkg",
-            "ml_model": f"data/ml/{region}_ml.joblib",
+            "ml_model": f"data/ml_model/{region}_ml.joblib",
         },
         "data.geopackage_layers": {
             "basins": "Basins",
@@ -150,9 +150,10 @@ class Logger(object):
         # self.logger.addHandler(self.console_handler)
 
         if log_dir is None:
-            log_dir = os.path.join(os.getcwd(), "logs")
-        if not os.path.exists(log_dir):
-            os.makedirs(log_dir)
+            log_dir = Path(os.getcwd()) / "logs"
+        # if not os.path.exists(log_dir):
+        #     os.makedirs(log_dir)
+        log_dir.mkdir(parents=True, exist_ok=True)
 
         # create a log file attribute (path to the log file)
         self.logger.log_file = str(Path(log_dir) / f"{logger_name}.log")
@@ -169,7 +170,6 @@ class Logger(object):
 
     def get_logger(self):
         return self.logger
-
 
 
 def validate_start_end_dates(start_date, end_date, logger=None):
