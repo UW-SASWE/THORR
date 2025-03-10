@@ -1744,15 +1744,7 @@ def get_reach_data(
         print("All done!")
 
 
-def reaches(config_path):
-    initiate_retrieval(config_path, element="reaches")
-
-
-def reservoirs(config_path):
-    initiate_retrieval(config_path, element="reservoirs")
-
-
-def initiate_retrieval(config_path, element="reaches"):
+def retrieve(config_path, element="reaches"):
 
     config_dict = read_config(Path(config_path))
 
@@ -1772,8 +1764,13 @@ def initiate_retrieval(config_path, element="reaches"):
     db = db_connect(config_path, logger=log, db_type=db_type)
 
     data_dir = proj_dir / "data" / "GEE"
-    reaches_dir = data_dir / "reaches"
-    reaches_dir.mkdir(parents=True, exist_ok=True)
+
+    if element == "reaches":
+        reaches_dir = data_dir / "reaches"
+        reaches_dir.mkdir(parents=True, exist_ok=True)
+    elif element == "reservoirs":
+        reservoirs_dir = data_dir / "reservoirs"
+        reservoirs_dir.mkdir(parents=True, exist_ok=True)
 
     # get start date from config file
     if (
