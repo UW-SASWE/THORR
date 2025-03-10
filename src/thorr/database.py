@@ -14,7 +14,7 @@ class Connect:
     def __init__(
         self,
         config_file,
-        section=None,
+        # section=None,
         logger=None,
         return_conn=False,
         db_type="postgresql",
@@ -293,8 +293,8 @@ def mysql_setup(config_file):
 
 
 # function to set up postgresql database
-def postgresql_setup(config_file, db_type="postgresql"):
-    db = Connect(config_file, db_type)
+def postgresql_setup(config_file):
+    db = Connect(config_file, db_type="postgresql")
     user = db.user
     schema = db.schema
     connection = db.connection
@@ -543,9 +543,9 @@ def db_setup(config_file, upload_gis_=False):
     db_config = read_config(config_file)
     db_type = db_config["database"]["type"].lower()
     if db_type == "mysql":
-        mysql_setup(config_file, db_type)
+        mysql_setup(config_file)
     elif db_type == "postgresql":
-        postgresql_setup(config_file, db_type)
+        postgresql_setup(config_file)
 
     if upload_gis_:
         proj_dir = Path(db_config["project"]["project_dir"])
