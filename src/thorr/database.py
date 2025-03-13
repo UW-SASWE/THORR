@@ -171,21 +171,34 @@ def mysql_setup(config_file):
     # turn off foreign key checks
     cursor.execute("SET FOREIGN_KEY_CHECKS = 0")
 
-    # Create the Basins table
-    basins_query = """
-    CREATE TABLE IF NOT EXISTS `Basins` (
-        `BasinID` SMALLINT NOT NULL AUTO_INCREMENT,
+    # # Create the Basins table
+    # basins_query = """
+    # CREATE TABLE IF NOT EXISTS `Basins` (
+    #     `BasinID` SMALLINT NOT NULL AUTO_INCREMENT,
+    #     `Name` varchar(255) NOT NULL,
+    #     `DrainageAreaSqKm` float DEFAULT NULL COMMENT 'Drainage area of the Basin in square-kilometers',
+    #     `MajorRiverID` MEDIUMINT DEFAULT NULL,
+    #     `geometry` geometry NOT NULL /*!80003 SRID 4326 */,
+    #     PRIMARY KEY (`BasinID`),
+    #     UNIQUE KEY `BasinID_UNIQUE` (`BasinID`),
+    #     KEY `Fk_MajorRiver` (`MajorRiverID`),
+    #     CONSTRAINT `Fk_MajorRiver` FOREIGN KEY (`MajorRiverID`) REFERENCES `Rivers` (`RiverID`) ON DELETE SET NULL ON UPDATE CASCADE
+    # ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
+    # """
+    # cursor.execute(basins_query)
+
+    # Create regions table
+    regions_query = """
+    CREATE TABLE IF NOT EXISTS `Regions` (
+        `RegionID` SMALLINT NOT NULL AUTO_INCREMENT,
         `Name` varchar(255) NOT NULL,
-        `DrainageAreaSqKm` float DEFAULT NULL COMMENT 'Drainage area of the Basin in square-kilometers',
-        `MajorRiverID` MEDIUMINT DEFAULT NULL,
         `geometry` geometry NOT NULL /*!80003 SRID 4326 */,
-        PRIMARY KEY (`BasinID`),
-        UNIQUE KEY `BasinID_UNIQUE` (`BasinID`),
-        KEY `Fk_MajorRiver` (`MajorRiverID`),
-        CONSTRAINT `Fk_MajorRiver` FOREIGN KEY (`MajorRiverID`) REFERENCES `Rivers` (`RiverID`) ON DELETE SET NULL ON UPDATE CASCADE
+        PRIMARY KEY (`RegionID`),
+        UNIQUE KEY `RegionID_UNIQUE` (`RegionID`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
     """
-    cursor.execute(basins_query)
+    cursor.execute(regions_query)
+
 
     # Create the Rivers table
     rivers_query = """
@@ -194,12 +207,12 @@ def mysql_setup(config_file):
         `Name` varchar(255) DEFAULT NULL,
         `LengthKm` float DEFAULT NULL COMMENT 'Length of the river in kilometers',
         `WidthM` float DEFAULT NULL COMMENT 'Width in meters',
-        `BasinID` SMALLINT DEFAULT NULL COMMENT 'ID for the basin in which this river lies',
+        `RegionID` SMALLINT DEFAULT NULL COMMENT 'ID for the region in which this river lies',
         `geometry` geometry NOT NULL /*!80003 SRID 4326 */,
         PRIMARY KEY (`RiverID`),
         UNIQUE KEY `RiverID_UNIQUE` (`RiverID`),
-        KEY `Fk_Basin` (`BasinID`),
-        CONSTRAINT `Fk_Basin` FOREIGN KEY (`BasinID`) REFERENCES `Basins` (`BasinID`) ON DELETE SET NULL ON UPDATE CASCADE
+        KEY `Fk_Region` (`RegionID`),
+        CONSTRAINT `Fk_Region` FOREIGN KEY (`RegionID`) REFERENCES `Regions` (`RegionID`) ON DELETE SET NULL ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
     """
     cursor.execute(rivers_query)
@@ -212,7 +225,7 @@ def mysql_setup(config_file):
         `Reservoir` varchar(255) DEFAULT NULL,
         `AltName` varchar(255) DEFAULT NULL,
         `RiverID` MEDIUMINT DEFAULT NULL,
-        `BasinID` SMALLINT DEFAULT NULL,
+        `RegionID` SMALLINT DEFAULT NULL,
         `Country` varchar(255) DEFAULT NULL,
         `Year` year DEFAULT NULL,
         `AreaSqKm` float DEFAULT NULL,
@@ -226,9 +239,9 @@ def mysql_setup(config_file):
         `ReservoirGeometry` polygon /*!80003 SRID 4326 */ DEFAULT NULL COMMENT 'Polygon geometry for the reservoir',
         PRIMARY KEY (`DamID`),
         UNIQUE KEY `DamID_UNIQUE` (`DamID`),
-        KEY `Fk_basin_dams` (`BasinID`),
+        KEY `Fk_regions_dams` (`RegionID`),
         KEY `Fk_river_dams` (`RiverID`),
-        CONSTRAINT `Fk_basin_dams` FOREIGN KEY (`BasinID`) REFERENCES `Basins` (`BasinID`) ON DELETE SET NULL ON UPDATE CASCADE,
+        CONSTRAINT `Fk_regions_dams` FOREIGN KEY (`RegionID`) REFERENCES `Regions` (`RegionID`) ON DELETE SET NULL ON UPDATE CASCADE,
         CONSTRAINT `Fk_river_dams` FOREIGN KEY (`RiverID`) REFERENCES `Rivers` (`RiverID`) ON DELETE SET NULL ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
     """
@@ -315,28 +328,46 @@ def postgresql_setup(config_file):
     # disable all triggers
     cursor.execute("SET session_replication_role = 'replica'")
 
-    # Create the Basins table
-    basins_query = f"""
-    CREATE TABLE IF NOT EXISTS "{schema}"."Basins"
+    # # Create the Basins table
+    # basins_query = f"""
+    # CREATE TABLE IF NOT EXISTS "{schema}"."Basins"
+    # (
+    #     "BasinID" smallint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 32767 CACHE 1 ),
+    #     "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    #     "DrainageAreaSqKm" double precision,
+    #     "MajorRiverID" smallint,
+    #     "geometry" geometry NOT NULL,
+    #     CONSTRAINT "Basins_pkey" PRIMARY KEY ("BasinID"),
+    #     CONSTRAINT "BasinID_UNIQUE" UNIQUE ("BasinID")
+    # )
+
+    # TABLESPACE pg_default;
+
+    # ALTER TABLE IF EXISTS "{schema}"."Basins"
+    #     OWNER to {user};
+
+    # COMMENT ON COLUMN "{schema}"."Basins"."DrainageAreaSqKm"
+    #     IS 'Drainage area of the Basin in square-kilometers';
+    # """
+    # cursor.execute(basins_query)
+
+    # create a regions table
+    regions_query = f"""
+    CREATE TABLE IF NOT EXISTS "{schema}"."Regions"
     (
-        "BasinID" smallint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 32767 CACHE 1 ),
+        "RegionID" smallint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 32767 CACHE 1 ),
         "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
-        "DrainageAreaSqKm" double precision,
-        "MajorRiverID" smallint,
         "geometry" geometry NOT NULL,
-        CONSTRAINT "Basins_pkey" PRIMARY KEY ("BasinID"),
-        CONSTRAINT "BasinID_UNIQUE" UNIQUE ("BasinID")
+        CONSTRAINT "Regions_pkey" PRIMARY KEY ("RegionID"),
+        CONSTRAINT "RegionID_UNIQUE" UNIQUE ("RegionID")
     )
 
     TABLESPACE pg_default;
 
-    ALTER TABLE IF EXISTS "{schema}"."Basins"
+    ALTER TABLE IF EXISTS "{schema}"."Regions"
         OWNER to {user};
-
-    COMMENT ON COLUMN "{schema}"."Basins"."DrainageAreaSqKm"
-        IS 'Drainage area of the Basin in square-kilometers';
     """
-    cursor.execute(basins_query)
+    cursor.execute(regions_query)
 
     # Create the Rivers table
     rivers_query = f"""
@@ -346,12 +377,12 @@ def postgresql_setup(config_file):
         "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
         "LengthKm" double precision,
         "WidthM" double precision,
-        "BasinID" smallint,
+        "RegionID" smallint,
         "geometry" geometry NOT NULL,
         CONSTRAINT "Rivers_pkey" PRIMARY KEY ("RiverID"),
         CONSTRAINT "RiverID_UNIQUE" UNIQUE ("RiverID"),
-        CONSTRAINT "Fk_Basin" FOREIGN KEY ("BasinID")
-            REFERENCES "{schema}"."Basins" ("BasinID") MATCH SIMPLE
+        CONSTRAINT "Fk_Region" FOREIGN KEY ("RegionID")
+            REFERENCES "{schema}"."Regions" ("RegionID") MATCH SIMPLE
             ON UPDATE CASCADE
             ON DELETE SET NULL
             NOT VALID
@@ -368,8 +399,8 @@ def postgresql_setup(config_file):
     COMMENT ON COLUMN "{schema}"."Rivers"."WidthM"
         IS 'Width in meters';
 
-    COMMENT ON COLUMN "{schema}"."Rivers"."BasinID"
-        IS 'ID for the basin in which this river lies';
+    COMMENT ON COLUMN "{schema}"."Rivers"."RegionID"
+        IS 'ID for the Region in which this river lies';
     """
     cursor.execute(rivers_query)
 
@@ -388,19 +419,19 @@ def postgresql_setup(config_file):
     # """
     # )
 
-    cursor.execute(
-        f"""
-        ALTER TABLE "{schema}"."Basins"
-            DROP CONSTRAINT IF EXISTS "Fk_MajorRiver";
+    # cursor.execute(
+    #     f"""
+    #     ALTER TABLE "{schema}"."Basins"
+    #         DROP CONSTRAINT IF EXISTS "Fk_MajorRiver";
 
-        ALTER TABLE "{schema}"."Basins"
-            ADD CONSTRAINT "Fk_MajorRiver" FOREIGN KEY ("MajorRiverID")
-            REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE SET NULL
-            NOT VALID;
-    """
-    )
+    #     ALTER TABLE "{schema}"."Basins"
+    #         ADD CONSTRAINT "Fk_MajorRiver" FOREIGN KEY ("MajorRiverID")
+    #         REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
+    #         ON UPDATE CASCADE
+    #         ON DELETE SET NULL
+    #         NOT VALID;
+    # """
+    # )
 
     # Create the Dams table
     dams_query = f"""
@@ -411,7 +442,7 @@ def postgresql_setup(config_file):
         "Reservoir" character varying(255) COLLATE pg_catalog."default",
         "AltName" character varying(255) COLLATE pg_catalog."default",
         "RiverID" smallint,
-        "BasinID" smallint,
+        "RegionID" smallint,
         "Country" character varying(255) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
         "Year" integer,
         "AreaSqKm" double precision,
@@ -425,8 +456,8 @@ def postgresql_setup(config_file):
         "ReservoirGeometry" geometry,
         CONSTRAINT "Dams_pkey" PRIMARY KEY ("DamID"),
         CONSTRAINT "DamID_UNIQUE" UNIQUE ("DamID"),
-        CONSTRAINT "Fk_basin_dams" FOREIGN KEY ("BasinID")
-            REFERENCES "{schema}"."Basins" ("BasinID") MATCH SIMPLE
+        CONSTRAINT "Fk_region_dams" FOREIGN KEY ("RegionID")
+            REFERENCES "{schema}"."Regions" ("RegionID") MATCH SIMPLE
             ON UPDATE CASCADE
             ON DELETE SET NULL
             NOT VALID,
