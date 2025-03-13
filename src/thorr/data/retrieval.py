@@ -17,10 +17,6 @@ from thorr.utils import read_config, Logger, validate_start_end_dates
 from thorr.database import Connect as db_connect
 
 
-def test_retrieval():
-    print("Retrieving reaches data")
-
-
 def divideDates(startDate, endDate):
     """
     Divide the timeframe into years
