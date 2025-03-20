@@ -620,6 +620,23 @@ def mysql_upload_gis(config_file, gpkg, gpkg_layers):
             cursor.execute(query)
             connection.commit()
 
+    if "regions" in gpkg_layers:
+
+        # print( gpkg, gpkg_layers)
+        regions_gdf = gpd.read_file(gpkg, layer=gpkg_layers["regions"])
+        # print(basins_gdf)
+        srid = regions_gdf.crs.to_epsg()
+
+        for i, region in regions_gdf.iterrows():
+            query = f"""
+                INSERT INTO `{database}`.`Regions` (Name, geometry)
+                SELECT '{region['Name']}', ST_GeomFromText('{region['geometry'].wkt}', {srid}, 'axis-order=long-lat')
+                WHERE NOT EXISTS (SELECT * FROM `{database}`.`Regions` WHERE Name = '{region['Name']}');
+                """
+
+            cursor.execute(query)
+            connection.commit()
+
     if "rivers" in gpkg_layers:
         rivers_gdf = gpd.read_file(gpkg, layer=gpkg_layers["rivers"])
         srid = rivers_gdf.crs.to_epsg()
@@ -636,26 +653,26 @@ def mysql_upload_gis(config_file, gpkg, gpkg_layers):
 
             query2 = f"""
                 UPDATE `{database}`.`Rivers`
-                SET BasinID = (SELECT BasinID FROM Basins WHERE Name = '{river['Basin']}'), LengthKm = {river['LengthKM']}
+                SET RegionID = (SELECT RegionID FROM Regions WHERE Name = '{river['Region']}')
                 WHERE Name = "{river['GNIS_Name']}";
                 """
 
             cursor.execute(query2)
             connection.commit()
 
-        # Update the MajorRiverID column if the river exists in the Rivers table
-        if "basins" in gpkg_layers:
-            basins_gdf = gpd.read_file(gpkg, layer=gpkg_layers["basins"])
+        # # Update the MajorRiverID column if the river exists in the Rivers table
+        # if "basins" in gpkg_layers:
+        #     basins_gdf = gpd.read_file(gpkg, layer=gpkg_layers["basins"])
 
-            for i, basin in basins_gdf.iterrows():
-                query = f"""
-                    UPDATE `{database}`.`Basins`
-                    SET MajorRiverID = (SELECT RiverID FROM Rivers WHERE Name = '{basin['MajorRiver']}')
-                    WHERE Name = '{basin['Name']}';
-                    """
+        #     for i, basin in basins_gdf.iterrows():
+        #         query = f"""
+        #             UPDATE `{database}`.`Basins`
+        #             SET MajorRiverID = (SELECT RiverID FROM Rivers WHERE Name = '{basin['MajorRiver']}')
+        #             WHERE Name = '{basin['Name']}';
+        #             """
 
-            cursor.execute(query)
-            connection.commit()
+        #     cursor.execute(query)
+        #     connection.commit()
 
     if "dams" in gpkg_layers:
         dams_gdf = gpd.read_file(gpkg, layer=gpkg_layers["dams"])
@@ -830,6 +847,25 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
             cursor.execute(query)
             connection.commit()
 
+    
+
+    if "regions" in gpkg_layers:
+
+        # print( gpkg, gpkg_layers)
+        regions_gdf = gpd.read_file(gpkg, layer=gpkg_layers["regions"])
+        # print(basins_gdf)
+        srid = regions_gdf.crs.to_epsg()
+
+        for i, region in regions_gdf.iterrows():
+            query = f"""
+                INSERT INTO "{schema}"."Regions" ("Name", "geometry")
+                SELECT '{region['Name']}', 'SRID={srid};{region['geometry'].wkt}'
+                WHERE NOT EXISTS (SELECT * FROM "{schema}"."Regions" WHERE "Name" = '{region['Name']}')
+                """
+
+            cursor.execute(query)
+            connection.commit()
+
     if "rivers" in gpkg_layers:
         rivers_gdf = gpd.read_file(gpkg, layer=gpkg_layers["rivers"])
         srid = rivers_gdf.crs.to_epsg()
@@ -846,26 +882,26 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
             query2 = f"""
             UPDATE "{schema}"."Rivers"
-            SET "BasinID" = (SELECT "BasinID" FROM "{schema}"."Basins" WHERE "Name" = '{river['Basin']}'), "LengthKm" = {river['LengthKM']}
+            SET "RegionID" = (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['Region']}')
             WHERE "Name" = '{river['GNIS_Name']}'
             """
 
             cursor.execute(query2)
             connection.commit()
 
-        # Update the MajorRiverID column if the river exists in the Rivers table
-        if "basins" in gpkg_layers:
-            basins_gdf = gpd.read_file(gpkg, layer=gpkg_layers["basins"])
+        # # Update the MajorRiverID column if the river exists in the Rivers table
+        # if "basins" in gpkg_layers:
+        #     basins_gdf = gpd.read_file(gpkg, layer=gpkg_layers["basins"])
 
-            for i, basin in basins_gdf.iterrows():
-                query = f"""
-                UPDATE "{schema}"."Basins"
-                SET "MajorRiverID" = (SELECT "RiverID" FROM "{schema}"."Rivers" WHERE "Name" = '{basin['MajorRiver']}')
-                WHERE "Name" = '{basin['Name']}'
-                """
+        #     for i, basin in basins_gdf.iterrows():
+        #         query = f"""
+        #         UPDATE "{schema}"."Basins"
+        #         SET "MajorRiverID" = (SELECT "RiverID" FROM "{schema}"."Rivers" WHERE "Name" = '{basin['MajorRiver']}')
+        #         WHERE "Name" = '{basin['Name']}'
+        #         """
 
-            cursor.execute(query)
-            connection.commit()
+        #     cursor.execute(query)
+        #     connection.commit()
 
     if "dams" in gpkg_layers:
         dams_gdf = gpd.read_file(gpkg, layer=gpkg_layers["dams"])
