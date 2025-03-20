@@ -642,10 +642,17 @@ def mysql_upload_gis(config_file, gpkg, gpkg_layers):
         srid = rivers_gdf.crs.to_epsg()
 
         for i, river in rivers_gdf.iterrows():
+
+            # query = f"""
+            #     INSERT INTO  `{database}`.`Rivers` (Name, LengthKm, geometry)
+            #     SELECT '{river['GNIS_Name']}', {river['LengthKM']}, ST_GeomFromText('{river['geometry'].wkt}', {srid}, 'axis-order=long-lat')
+            #     WHERE NOT EXISTS (SELECT * FROM  `{database}`.`Rivers` WHERE Name = '{river['GNIS_Name']}');
+            #     """
+
             query = f"""
-                INSERT INTO  `{database}`.`Rivers` (Name, LengthKm, geometry)
-                SELECT '{river['GNIS_Name']}', {river['LengthKM']}, ST_GeomFromText('{river['geometry'].wkt}', {srid}, 'axis-order=long-lat')
-                WHERE NOT EXISTS (SELECT * FROM  `{database}`.`Rivers` WHERE Name = '{river['GNIS_Name']}');
+                INSERT INTO  `{database}`.`Rivers` (Name, geometry)
+                SELECT '{river['Name']}', ST_GeomFromText('{river['geometry'].wkt}', {srid}, 'axis-order=long-lat')
+                WHERE NOT EXISTS (SELECT * FROM  `{database}`.`Rivers` WHERE Name = '{river['Name']}');
                 """
 
             cursor.execute(query)
@@ -654,7 +661,7 @@ def mysql_upload_gis(config_file, gpkg, gpkg_layers):
             query2 = f"""
                 UPDATE `{database}`.`Rivers`
                 SET RegionID = (SELECT RegionID FROM Regions WHERE Name = '{river['Region']}')
-                WHERE Name = "{river['GNIS_Name']}";
+                WHERE Name = "{river['Name']}";
                 """
 
             cursor.execute(query2)
@@ -871,10 +878,16 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
         srid = rivers_gdf.crs.to_epsg()
 
         for i, river in rivers_gdf.iterrows():
+            # query = f"""
+            #     INSERT INTO "{schema}"."Rivers" ("Name", "LengthKm", "geometry")
+            #     SELECT '{river['GNIS_Name']}', {river['LengthKM']}, 'SRID={srid};{river['geometry'].wkt}'
+            #     WHERE NOT EXISTS (SELECT * FROM "{schema}"."Rivers" WHERE "Name" = '{river['GNIS_Name']}')
+            #     """
+            
             query = f"""
-                INSERT INTO "{schema}"."Rivers" ("Name", "LengthKm", "geometry")
-                SELECT '{river['GNIS_Name']}', {river['LengthKM']}, 'SRID={srid};{river['geometry'].wkt}'
-                WHERE NOT EXISTS (SELECT * FROM "{schema}"."Rivers" WHERE "Name" = '{river['GNIS_Name']}')
+                INSERT INTO "{schema}"."Rivers" ("Name", "geometry")
+                SELECT '{river['Name']}', 'SRID={srid};{river['geometry'].wkt}'
+                WHERE NOT EXISTS (SELECT * FROM "{schema}"."Rivers" WHERE "Name" = '{river['Name']}')
                 """
 
             cursor.execute(query)
@@ -883,7 +896,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
             query2 = f"""
             UPDATE "{schema}"."Rivers"
             SET "RegionID" = (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['Region']}')
-            WHERE "Name" = '{river['GNIS_Name']}'
+            WHERE "Name" = '{river['Name']}'
             """
 
             cursor.execute(query2)
