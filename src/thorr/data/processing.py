@@ -1,8 +1,10 @@
 import geopandas as gpd
-import fiona
+
+# import fiona
 from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
+import shapely
 from shapely.ops import split, snap
 from shapely.geometry import LineString, Point
 import pandas as pd
@@ -354,3 +356,149 @@ def rivers_to_reaches(
         return reaches, buffered_reaches
     else:
         return
+
+
+def process_sword_reaches_(reaches, rivers, koppen_path):
+    # add river km to the reaches
+    # add a new reach id to the reaches (river name + reach number)
+    # add the koppen classification to the reaches
+    # buffer the reaches by the width of the reach + 120 m
+
+    reach_rivers = reaches["river_name"].unique()
+    koppen_raster = rio.open(koppen_path)
+    reaches = reaches.copy()
+
+    # for reach_river in reach_rivers:
+    #     print(reach_river)
+
+    RKm = []
+    koppen = []
+    buffered_geometry = []
+    reach_id = []
+
+    for i, reach in reaches.iterrows():
+        # print(reach["river_name"])
+        river = rivers[rivers["Name"] == reach["river_name"]].copy()
+        # print(river['geometry'])
+
+        lon_0, lat_0 = (
+            river["geometry"].convex_hull.centroid.x.values[0],
+            river["geometry"].convex_hull.centroid.y.values[0],
+        )
+
+        # define aeqd projection centered on the centroid of the basin
+        projected_crs = f"+proj=aeqd +lat_0={lat_0} +lon_0={lon_0}"
+
+        # reproject the river to the aeqd projection
+        river = river.to_crs(projected_crs)
+        projected_reach = reaches.iloc[[i]].copy()
+        projected_reach = projected_reach.to_crs(projected_crs)
+
+        # find the distance of the reach from the mouth of the river
+        reach_start = shapely.get_point(projected_reach.geometry[i], 0)
+        RKm.append(round(river.project(reach_start).values[0] * 1e-3, 3))
+
+        reprojected_reach = projected_reach.to_crs(koppen_raster.crs)
+
+        koppen_row, koppen_col = koppen_raster.index(
+            reprojected_reach.geometry.centroid.x, reprojected_reach.geometry.centroid.y
+        )
+        koppen.append((koppen_raster.read(1)[koppen_row, koppen_col]))
+
+        # buffer the reach by the width of the reach + 120 m
+        buffered_geometry.append(
+            projected_reach.geometry.buffer(
+                projected_reach["WidthMean"].values[0] / 2 + 120
+            ).geometry.values[0]
+        )
+
+    # print(RKm)
+    # print(koppen)
+    # print(buffered_geometry)
+    reaches["RKm"] = RKm
+    reaches["koppen"] = koppen
+
+    return reaches
+
+
+def process_sword_reaches(reaches, rivers, koppen_path):
+    river_names = reaches["river_name"].unique()
+    koppen_raster = rio.open(koppen_path)
+    print(rivers.crs)
+
+    processed_reaches = pd.DataFrame()
+    processed_buffered_reaches = pd.DataFrame()
+
+    for river_name in river_names:
+        RKm = []
+        koppen = []
+
+        river = rivers[rivers["Name"] == river_name].copy()
+        lat_0, lon_0 = (
+            river["geometry"].convex_hull.centroid.y.values[0],
+            river["geometry"].convex_hull.centroid.x.values[0],
+        )
+        projected_crs = f"+proj=aeqd +lat_0={lat_0} +lon_0={lon_0}"
+        river = river.to_crs(projected_crs)
+        projected_reaches = reaches[reaches["river_name"] == river_name].copy()
+        projected_reaches = projected_reaches.to_crs(projected_crs)
+
+        for i, reach in projected_reaches.iterrows():
+            reach_start, reach_end = (
+                shapely.get_point(reach.geometry, 0),
+                shapely.get_point(reach.geometry, 1),
+            )
+
+            RKm.append(round(river.project(reach_start).values[0] * 1e-3, 3))
+
+        projected_reaches["RKm"] = RKm
+        projected_reaches.fillna({"WidthMean": 30}, inplace=True)
+        buffered_reaches = projected_reaches.copy()
+        buffered_reaches["geometry"] = projected_reaches.geometry.buffer(
+            projected_reaches["WidthMean"] / 2 + 120
+        )
+
+        processed_reaches = gpd.GeoDataFrame(
+            pd.concat(
+                [processed_reaches, projected_reaches.to_crs(4326)], ignore_index=True
+            ),
+            geometry="geometry",
+            crs=4326,
+        )
+        processed_buffered_reaches = gpd.GeoDataFrame(
+            pd.concat(
+                [processed_buffered_reaches, buffered_reaches.to_crs(4326)],
+                ignore_index=True,
+            ),
+            geometry="geometry",
+            crs=4326,
+        )
+
+    # Extract Köppen class for each reach based on centroid and add to reaches_gdf
+    koppen_class = []
+    reprojected_reaches = processed_reaches.to_crs(koppen_raster.crs)
+    for i in range(len(reprojected_reaches)):
+        row = reprojected_reaches.iloc[i]
+        x = row.geometry.centroid.x
+        y = row.geometry.centroid.y
+        row, col = koppen_raster.index(x, y)
+        koppen_class.append(koppen_raster.read(1)[row, col])
+
+    processed_reaches["koppen"] = koppen_class
+    processed_buffered_reaches["koppen"] = koppen_class
+
+    return processed_reaches, processed_buffered_reaches
+
+
+# Example usage:
+
+# gpkg = "data/gis/geopackages/thorr.gpkg"
+# rivers = gpd.read_file(gpkg, layer="Rivers")
+# reaches = gpd.read_file(gpkg, layer="Reaches")
+# koppen_path = "/Users/gdarkwah/Library/CloudStorage/OneDrive-UW/01-Research/01-THORR/data/gis/raw/Beck_KG_V1/Beck_KG_V1_present_0p083.tif"
+
+# reaches, buffered_reaches = process_sword_reaches(reaches, rivers, koppen_path)
+# reaches.to_file(gpkg, layer="Reaches", driver="GPKG", overwrite=True)
+# buffered_reaches.to_file(
+#     gpkg, layer="BufferedReaches", driver="GPKG", overwrite=True
+# )
