@@ -257,7 +257,7 @@ def mysql_setup(config_file):
         `WidthMin` float DEFAULT NULL COMMENT 'Minimum width (meters)',
         `WidthMean` float DEFAULT NULL COMMENT 'Mean width (meters)',
         `WidthMax` float DEFAULT NULL COMMENT 'Maximum width (meters)',
-        `RKm` SMALLINT DEFAULT NULL COMMENT 'Distance from the mouth of the river (km)',
+        `RKm` float DEFAULT NULL COMMENT 'Distance from the mouth of the river (km)',
         `geometry` geometry NOT NULL /*!80003 SRID 4326 */,
         `buffered_geometry` geometry /*!80003 SRID 4326 */ DEFAULT NULL,
         PRIMARY KEY (`ReachID`),
@@ -492,7 +492,7 @@ def postgresql_setup(config_file):
         "WidthMin" double precision,
         "WidthMean" double precision,
         "WidthMax" double precision,
-        "RKm" smallint,
+        "RKm" double precision,
         "geometry" geometry NOT NULL,
         "buffered_geometry" geometry,
         CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
@@ -767,10 +767,10 @@ def mysql_upload_gis(config_file, gpkg, gpkg_layers):
             cursor.execute(query2)
             connection.commit()
 
-            # Update the BasinID column if the basin exists in the Basins table
+            # Update the RegionID column if the basin exists in the Basins table
             query3 = f"""
             UPDATE `{database}`.`Dams`
-            SET BasinID = (SELECT BasinID FROM `{database}`.`Basins` WHERE Name = 'Columbia River Basin')
+            SET RegionID = (SELECT RegionID FROM `{database}`.`Regions` WHERE Name = 'Columbia River Basin')
             WHERE Name = '{str(dam['DAM_NAME']).replace("'", "''")}';
             """
 
@@ -802,8 +802,8 @@ def mysql_upload_gis(config_file, gpkg, gpkg_layers):
 
             query = f"""
                 INSERT INTO `{database}`.`Reaches` (Name, RiverID, ClimateClass, WidthMin, WidthMean, WidthMax, RKm, geometry)
-                SELECT "{reach['reach_id']}",(SELECT RiverID FROM Rivers WHERE Name = '{reach['GNIS_Name']}'), {reach['koppen']}, NULLIF("{str(reach['WidthMin'])}",'nan'), NULLIF("{str(reach['WidthMean'])}",'nan'), NULLIF("{str(reach['WidthMax'])}",'nan'), NULLIF("{str(reach['RKm'])}",'nan'), ST_GeomFromText('{reach['geometry'].wkt}', {srid}, 'axis-order=long-lat')
-                WHERE NOT EXISTS (SELECT * FROM `{database}`.`Reaches` WHERE Name = "{reach['reach_id']}");
+                SELECT "{reach['Name']}",(SELECT RiverID FROM Rivers WHERE Name = '{reach['river_name']}'), {reach['koppen']}, NULLIF("{str(reach['WidthMin'])}",'nan'), NULLIF("{str(reach['WidthMean'])}",'nan'), NULLIF("{str(reach['WidthMax'])}",'nan'), NULLIF("{str(reach['RKm'])}",'nan'), ST_GeomFromText('{reach['geometry'].wkt}', {srid}, 'axis-order=long-lat')
+                WHERE NOT EXISTS (SELECT * FROM `{database}`.`Reaches` WHERE Name = "{reach['Name']}");
                 """
 
             cursor.execute(query)
@@ -819,7 +819,7 @@ def mysql_upload_gis(config_file, gpkg, gpkg_layers):
                 query = f"""
                     UPDATE `{database}`.`Reaches`
                     SET buffered_geometry = ST_GeomFromText('{buffered_reach['geometry'].wkt}', {srid}, 'axis-order=long-lat')
-                    WHERE Name = '{buffered_reach['reach_id']}';
+                    WHERE Name = '{buffered_reach['Name']}';
                     """
 
                 cursor.execute(query)
@@ -1005,7 +1005,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
             # Update the BasinID column if the basin exists in the Basins table
             query3 = f"""
             UPDATE "{schema}"."Dams"
-            SET "BasinID" = (SELECT "BasinID" FROM "{schema}"."Basins" WHERE "Name" = 'Columbia River Basin')
+            SET "RegionID" = (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = 'Columbia River Basin')
             WHERE "Name" = '{str(dam['DAM_NAME']).replace("'", "''")}'
             """
 
@@ -1037,8 +1037,8 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
             query = f"""
                 INSERT INTO "{schema}"."Reaches" ("Name", "RiverID", "ClimateClass", "WidthMin", "WidthMean", "WidthMax", "RKm", "geometry")
-                SELECT '{reach['reach_id']}', (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = '{reach['GNIS_Name']}'), {reach['koppen']}, CAST(NULLIF('{str(reach['WidthMin'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMean'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMax'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['RKm'])}','NaN') AS double precision), 'SRID={srid};{reach['geometry'].wkt}'
-                WHERE NOT EXISTS (SELECT * FROM {schema}."Reaches" WHERE "Name" = '{reach['reach_id']}')
+                SELECT '{reach['Name']}', (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = '{reach['river_name']}'), {reach['koppen']}, CAST(NULLIF('{str(reach['WidthMin'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMean'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMax'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['RKm'])}','NaN') AS double precision), 'SRID={srid};{reach['geometry'].wkt}'
+                WHERE NOT EXISTS (SELECT * FROM {schema}."Reaches" WHERE "Name" = '{reach['Name']}')
                 """
 
             cursor.execute(query)
@@ -1054,7 +1054,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
                 query = f"""
                     UPDATE "{schema}"."Reaches"
                     SET "buffered_geometry" = 'SRID={srid};{buffered_reach['geometry'].wkt}'
-                    WHERE "Name" = '{buffered_reach['reach_id']}'
+                    WHERE "Name" = '{buffered_reach['Name']}'
                     """
 
                 cursor.execute(query)
