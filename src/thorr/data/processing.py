@@ -424,10 +424,33 @@ def process_sword_reaches(reaches, rivers, koppen_path):
     processed_reaches["koppen"] = koppen_class
     processed_buffered_reaches["koppen"] = koppen_class
 
+    # sort the processed_reaches by RKm and river_name
+    processed_reaches.sort_values(
+        by=["river_name", "RKm"], ascending=[True, True], inplace=True
+    )
+    processed_buffered_reaches.sort_values(
+        by=["river_name", "RKm"], ascending=[True, True], inplace=True
+    )
+    # assign unique reach id (Name) to the reaches
+    # unique id = river_name [join with _] + "_" + rank of rkm
+    processed_reaches["Name"] = (
+        # join the spaces in the river name with "_" and add the rank of the reach
+        processed_reaches["river_name"].str.replace(" ", "_")
+        + "_"
+        + (processed_reaches.groupby("river_name").cumcount() + 1).astype(str)
+    )
+    
+    processed_buffered_reaches["Name"] = (
+        processed_buffered_reaches["river_name"].str.replace(" ", "_")
+        + "_"
+        + (processed_buffered_reaches.groupby("river_name").cumcount() + 1).astype(str)
+    )
+    # print(processed_reaches["Name"])
+
     return processed_reaches, processed_buffered_reaches
 
 
-# Example usage:
+# # Example usage:
 
 # gpkg = "data/gis/geopackages/thorr.gpkg"
 # rivers = gpd.read_file(gpkg, layer="Rivers")
@@ -436,6 +459,4 @@ def process_sword_reaches(reaches, rivers, koppen_path):
 
 # reaches, buffered_reaches = process_sword_reaches(reaches, rivers, koppen_path)
 # reaches.to_file(gpkg, layer="Reaches", driver="GPKG", overwrite=True)
-# buffered_reaches.to_file(
-#     gpkg, layer="BufferedReaches", driver="GPKG", overwrite=True
-# )
+# buffered_reaches.to_file(gpkg, layer="BufferedReaches", driver="GPKG", overwrite=True)
