@@ -7,7 +7,7 @@ from thorr.data import retrieval
 
 from pathlib import Path
 
-app = typer.Typer(rich_markup_mode=None)
+app = typer.Typer(rich_markup_mode=None, pretty_exceptions_show_locals=False)
 
 
 @app.command()
