@@ -7,7 +7,11 @@ from thorr.data import retrieval
 
 from pathlib import Path
 
-app = typer.Typer(rich_markup_mode=None, pretty_exceptions_show_locals=False, pretty_exceptions_enable=False)
+app = typer.Typer(
+    rich_markup_mode=None,
+    pretty_exceptions_show_locals=False,
+    pretty_exceptions_enable=False,
+)
 
 
 @app.command()
@@ -32,7 +36,7 @@ def get_thorr_data(
     # download the gis data
     download_data(gis_url, gis_file_Path, region)
 
-    print("Data downloaded successfully")
+    # print("Data downloaded successfully")
 
 
 @app.command()
@@ -49,18 +53,26 @@ def database_setup(
 
 @app.command()
 def retrieve_data(
-    config_path: Annotated[str, typer.Argument(help="Path to the configuration file")], element_type: Annotated[str, typer.Option(help="Type of element to retrieve (reaches or reservoirs)")]="reaches"
+    config_path: Annotated[str, typer.Argument(help="Path to the configuration file")],
+    element_type: Annotated[
+        str, typer.Option(help="Type of element to retrieve (reaches or reservoirs)")
+    ] = "reaches",
 ):
     retrieval.retrieve(config_path, element_type)
 
+
 @app.command()
 def estimate_temperature(
-    config_path: Annotated[str, typer.Argument(help="Path to the configuration file")], element_type: Annotated[str, typer.Option(help="Type of element to retrieve (reaches or reservoirs)")]="reaches"
+    config_path: Annotated[str, typer.Argument(help="Path to the configuration file")],
+    element_type: Annotated[
+        str, typer.Option(help="Type of element to retrieve (reaches or reservoirs)")
+    ] = "reaches",
 ):
     if element_type == "reaches":
         est_temp_reaches(config_path, element_type)
     elif element_type == "reservoirs":
         est_temp_reservoirs(config_path, element_type)
+
 
 @app.command()
 def new_project(
