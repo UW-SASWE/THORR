@@ -41,7 +41,7 @@ def create_config_file(proj_dir, config_filepath: Path, name=None, region=None) 
             "ml_model": f"data/ml_model/{region}_ml.joblib",
         },
         "data.geopackage_layers": {
-            "basins": "Basins",
+            "regions": "Regions",
             "rivers": "Rivers",
             "dams": "Dams",
             "reservoirs": "Reservoirs",
