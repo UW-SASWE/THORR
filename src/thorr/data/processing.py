@@ -358,69 +358,6 @@ def rivers_to_reaches(
         return
 
 
-def process_sword_reaches_(reaches, rivers, koppen_path):
-    # add river km to the reaches
-    # add a new reach id to the reaches (river name + reach number)
-    # add the koppen classification to the reaches
-    # buffer the reaches by the width of the reach + 120 m
-
-    reach_rivers = reaches["river_name"].unique()
-    koppen_raster = rio.open(koppen_path)
-    reaches = reaches.copy()
-
-    # for reach_river in reach_rivers:
-    #     print(reach_river)
-
-    RKm = []
-    koppen = []
-    buffered_geometry = []
-    reach_id = []
-
-    for i, reach in reaches.iterrows():
-        # print(reach["river_name"])
-        river = rivers[rivers["Name"] == reach["river_name"]].copy()
-        # print(river['geometry'])
-
-        lon_0, lat_0 = (
-            river["geometry"].convex_hull.centroid.x.values[0],
-            river["geometry"].convex_hull.centroid.y.values[0],
-        )
-
-        # define aeqd projection centered on the centroid of the basin
-        projected_crs = f"+proj=aeqd +lat_0={lat_0} +lon_0={lon_0}"
-
-        # reproject the river to the aeqd projection
-        river = river.to_crs(projected_crs)
-        projected_reach = reaches.iloc[[i]].copy()
-        projected_reach = projected_reach.to_crs(projected_crs)
-
-        # find the distance of the reach from the mouth of the river
-        reach_start = shapely.get_point(projected_reach.geometry[i], 0)
-        RKm.append(round(river.project(reach_start).values[0] * 1e-3, 3))
-
-        reprojected_reach = projected_reach.to_crs(koppen_raster.crs)
-
-        koppen_row, koppen_col = koppen_raster.index(
-            reprojected_reach.geometry.centroid.x, reprojected_reach.geometry.centroid.y
-        )
-        koppen.append((koppen_raster.read(1)[koppen_row, koppen_col]))
-
-        # buffer the reach by the width of the reach + 120 m
-        buffered_geometry.append(
-            projected_reach.geometry.buffer(
-                projected_reach["WidthMean"].values[0] / 2 + 120
-            ).geometry.values[0]
-        )
-
-    # print(RKm)
-    # print(koppen)
-    # print(buffered_geometry)
-    reaches["RKm"] = RKm
-    reaches["koppen"] = koppen
-
-    return reaches
-
-
 def process_sword_reaches(reaches, rivers, koppen_path):
     river_names = reaches["river_name"].unique()
     koppen_raster = rio.open(koppen_path)
