@@ -13,170 +13,8 @@ from random import randint
 import json
 import datetime
 
-
-from thorr.utils import config as cfg
-from thorr.utils import database
-from thorr.utils import logger
-
-# TODO: use the utils package to read the configuration file
-from configparser import ConfigParser
-
-
-def read_config(config_path, required_sections=[]):
-    """
-    Read configuration file
-
-    Parameters:
-    -----------
-    config_path: str
-        path to configuration file
-    required_sections: list
-        list of required sections in the configuration file
-
-    Returns:
-    --------
-    dict
-        dictionary of configuration parameters
-    """
-
-    config = ConfigParser()
-    config.read(config_path)
-
-    if required_sections:
-        for section in required_sections:
-            if section not in config.sections():
-                raise Exception(
-                    f"Section {section} not found in the {config_path} file"
-                )
-        # create a dictionary of parameters
-        config_dict = {
-            section: dict(config.items(section)) for section in required_sections
-        }
-    else:
-        config_dict = {
-            section: dict(config.items(section)) for section in config.sections()
-        }
-
-    return config_dict
-
-
-# import connect
-# TODO: convert this to a function in the utils package
-def get_db_connection(package_dir, db_config_path, logger=None, return_conn=False):
-    utils = str(package_dir / "utils")
-    sys.path.insert(0, utils)
-    from sql import connect  # utility functions for connecting to MySQL
-
-    conn = connect.Connect(Path(db_config_path), logger=logger)
-    connection = conn.conn
-
-    if return_conn:
-        return conn
-    else:
-        return connection
-
-
-def get_logger(
-    package_dir,
-    project_title,
-    log_dir,
-    logger_format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-):
-    utils = str(package_dir / "utils")
-    sys.path.insert(0, utils)
-    import logger
-
-    logger = logger.Logger(
-        project_title=project_title, log_dir=log_dir, logger_format=logger_format
-    ).get_logger()
-
-    return logger
-
-
-def validate_start_end_dates(start_date, end_date, logger=None):
-    """
-    Validate start and end dates
-
-    Parameters:
-    -----------
-    start_date: str
-        start date
-    end_date: str
-        end date
-
-    Returns:
-    --------
-    tuple
-        start and end dates
-    """
-
-    # get today's date
-    today = datetime.datetime.today()
-
-    # convert start and end dates to datetime objects
-    if end_date is None:
-        end_date_ = today
-        if logger is not None:
-            logger.info(f"End date is set to {end_date_}")
-        else:
-            print(f"End date is set to {end_date_}")
-    else:
-        end_date_ = datetime.datetime.strptime(end_date, "%Y-%m-%d")
-        if end_date_ > today:
-            end_date_ = today
-            if logger is not None:
-                logger.info(f"End date is set to {end_date_}")
-            else:
-                print(f"End date is set to {end_date_}")
-
-    if start_date is None:
-        start_date_ = end_date_ - datetime.timedelta(days=90)
-        if logger is not None:
-            logger.info(f"Start date is set to {start_date_}")
-        else:
-            print(f"Start date is set to {start_date_}")
-    else:
-        start_date_ = datetime.datetime.strptime(start_date, "%Y-%m-%d")
-
-    # check if start date is greater than end date
-    if start_date_ > end_date_:
-        start_date_ = end_date_ - datetime.timedelta(days=90)
-        if logger is not None:
-            logger.info(f"Start date is set to {start_date_}")
-        else:
-            print(f"Start date is set to {start_date_}")
-        # raise Exception("Start date cannot be greater than end date!")
-
-    # check if start date is greater than today's date
-    if start_date_ > today:
-        if logger is not None:
-            logger.error("Start date cannot be greater than today's date!")
-        else:
-            print("Start date cannot be greater than today's date!")
-        raise Exception("Start date cannot be greater than today's date!")
-
-    # check if end date is greater than today's date
-    if end_date_ > today:
-        if logger is not None:
-            logger.error("End date cannot be greater than today's date!")
-        else:
-            print("End date cannot be greater than today's date!")
-        raise Exception("End date cannot be greater than today's date!")
-
-    # convert the start date to the first day of the month
-    start_date_ = start_date_.replace(day=1)
-
-    # convert the end date to the last day of the month
-    first_day_of_next_month = end_date_.replace(day=28) + datetime.timedelta(days=4)
-    end_date_ = first_day_of_next_month - datetime.timedelta(
-        days=first_day_of_next_month.day
-    )
-
-    # format dates as strings
-    start_date = start_date_.strftime("%Y-%m-%d")
-    end_date = end_date_.strftime("%Y-%m-%d")
-
-    return start_date, end_date
+from thorr.utils import read_config, Logger, validate_start_end_dates
+from thorr.database import Connect as db_connect
 
 
 def divideDates(startDate, endDate):
@@ -350,7 +188,7 @@ def extractTempSeries(
     # ndwi_threshold=0.2,
     imageCollection="LANDSAT/LC08/C02/T1_L2",
     logger=None,
-    element_type="dam"
+    element_type="dam",
 ):
     """
     Extract temperature time series for a reservoir
@@ -677,7 +515,6 @@ def entryToDB(
     # data = data[data[value_col] != -9999]
     data = data.sort_values(by=entry_key["Date"])
 
-
     connection = db.connection
     cursor = connection.cursor()
 
@@ -746,7 +583,7 @@ def entryToDB(
                 # print(query)
                 cursor.execute(query)
                 connection.commit()
-        
+
 
 def damwiseExtraction(
     dams,
@@ -811,7 +648,7 @@ def damwiseExtraction(
                     # ndwi_threshold,
                     imageCollection,
                     logger,
-                    "dam"
+                    "dam",
                 )
             case (
                 "LANDSAT/LT04/C02/T1_L2"
@@ -825,11 +662,11 @@ def damwiseExtraction(
                     # ndwi_threshold,
                     imageCollection,
                     logger,
-                    "dam"
+                    "dam",
                 )
             case _:
                 pass
-        
+
         # print("Breakpoint damwise 2")
         # dataSeries = extractTempSeries(
         #     reach,
@@ -839,7 +676,9 @@ def damwiseExtraction(
         #     imageCollection,
         # )
         # if dataSeries is not None:
-        if dataSeries.size().getInfo(): # truthy check to see if the dataSeries is not empty
+        if (
+            dataSeries.size().getInfo()
+        ):  # truthy check to see if the dataSeries is not empty
             # print(dataSeries.size().getInfo())
             dataSeries = geemap.ee_to_df(dataSeries)
         else:
@@ -963,6 +802,7 @@ def damwiseExtraction(
         db_type=db_type,
     )
 
+
 def reachwiseExtraction(
     reaches,
     reach_id,
@@ -1026,7 +866,7 @@ def reachwiseExtraction(
                     # ndwi_threshold,
                     imageCollection,
                     logger,
-                    "reach"
+                    "reach",
                 )
             case (
                 "LANDSAT/LT04/C02/T1_L2"
@@ -1040,11 +880,11 @@ def reachwiseExtraction(
                     # ndwi_threshold,
                     imageCollection,
                     logger,
-                    "reach"
+                    "reach",
                 )
             case _:
                 pass
-        
+
         # print("Breakpoint damwise 2")
         # dataSeries = extractTempSeries(
         #     reach,
@@ -1054,7 +894,9 @@ def reachwiseExtraction(
         #     imageCollection,
         # )
         # if dataSeries is not None:
-        if dataSeries.size().getInfo(): # truthy check to see if the dataSeries is not empty
+        if (
+            dataSeries.size().getInfo()
+        ):  # truthy check to see if the dataSeries is not empty
             # print(dataSeries.size().getInfo())
             dataSeries = geemap.ee_to_df(dataSeries)
         else:
@@ -1202,7 +1044,7 @@ def runReservoirExtraction(
     dam_ids = reservoirs_gdf["dam_id"].tolist()
     dam_names = reservoirs_gdf["DAM_NAME"].tolist()
     dam_ids = dam_ids[checkpoint["reservoir_index"] :]
-    
+
     dams = geemap.shp_to_ee(data_dir / "reservoirs" / "reservoirs.shp")
     # if reach_ids is None:
     #     ee_reach_ids = reaches.select("reach_id", retainGeometry=False).getInfo()
@@ -1371,6 +1213,7 @@ def runReservoirExtraction(
         else:
             print(f"{dam_name} done!")
 
+
 def runReachExtraction(
     data_dir,
     rivers,
@@ -1383,13 +1226,13 @@ def runReachExtraction(
     # connection=None,
     logger=None,
 ):
-    
+
     if checkpoint_path is None:
         checkpoint = {"river_index": 0, "reach_index": 0}
     else:
         with open(checkpoint_path, "r") as f:
             checkpoint = json.load(f)
-    
+
     unique_rivers = rivers[checkpoint["river_index"] :]
 
     for river in unique_rivers:
@@ -1410,7 +1253,7 @@ def runReachExtraction(
                 checkpoint["reach_index"] :
             ]
             # reach_ids = gdf["reach_id"].tolist()
-            
+
         for reach_id in reach_ids:
             # Landsat9 Data
             if datetime.datetime.strptime(
@@ -1442,9 +1285,9 @@ def runReachExtraction(
                 end_date, "%Y-%m-%d"
             ) >= datetime.datetime.strptime("2013-03-01", "%Y-%m-%d"):
                 # print("Landsat8")
-                    reachwiseExtraction(
-                        reaches,
-                        reach_id,
+                reachwiseExtraction(
+                    reaches,
+                    reach_id,
                     # dam_name,
                     max(
                         datetime.datetime.strptime(start_date, "%Y-%m-%d"),
@@ -1474,9 +1317,9 @@ def runReachExtraction(
                 "1999-05-01", "%Y-%m-%d"
             ):
                 # print("Landsat7")
-                        reachwiseExtraction(
-                            reaches,
-                            reach_id,
+                reachwiseExtraction(
+                    reaches,
+                    reach_id,
                     # dam_name,
                     max(
                         datetime.datetime.strptime(start_date, "%Y-%m-%d"),
@@ -1495,8 +1338,8 @@ def runReachExtraction(
                     logger=logger,
                 )
 
-        # Landsat5 Data
-        # if datetime.datetime.strptime(start_date, "%Y-%m-%d") >= datetime.datetime.strptime("1984-03-01", "%Y-%m-%d") and datetime.datetime.strptime(end_date, "%Y-%m-%d") <= datetime.datetime.strptime("2012-05-31", "%Y-%m-%d"):
+            # Landsat5 Data
+            # if datetime.datetime.strptime(start_date, "%Y-%m-%d") >= datetime.datetime.strptime("1984-03-01", "%Y-%m-%d") and datetime.datetime.strptime(end_date, "%Y-%m-%d") <= datetime.datetime.strptime("2012-05-31", "%Y-%m-%d"):
             if datetime.datetime.strptime(
                 start_date, "%Y-%m-%d"
             ) < datetime.datetime.strptime(
@@ -1507,9 +1350,9 @@ def runReachExtraction(
                 "1984-03-01", "%Y-%m-%d"
             ):
                 # print("Landsat5")
-                    reachwiseExtraction(
-                        reaches,
-                        reach_id,
+                reachwiseExtraction(
+                    reaches,
+                    reach_id,
                     # dam_name,
                     max(
                         datetime.datetime.strptime(start_date, "%Y-%m-%d"),
@@ -1540,9 +1383,9 @@ def runReachExtraction(
                 "1982-08-01", "%Y-%m-%d"
             ):
                 # print("Landsat4")
-                    reachwiseExtraction(
-                        reaches,
-                        reach_id,
+                reachwiseExtraction(
+                    reaches,
+                    reach_id,
                     # dam_name,
                     max(
                         datetime.datetime.strptime(start_date, "%Y-%m-%d"),
@@ -1593,7 +1436,9 @@ def fetch_reservoir_gdf(db, db_type="postgresql"):
         connection = db.connection
         cursor = connection.cursor()
         cursor.execute(query)
-        reservoirs_gdf = pd.DataFrame(cursor.fetchall(), columns=["dam_id", "DAM_NAME", "geometry", "srid"])
+        reservoirs_gdf = pd.DataFrame(
+            cursor.fetchall(), columns=["dam_id", "DAM_NAME", "geometry", "srid"]
+        )
         reservoirs_gdf["geometry"] = gpd.GeoSeries.from_wkb(reservoirs_gdf["geometry"])
         reservoirs_gdf = gpd.GeoDataFrame(reservoirs_gdf, geometry="geometry")
         reservoirs_gdf = reservoirs_gdf.set_crs(epsg=reservoirs_gdf["srid"].iloc[0])
@@ -1611,12 +1456,15 @@ def fetch_reservoir_gdf(db, db_type="postgresql"):
         connection = db.connection
         cursor = connection.cursor()
         cursor.execute(query)
-        reservoirs_gdf = pd.DataFrame(cursor.fetchall(), columns=["dam_id", "DAM_NAME", "geometry"])
+        reservoirs_gdf = pd.DataFrame(
+            cursor.fetchall(), columns=["dam_id", "DAM_NAME", "geometry"]
+        )
         reservoirs_gdf["geometry"] = gpd.GeoSeries.from_wkt(reservoirs_gdf["geometry"])
         reservoirs_gdf = gpd.GeoDataFrame(reservoirs_gdf, geometry="geometry")
         reservoirs_gdf = reservoirs_gdf.set_crs(epsg=reservoirs_gdf["srid"].iloc[0])
 
     return reservoirs_gdf
+
 
 def fetch_reach_gdf(db, db_type="postgresql"):
     if db_type == "postgresql":
@@ -1636,7 +1484,10 @@ def fetch_reach_gdf(db, db_type="postgresql"):
         connection = db.connection
         cursor = connection.cursor()
         cursor.execute(query)
-        reaches_gdf = pd.DataFrame(cursor.fetchall(), columns=["reach_id", "reach_name", "river_id", "geometry", "srid"])
+        reaches_gdf = pd.DataFrame(
+            cursor.fetchall(),
+            columns=["reach_id", "reach_name", "river_id", "geometry", "srid"],
+        )
         reaches_gdf["geometry"] = gpd.GeoSeries.from_wkb(reaches_gdf["geometry"])
         reaches_gdf = gpd.GeoDataFrame(reaches_gdf, geometry="geometry")
         reaches_gdf = reaches_gdf.set_crs(epsg=reaches_gdf["srid"].iloc[0])
@@ -1657,7 +1508,10 @@ def fetch_reach_gdf(db, db_type="postgresql"):
         connection = db.connection
         cursor = connection.cursor()
         cursor.execute(query)
-        reaches_gdf = pd.DataFrame(cursor.fetchall(), columns=["reach_id", "reach_name", "river_id", "geometry", "srid"])
+        reaches_gdf = pd.DataFrame(
+            cursor.fetchall(),
+            columns=["reach_id", "reach_name", "river_id", "geometry", "srid"],
+        )
         reaches_gdf["geometry"] = gpd.GeoSeries.from_wkt(reaches_gdf["geometry"])
         reaches_gdf = gpd.GeoDataFrame(reaches_gdf, geometry="geometry")
         reaches_gdf = reaches_gdf.set_crs(epsg=reaches_gdf["srid"].iloc[0])
@@ -1769,6 +1623,7 @@ def get_reservoir_data(
 
     # # print("Test okay")
 
+
 def get_reach_data(
     db,
     db_type,
@@ -1794,7 +1649,6 @@ def get_reach_data(
     # reaches = reaches_gdf["reach_name"].to_list()
 
     rivers = reaches_gdf["river_id"].unique()
-
 
     try:
         with open(data_dir / "reaches" / "checkpoint.json", "r") as f:
@@ -1855,9 +1709,7 @@ def get_reach_data(
             # if repeated_tries > 3, increment river_index and reset reach_index
             if repeated_tries > 5:
                 checkpoint["reach_index"] += 1
-                current_river = rivers[
-                    checkpoint["river_index"]
-                ]
+                current_river = rivers[checkpoint["river_index"]]
                 if checkpoint["reach_index"] >= len(
                     reaches_gdf[reaches_gdf["river_id"] == current_river][
                         "reach_id"
@@ -1887,33 +1739,34 @@ def get_reach_data(
     else:
         print("All done!")
 
-    # print("Test okay")
 
-# function to initialize the retrieval process
-def init_retrieval(config, db_type="mysql", element="reach"):
-    config_path = Path(config)
-    config_dict = cfg.read_config(
-        config_path,
-        # required_sections=["project", "mysql", "data", "ee"]
-    )
+def retrieve(config_path, element_type="reaches"):
 
-    project_dir = Path(config_dict["project"]["project_dir"])
-    db_config_path = project_dir / config_dict[db_type]["db_config_path"]
+    config_dict = read_config(Path(config_path))
 
+    proj_dir = Path(config_dict["project"]["project_dir"])
     ee_credentials = {
         "service_account": config_dict["ee"]["service_account"],
         "private_key_path": config_dict["ee"]["private_key_path"],
     }
 
-    log = logger.Logger(
-        project_title=config_dict["project"]["title"], log_dir="tests"
+    log = Logger(
+        project_title=config_dict["project"]["name"],
+        logger_format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        log_dir=Path(proj_dir / "logs"),
     ).get_logger()
 
-    db = database.Connect(db_config_path, db_type=db_type)
+    db_type = config_dict["database"]["type"].lower()
+    db = db_connect(config_path, logger=log, db_type=db_type)
 
-    data_dir = Path(project_dir, "Data/GEE")
-    os.makedirs(data_dir / "reservoirs", exist_ok=True)
-    os.makedirs(data_dir / "reaches", exist_ok=True)
+    data_dir = proj_dir / "data" / "GEE"
+
+    if element_type == "reaches":
+        reaches_dir = data_dir / "reaches"
+        reaches_dir.mkdir(parents=True, exist_ok=True)
+    elif element_type == "reservoirs":
+        reservoirs_dir = data_dir / "reservoirs"
+        reservoirs_dir.mkdir(parents=True, exist_ok=True)
 
     # get start date from config file
     if (
@@ -1936,49 +1789,16 @@ def init_retrieval(config, db_type="mysql", element="reach"):
     # validate start and end dates
     start_date, end_date = validate_start_end_dates(start_date, end_date, logger=log)
 
-    if element == "reach":
+    if element_type == "reaches":
         get_reach_data(
-            db, db_type, data_dir, ee_credentials, start_date, end_date, logger=log)
+            db, db_type, data_dir, ee_credentials, start_date, end_date, logger=log
+        )
+        # print("Retrieving reaches data")
         # pass
-    elif element == "reservoir":
+    elif element_type == "reservoirs":
         get_reservoir_data(
-            db, db_type, data_dir, ee_credentials, start_date, end_date, logger=log)
-        # pass
+            db, db_type, data_dir, ee_credentials, start_date, end_date, logger=log
+        )
+        # print("Retrieving reservoirs data")
 
-    
-
-    # get_reservoir_data(
-    #     reservoirs_shp=reservoirs_shp,
-    #     data_dir=data_dir,
-    #     ee_credentials=ee_credentials,
-    #     connection=connection,
-    #     start_date=start_date,
-    #     end_date=end_date,
-    #     logger=logger,
-    #     # temperature_gauges_shp=temperature_gauges_shp,
-    #     # startDate=startDate,
-    #     # endDate=endDate,
-    #     # ndwi_threshold=ndwi_threshold,
-    #     # imageCollection=imageCollection,
-    # )
-
-def main(args):
-    config_path = Path(args.config)
-    db_type = args.db_type
-    init_retrieval(config_path, db_type=db_type, element=args.element)
-    pass
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-c", "--config", type=str, help="path to config file", required=True
-    )
-    parser.add_argument(
-        "-db", "--db_type", default="mysql", type=str, help="type of database: either 'mysql' or 'postgresql'", required=False
-    )
-    parser.add_argument(
-        "-e", "--element", type=str, default="reach", help="element to retrieve data for: reach or reservoir", required=False
-    )
-
-    main(args=parser.parse_args())
+    # print(proj_dir, ee_credentials)
