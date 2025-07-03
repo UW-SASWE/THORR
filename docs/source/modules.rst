@@ -32,6 +32,20 @@ Create the database tables required by THORR to store project data. The database
 
     .. program-output:: python -m thorr database-setup --help
 
+.. _retrieve-data:
+``thorr retrieve-data``
+~~~~~~~~~~~~~~~~~~~~~~~
+Retrieve satellite data from Google Earth Engine (GEE) and save it to a specified database. 
+
+    .. program-output:: python -m thorr retrieve-data --help
+
+.. _estimate-temperature:
+``thorr estimate-temperature``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Estimate water temperature using a trained machine learning model.
+
+    .. program-output:: python -m thorr estimate-temperature --help
+
 
 .. Satellite Data Retrieval
 .. ------------------------
