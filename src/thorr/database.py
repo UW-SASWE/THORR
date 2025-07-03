@@ -511,6 +511,36 @@ def postgresql_setup(config_file):
     """
     cursor.execute(reaches_query)
 
+    # create the Nodes table
+    nodes_query = f"""
+    CREATE TABLE IF NOT EXISTS "{schema}"."Nodes"
+    (
+        "NodeID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+        "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
+        "ReachID" integer,
+        "ClimateClass" smallint,
+        "WidthMin" double precision,
+        "WidthMean" double precision,
+        "WidthMax" double precision,
+        "RKm" double precision,
+        "geometry" geometry NOT NULL,
+        "buffered_geometry" geometry,
+        CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
+        CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
+        CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
+            REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE
+            NOT VALID
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS "{schema}"."Reaches"
+        OWNER to {user};
+    """
+    cursor.execute(reaches_query)
+
     # Create the DamData table
     dam_data_query = f"""
     CREATE TABLE IF NOT EXISTS "{schema}"."DamData"
@@ -570,6 +600,295 @@ def postgresql_setup(config_file):
     connection.commit()
 
     pass
+
+
+# function to set up postgresql database
+def postgresql_setup_new(config_file):
+    db = Connect(config_file, db_type="postgresql")
+    user = db.user
+    schema = db.schema
+    connection = db.connection
+    cursor = connection.cursor()
+
+    # enable postgis extension
+    cursor.execute("CREATE EXTENSION IF NOT EXISTS postgis")
+
+    # Create database if it doesn't exist
+    cursor.execute(
+        f"""CREATE SCHEMA IF NOT EXISTS {schema}
+    AUTHORIZATION {user};"""
+    )
+
+    # disable all triggers
+    cursor.execute("SET session_replication_role = 'replica'")
+
+    # # Create the Basins table
+    # basins_query = f"""
+    # CREATE TABLE IF NOT EXISTS "{schema}"."Basins"
+    # (
+    #     "BasinID" smallint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 32767 CACHE 1 ),
+    #     "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    #     "DrainageAreaSqKm" double precision,
+    #     "MajorRiverID" smallint,
+    #     "geometry" geometry NOT NULL,
+    #     CONSTRAINT "Basins_pkey" PRIMARY KEY ("BasinID"),
+    #     CONSTRAINT "BasinID_UNIQUE" UNIQUE ("BasinID")
+    # )
+
+    # TABLESPACE pg_default;
+
+    # ALTER TABLE IF EXISTS "{schema}"."Basins"
+    #     OWNER to {user};
+
+    # COMMENT ON COLUMN "{schema}"."Basins"."DrainageAreaSqKm"
+    #     IS 'Drainage area of the Basin in square-kilometers';
+    # """
+    # cursor.execute(basins_query)
+
+    # create a regions table
+    regions_query = f"""
+    CREATE TABLE IF NOT EXISTS "{schema}"."Regions"
+    (
+        region_id smallint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 32767 CACHE 1 ),
+        name character varying(255) COLLATE pg_catalog."default" NOT NULL,
+        geometry geometry NOT NULL,
+        CONSTRAINT regions_pkey PRIMARY KEY (region_id)
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS "{schema}"."Regions"
+        OWNER to {user};
+    """
+    cursor.execute(regions_query)
+
+    # Create the Rivers table
+    rivers_query = f"""
+    CREATE TABLE IF NOT EXISTS {schema}.rivers
+    (
+        river_id smallint NOT NULL,
+        name character varying(255) COLLATE pg_catalog."default",
+        length_km double precision,
+        region_id smallint,
+        geometry geometry NOT NULL,
+        CONSTRAINT rivers_pkey PRIMARY KEY (river_id),
+        CONSTRAINT fkey_region FOREIGN KEY (region_id)
+            REFERENCES {schema}.regions (region_id) MATCH SIMPLE
+            ON UPDATE NO ACTION
+            ON DELETE NO ACTION
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS {schema}.rivers
+        OWNER to {user};
+
+    COMMENT ON COLUMN {schema}.rivers.length_km
+        IS 'estimated length of the river in kilometers';
+
+    COMMENT ON COLUMN {schema}.rivers.region_id
+        IS 'id for the Region in which this river lies';
+    """
+    cursor.execute(rivers_query)
+
+    # # add foreign key constraint to basin
+    # print(
+    #     f"""
+    #     IF NOT EXISTS (SELECT *
+    #         FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+    #         WHERE "constraint_name" = 'Fk_MajorRiver' AND "constraint_schema" = '{schema}')
+    #     ALTER TABLE "{schema}"."Basins"
+    #         ADD CONSTRAINT "Fk_MajorRiver" FOREIGN KEY ("MajorRiverID")
+    #         REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
+    #         ON UPDATE CASCADE
+    #         ON DELETE SET NULL
+    #         NOT VALID
+    # """
+    # )
+
+    # cursor.execute(
+    #     f"""
+    #     ALTER TABLE "{schema}"."Basins"
+    #         DROP CONSTRAINT IF EXISTS "Fk_MajorRiver";
+
+    #     ALTER TABLE "{schema}"."Basins"
+    #         ADD CONSTRAINT "Fk_MajorRiver" FOREIGN KEY ("MajorRiverID")
+    #         REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
+    #         ON UPDATE CASCADE
+    #         ON DELETE SET NULL
+    #         NOT VALID;
+    # """
+    # )
+
+    # # Create the Dams table
+    # dams_query = f"""
+    # CREATE TABLE IF NOT EXISTS "{schema}"."Dams"
+    # (
+    #     "DamID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    #     "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    #     "Reservoir" character varying(255) COLLATE pg_catalog."default",
+    #     "AltName" character varying(255) COLLATE pg_catalog."default",
+    #     "RiverID" smallint,
+    #     "RegionID" smallint,
+    #     "Country" character varying(255) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    #     "Year" integer,
+    #     "AreaSqKm" double precision,
+    #     "CapacityMCM" double precision,
+    #     "DepthM" double precision,
+    #     "ElevationMASL" integer,
+    #     "MainUse" character varying(255) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+    #     "LONG_DD" double precision,
+    #     "LAT_DD" double precision,
+    #     "DamGeometry" geometry NOT NULL,
+    #     "ReservoirGeometry" geometry,
+    #     CONSTRAINT "Dams_pkey" PRIMARY KEY ("DamID"),
+    #     CONSTRAINT "DamID_UNIQUE" UNIQUE ("DamID"),
+    #     CONSTRAINT "Fk_region_dams" FOREIGN KEY ("RegionID")
+    #         REFERENCES "{schema}"."Regions" ("RegionID") MATCH SIMPLE
+    #         ON UPDATE CASCADE
+    #         ON DELETE SET NULL
+    #         NOT VALID,
+    #     CONSTRAINT "Fk_river_dams" FOREIGN KEY ("RiverID")
+    #         REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
+    #         ON UPDATE NO ACTION
+    #         ON DELETE NO ACTION
+    #         NOT VALID
+    # )
+
+    # TABLESPACE pg_default;
+
+    # ALTER TABLE IF EXISTS "{schema}"."Dams"
+    #     OWNER to {user};
+
+    # COMMENT ON COLUMN "{schema}"."Dams"."DamGeometry"
+    #     IS 'Point geometry for the dam';
+
+    # COMMENT ON COLUMN "{schema}"."Dams"."ReservoirGeometry"
+    #     IS 'Polygon geometry for the reservoir';
+    # """
+    # cursor.execute(dams_query)
+
+    # create the Reaches table
+    reaches_query = f"""
+    CREATE TABLE IF NOT EXISTS "{schema}"."Reaches"
+    (
+        "ReachID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+        "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
+        "RiverID" smallint,
+        "ClimateClass" smallint,
+        "WidthMin" double precision,
+        "WidthMean" double precision,
+        "WidthMax" double precision,
+        "RKm" double precision,
+        "geometry" geometry NOT NULL,
+        "buffered_geometry" geometry,
+        CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
+        CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
+        CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
+            REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE
+            NOT VALID
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS "{schema}"."Reaches"
+        OWNER to {user};
+    """
+    cursor.execute(reaches_query)
+
+    # create the Nodes table
+    nodes_query = f"""
+    CREATE TABLE IF NOT EXISTS "{schema}"."Nodes"
+    (
+        "NodeID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+        "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
+        "ReachID" integer,
+        "ClimateClass" smallint,
+        "WidthMin" double precision,
+        "WidthMean" double precision,
+        "WidthMax" double precision,
+        "RKm" double precision,
+        "geometry" geometry NOT NULL,
+        "buffered_geometry" geometry,
+        CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
+        CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
+        CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
+            REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE
+            NOT VALID
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS "{schema}"."Reaches"
+        OWNER to {user};
+    """
+    cursor.execute(reaches_query)
+
+    # Create the DamData table
+    dam_data_query = f"""
+    CREATE TABLE IF NOT EXISTS "{schema}"."DamData"
+    (
+        "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+        "Date" date NOT NULL,
+        "DamID" smallint NOT NULL,
+        "WaterTempC" double precision NOT NULL,
+        "Mission" character varying(4) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
+        CONSTRAINT "DamData_pkey" PRIMARY KEY ("ID"),
+        CONSTRAINT "DamDataID_UNIQUE" UNIQUE ("ID"),
+        CONSTRAINT "Fk_water_temp_dam" FOREIGN KEY ("DamID")
+            REFERENCES "{schema}"."Dams" ("DamID") MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE
+            NOT VALID
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS "{schema}"."DamData"
+        OWNER to {user};
+    """
+    cursor.execute(dam_data_query)
+
+    # Create the ReachData table
+    query = f"""
+    CREATE TABLE IF NOT EXISTS "{schema}"."ReachData"
+    (
+        "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+        "Date" date NOT NULL,
+        "ReachID" smallint NOT NULL,
+        "LandTempC" double precision,
+        "WaterTempC" double precision,
+        "NDVI" double precision,
+        "Mission" character varying(4) COLLATE pg_catalog."default",
+        "EstTempC" double precision,
+        CONSTRAINT "ReachData_pkey" PRIMARY KEY ("ID"),
+        CONSTRAINT "ReachDataID_UNIQUE" UNIQUE ("ID"),
+        CONSTRAINT "Fk_data_reach" FOREIGN KEY ("ReachID")
+            REFERENCES "{schema}"."Reaches" ("ReachID") MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE
+            NOT VALID
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS "{schema}"."ReachData"
+        OWNER to {user};
+    """
+    cursor.execute(query)
+
+    # enable all triggers
+    cursor.execute("SET session_replication_role = 'origin'")
+
+    connection.commit()
+
+    pass
+
+
 
 
 # function to set up a fresh database
