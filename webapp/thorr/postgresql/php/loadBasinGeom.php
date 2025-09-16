@@ -10,13 +10,13 @@ $pgsql_connection = pg_connect($connStr);
 // }
 $sql = <<<QUERY
 SELECT
-	"BasinID",
+	"RegionID" as BasinID,
 	"Name",
 	ST_ASGEOJSON (ST_SIMPLIFY ("geometry", 0.005), 2) AS GEOMETRY
 FROM
-	"$schema"."Basins"
+	"$schema"."Regions"
 WHERE
-	"BasinID" = {$_POST['BasinID']}
+	"RegionID" = {$_POST['BasinID']}
 ORDER BY
 	"Name" ASC;
 QUERY;

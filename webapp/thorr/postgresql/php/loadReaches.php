@@ -20,10 +20,10 @@ if ($_POST['BasinID']) {
             CONCAT("Rivers"."Name", ' (', "Reaches"."RKm", ' km)') AS "Name"
         FROM
             "$schema"."Rivers"
-            INNER JOIN "$schema"."Basins" USING ("BasinID")
+            INNER JOIN "$schema"."Regions" USING ("RegionID")
             INNER JOIN "$schema"."Reaches" USING ("RiverID")
         WHERE
-            "Basins"."BasinID" = {$_POST['BasinID']}
+            "Regions"."RegionID" = {$_POST['BasinID']}
             AND "RiverID" = {$_POST['RiverID']}
         ORDER BY
             "Name" ASC;
@@ -36,10 +36,10 @@ if ($_POST['BasinID']) {
             CONCAT("Rivers"."Name", ' (', "Reaches"."RKm", ' km)') AS "Name"
         FROM
             "$schema"."Rivers"
-            INNER JOIN "$schema"."Basins" USING ("BasinID")
+            INNER JOIN "$schema"."Regions" USING ("RegionID")
             INNER JOIN "$schema"."Reaches" USING ("RiverID")
         WHERE
-            "Basins"."BasinID" = {$_POST['BasinID']}
+            "Regions"."RegionID" = {$_POST['BasinID']}
         ORDER BY
             "Name" ASC;
         QUERY;
@@ -52,7 +52,7 @@ if ($_POST['BasinID']) {
         CONCAT("Rivers"."Name", ' (', "Reaches"."RKm", ' km)') AS "Name"
     FROM
         "$schema"."Rivers"
-        INNER JOIN "$schema"."Basins" USING ("BasinID")
+        INNER JOIN "$schema"."Regions" USING ("RegionID")
         INNER JOIN "$schema"."Reaches" USING ("RiverID")
     ORDER BY
         "Name" ASC;

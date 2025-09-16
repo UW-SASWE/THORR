@@ -30,10 +30,10 @@ if (isset($_POST['offset']) || isset($_POST['row_count'])) {
                     ST_ASGEOJSON("Reaches"."geometry") AS "geometry"
             FROM
                 "$schema"."Rivers"
-            INNER JOIN "$schema"."Basins" USING ("BasinID")
+            INNER JOIN "$schema"."Regions" USING ("RegionID")
             INNER JOIN "$schema"."Reaches" USING ("RiverID")
             WHERE
-                "Basins"."BasinID" = {$_POST['BasinID']}) AS R
+                "Regions"."RegionID" = {$_POST['BasinID']}) AS R
                 INNER JOIN
             "$schema"."ReachData" USING ("ReachID")
                 INNER JOIN
@@ -69,10 +69,10 @@ if (isset($_POST['offset']) || isset($_POST['row_count'])) {
                     ST_ASGEOJSON("Reaches"."geometry") AS "geometry"
             FROM
                 "$schema"."Rivers"
-            INNER JOIN "$schema"."Basins" USING ("BasinID")
+            INNER JOIN "$schema"."Regions" USING ("RegionID")
             INNER JOIN "$schema"."Reaches" USING ("RiverID")
             WHERE
-                "Basins"."BasinID" = {$_POST['BasinID']}) AS R
+                "Regions"."RegionID" = {$_POST['BasinID']}) AS R
                 INNER JOIN
             "$schema"."ReachData" USING ("ReachID")
                 INNER JOIN
