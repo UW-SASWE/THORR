@@ -176,7 +176,7 @@ Thumbs.db
 .vscode/
 
 # custom/specific files and folders
-dbConfig.php
+# dbConfig.php
 esriAPIKey.php
 hydrothermalviewer/
 thorr_retired/
@@ -211,3 +211,7 @@ packaging.sh
 webapp/thorr/js/script.js
 # webapp/thorr/postgresql/js/script.js
 webapp/thorr/mysql/js/script.js
+
+webapp/thorr/php/dbConfig.php
+webapp/thorr/mysql/php/dbConfig.php
+webapp/thorr/php/postgresql/dbConfig.php
