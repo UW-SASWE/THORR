@@ -26,14 +26,14 @@ if (isset($_POST['offset']) || isset($_POST['row_count'])) {
                 SELECT
                     "DamID",
                     "RiverID",
-                    "BasinID",
+                    "RegionID",
                     "Name",
                     "Reservoir",
                     ST_ASGEOJSON ("Dams"."DamGeometry") AS "geometry"
                 FROM
                     "$schema"."Dams"
                 WHERE
-                    "BasinID" = {$_POST['BasinID']}
+                    "RegionID" = {$_POST['BasinID']}
             ) AS D
             INNER JOIN "$schema"."DamData" USING ("DamID")
             INNER JOIN (
@@ -67,14 +67,14 @@ if (isset($_POST['offset']) || isset($_POST['row_count'])) {
                 SELECT
                     "DamID",
                     "RiverID",
-                    "BasinID",
+                    "RegionID",
                     "Name",
                     "Reservoir",
                     ST_ASGEOJSON ("Dams"."DamGeometry") AS "geometry"
                 FROM
                     "$schema"."Dams"
                 WHERE
-                    "BasinID" = {$_POST['BasinID']}
+                    "RegionID" = {$_POST['BasinID']}
             ) AS D
             INNER JOIN "$schema"."DamData" USING ("DamID")
             INNER JOIN (

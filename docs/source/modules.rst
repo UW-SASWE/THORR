@@ -18,7 +18,7 @@ Create a new project with the specified name and directory. The project director
 
     .. program-output:: python -m thorr new-project --help
 
-.. _download-data:
+.. _get-thorr-data:
 ``thorr get-thorr-data``
 ~~~~~~~~~~~~~~~~~~~~~~~
 Download data from the specified source and save it to the specified directory. THORR's data includes trained machine learning models and GIS data for the various regions.
@@ -31,6 +31,20 @@ Download data from the specified source and save it to the specified directory. 
 Create the database tables required by THORR to store project data. The database system must be running and accessible to the THORR project.
 
     .. program-output:: python -m thorr database-setup --help
+
+.. _retrieve-data:
+``thorr retrieve-data``
+~~~~~~~~~~~~~~~~~~~~~~~
+Retrieve satellite data from Google Earth Engine (GEE) and save it to a specified database. 
+
+    .. program-output:: python -m thorr retrieve-data --help
+
+.. _estimate-temperature:
+``thorr estimate-temperature``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Estimate water temperature using a trained machine learning model.
+
+    .. program-output:: python -m thorr estimate-temperature --help
 
 
 .. _retrieve-data:
