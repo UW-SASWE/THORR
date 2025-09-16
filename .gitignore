@@ -209,5 +209,5 @@ tests/*
 packaging.sh
 
 webapp/thorr/js/script.js
-webapp/thorr/postgresql/js/script.js
+# webapp/thorr/postgresql/js/script.js
 webapp/thorr/mysql/js/script.js
