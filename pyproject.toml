@@ -26,8 +26,12 @@ dependencies = [
   "mysql-connector-python",
   "numpy",
   "pandas",
-  "psycopg",
+  # "pkg_resources",
+  "psycopg[binary]",
+  "PyCRS",
   "rasterio",
+  "scikit-learn",
+  "setuptools",
   "shapely",
   "typer",
 ]
@@ -54,6 +58,7 @@ exclude = [
   "/archive",
   "/.env",
   "/.vscode",
+  "/tests",
 ]
 
 [tool.hatch.version]

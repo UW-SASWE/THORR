@@ -3,7 +3,7 @@ Modules
 
 Command Line Interface
 ----------------------
-THORR has a command line interface (CLI) that allows you to interact with the the package from the terminal. The CLI provides a number of commands that can be used to create new projects, manage existing projects and run other THORR services. The CLI is accessible by running the `python -m thorr` command from the terminal. For example, to create a new project with the :ref:`new-project <new-project>` command, run the following command from the terminal:
+THORR has a command line interface (CLI) that allows you to interact with the the package from the terminal. The CLI provides a number of commands that can be used to create new projects, manage existing projects and run other THORR services. The CLI is accessible by running the ``python -m thorr`` command from the terminal. For example, to create a new project with the :ref:`new-project <new-project>` command, run the following command from the terminal:
 
 .. code-block:: bash
 
@@ -31,6 +31,21 @@ Download data from the specified source and save it to the specified directory. 
 Create the database tables required by THORR to store project data. The database system must be running and accessible to the THORR project.
 
     .. program-output:: python -m thorr database-setup --help
+
+.. _retrieve-data:
+``thorr retrieve-data``
+~~~~~~~~~~~~~~~~~~~~~~~
+Retrieve satellite data from Google Earth Engine (GEE) and save it to a specified database. 
+
+    .. program-output:: python -m thorr retrieve-data --help
+
+.. _estimate-temperature:
+``thorr estimate-temperature``
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Estimate water temperature using a trained machine learning model.
+
+    .. program-output:: python -m thorr estimate-temperature --help
+
 
 .. _retrieve-data:
 ``thorr retrieve-data``

@@ -38,7 +38,7 @@ THORR uses a predefined database tables to store project data. Tables in the THO
 .. _basins-table:
 Basins
 ~~~~~~
-The basins table stores information about the drainage basins in the project region.
+The basins table stores information about the drainage basins in the project.
 
 +------------------+------------------------------------------------------------------+-----------+
 |      Column      |                           Description                            | Data Type |

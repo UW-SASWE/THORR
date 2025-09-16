@@ -96,23 +96,34 @@ The configuration file contains the following sections: :ref:`config-project`, :
 .. _config-project:
 ``[project]``
 ~~~~~~~~~~~~~~
-The ``[project]`` section contains the project settings, such as the project name, description, and version. The following keys are available in the ``[project]`` section:
+The ``[project]`` section contains the project settings, such as the project name, region, description and time frame. The following keys are available in the ``[project]`` section:
 
-+-------------+--------------------------------------------------+
-|     Key     |                      Value                       |
-+=============+==================================================+
-| name        | The name or title of the project                 |
-+-------------+--------------------------------------------------+
-| project_dir | Path to the project directory                    |
-+-------------+--------------------------------------------------+
-| region      | Region for the project                           |
-+-------------+--------------------------------------------------+
-| description | Brief description of the project                 |
-+-------------+--------------------------------------------------+
-| start_date  | Start date for THORR water temperature estimates |
-+-------------+--------------------------------------------------+
-| end_date    | End date for THORR water temperature estimates   |
-+-------------+--------------------------------------------------+
++-------------+-----------------------------------------------------------------------------+
+|     Key     |                      Value                                                  |
++=============+=============================================================================+
+| name        | The name or title of the project                                            |
++-------------+-----------------------------------------------------------------------------+
+| project_dir | Path to the project directory                                               |
++-------------+-----------------------------------------------------------------------------+
+| region      | Abbreviation of the region for the project (See :ref:`thorr-regions`)       |
++-------------+-----------------------------------------------------------------------------+
+| description | Brief description of the project                                            |
++-------------+-----------------------------------------------------------------------------+
+| start_date  | Start date for THORR water temperature estimates                            |
++-------------+-----------------------------------------------------------------------------+
+| end_date    | End date for THORR water temperature estimates                              |
++-------------+-----------------------------------------------------------------------------+
+
+.. _thorr-regions:
+Regions
+^^^^^^^
+The ``region`` key in the ``[project]`` section specifies the region for the project. THORR has separately trained models for different regions. The following regions are currently available in THORR:
+
++----------------------+---------------------+
+|     Region           |      Abbreviation   |
++======================+=====================+
+| Columbia River Basin | crb                 |
++----------------------+---------------------+
 
 .. _config-database:
 ``[database]``
@@ -191,7 +202,7 @@ Workflow and Cronjob
 Once the project is set up and configured, you can start using THORR to generate water temperature estimates. THORR's workflow consists of 4 main steps:
 
 1. Read and process GIS information from database
-2. Retrieve and process satellite data from Google Earth Engine
+2. Retrieve and process satellite data from Google Earth Engine (See :ref:`retrieve-data`)
 3. Generate water temeprature estimates using machine learning models
 4. Save the results to the database
 

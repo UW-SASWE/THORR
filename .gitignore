@@ -176,7 +176,7 @@ Thumbs.db
 .vscode/
 
 # custom/specific files and folders
-dbConfig.php
+# dbConfig.php
 esriAPIKey.php
 hydrothermalviewer/
 thorr_retired/
@@ -194,6 +194,7 @@ Results/2.WaterTempEst/2.RandomForestRegression/*.pkl
 
 data/GEE/*
 data/ml_model/RFR1.joblib
+data/ML Model
 /methods/04-ml_development/var1/ann_*_tuning
 *RFR*.joblib
 methods/04-ml_development/input_data/ml_input_data_all.csv
@@ -201,3 +202,16 @@ data/MySQL/dumps_utf8mb3 (1)/thorr_transfer_Basins.sql
 data/MySQL/dumps_utf8mb3 (1)/thorr_transfer_Rivers.sql
 data/MySQL/dumps_utf8mb3 (2)/thorr_transfer_DamData.sql
 methods/06-temperature_est/reconstructed_data.csv
+data/gis/*
+docs/Documentation for THORR.docx
+99-misc
+tests/*
+packaging.sh
+
+webapp/thorr/js/script.js
+# webapp/thorr/postgresql/js/script.js
+webapp/thorr/mysql/js/script.js
+
+webapp/thorr/php/dbConfig.php
+webapp/thorr/mysql/php/dbConfig.php
+webapp/thorr/php/postgresql/dbConfig.php
