@@ -209,4 +209,3 @@ Once the project is set up and configured, you can start using THORR to generate
 This workflow can be automated to run at regular intervals using a cronjob.
 
 .. TODO: Add instructions on setting up a cronjob to run the THORR workflow at regular intervals.
-
