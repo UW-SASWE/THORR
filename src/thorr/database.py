@@ -192,6 +192,8 @@ def mysql_setup(config_file):
     CREATE TABLE IF NOT EXISTS `Regions` (
         `RegionID` SMALLINT NOT NULL AUTO_INCREMENT,
         `Name` varchar(255) NOT NULL,
+        `country` varchar(255) DEFAULT NULL,
+        `country_code` varchar(2) DEFAULT NULL,
         `geometry` geometry NOT NULL /*!80003 SRID 4326 */,
         PRIMARY KEY (`RegionID`),
         UNIQUE KEY `RegionID_UNIQUE` (`RegionID`)
