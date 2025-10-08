@@ -495,10 +495,47 @@ def postgresql_setup(config_file):
         "WidthMean" double precision,
         "WidthMax" double precision,
         "RKm" double precision,
-        "geometry" geometry NOT NULL,
+        "sword_x" double precision,
+        "sword_y" double precision,
+        "sword_reach_id" bigint,
+        "sword_reach_len" double precision,
+        "sword_n_nodes" double precision,
+        "sword_wse" double precision,
+        "sword_wse_var" double precision,
+        "sword_width" double precision,
+        "sword_width_var" double precision,
+        "sword_facc" double precision,
+        "sword_n_chan_max" smallint,
+        "sword_n_chan_mod" smallint,
+        "sword_obstr_type" smallint,
+        "sword_grod_id" integer,
+        "sword_hfalls_id" double precision,
+        "sword_slope" double precision,
+        "sword_dist_out" double precision,
+        "sword_lakeflag" smallint,
+        "sword_max_width" double precision,
+        "sword_n_rch_up" smallint,
+        "sword_n_rch_dn" smallint,
+        "sword_rch_id_up" bigint,
+        "sword_rch_id_dn" bigint,
+        "sword_swot_orbit" smallint,
+        "sword_swot_obs" double precision,
+        "sword_type" double precision,
+        "sword_river_name" VARCHAR(254),
+        "sword_edit_flag" smallint DEFAULT 0,
+        "sword_trib_flag" smallint,
+        "sword_path_freq" smallint,
+        "sword_path_order" smallint,
+        "sword_path_segs" smallint,
+        "sword_main_side" smallint,
+        "sword_strm_order" smallint,
+        "sword_end_reach" smallint,
+        "sword_network" integer,
+        "region" VARCHAR(254),
+        "region_id" smallint,
         "buffered_geometry" geometry,
+        "geometry" geometry NOT NULL,
         CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
-        CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
         CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
             REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
             ON UPDATE CASCADE
@@ -605,7 +642,7 @@ def postgresql_setup(config_file):
 
 
 # function to set up postgresql database
-def postgresql_setup_new(config_file):
+def postgresql_setup_new(config_file, include_sword_metadata=False):
     db = Connect(config_file, db_type="postgresql")
     user = db.user
     schema = db.schema
