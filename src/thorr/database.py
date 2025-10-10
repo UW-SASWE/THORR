@@ -1104,6 +1104,9 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
         # for i, reach in reaches_gdf.iterrows():
         #     # Iinsert reach data into the table if the entry doesn't already exist
+
+        
+
         for i, reach in reaches_gdf.iterrows():
 
             query = f"""
@@ -1134,6 +1137,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
 def upload_gis(config_file, gpkg, gpkg_layers, db_type="mysql"):
     print("Uploading GIS data to database...")
+    gpkg_layers = {k: v for k, v in gpkg_layers.items() if v} # remove empty layer keys
     if db_type == "mysql":
         mysql_upload_gis(
             config_file,
