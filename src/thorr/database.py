@@ -578,7 +578,7 @@ def postgresql_setup(config_file):
     ALTER TABLE IF EXISTS "{schema}"."Reaches"
         OWNER to {user};
     """
-    cursor.execute(reaches_query)
+    cursor.execute(nodes_query)
 
     # Create the DamData table
     dam_data_query = f"""
