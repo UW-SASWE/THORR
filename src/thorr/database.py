@@ -1102,16 +1102,21 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
         reaches_gdf = gpd.read_file(gpkg, layer=gpkg_layers["reaches"])
         srid = reaches_gdf.crs.to_epsg()
 
+        columns = reaches_gdf.columns.tolist()
+        for col_name in ["WidthMin", "WidthMean", "WidthMax", "RKm", "koppen"]:
+            # add empty columns if they don't exist
+            if col_name not in columns:
+                reaches_gdf[col_name] = np.nan
+
         # for i, reach in reaches_gdf.iterrows():
         #     # Iinsert reach data into the table if the entry doesn't already exist
 
-        
 
         for i, reach in reaches_gdf.iterrows():
 
             query = f"""
                 INSERT INTO "{schema}"."Reaches" ("Name", "RiverID", "ClimateClass", "WidthMin", "WidthMean", "WidthMax", "RKm", "geometry")
-                SELECT '{reach['Name']}', (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = '{reach['river_name']}'), {reach['koppen']}, CAST(NULLIF('{str(reach['WidthMin'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMean'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMax'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['RKm'])}','NaN') AS double precision), 'SRID={srid};{reach['geometry'].wkt}'
+                SELECT '{reach['Name']}', (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = '{reach['river_name']}'), CAST(NULLIF('{str(reach['koppen'])}', 'NaN') AS smallint), CAST(NULLIF('{str(reach['WidthMin'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMean'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMax'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['RKm'])}','NaN') AS double precision), 'SRID={srid};{reach['geometry'].wkt}'
                 WHERE NOT EXISTS (SELECT * FROM {schema}."Reaches" WHERE "Name" = '{reach['Name']}')
                 """
 
