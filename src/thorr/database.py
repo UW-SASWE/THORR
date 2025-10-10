@@ -952,17 +952,18 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
             
             query = f"""
                 INSERT INTO "{schema}"."Rivers" ("Name", "geometry")
-                SELECT '{river['Name']}', 'SRID={srid};{river['geometry'].wkt}'
-                WHERE NOT EXISTS (SELECT * FROM "{schema}"."Rivers" WHERE "Name" = '{river['Name']}')
+                SELECT '{river['river_name'].replace("'", "''")}', 'SRID={srid};{river['geometry'].wkt}'
+                WHERE NOT EXISTS (SELECT * FROM "{schema}"."Rivers" WHERE "Name" = CAST(NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)))
                 """
-
+            
             cursor.execute(query)
             connection.commit()
 
+            # Update the RegionID column if the region exists in the regions table
             query2 = f"""
             UPDATE "{schema}"."Rivers"
             SET "RegionID" = (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['Region']}')
-            WHERE "Name" = '{river['Name']}'
+            WHERE "Name" = '{river['river_name'].replace("'", "''")}'
             """
 
             cursor.execute(query2)
@@ -1208,6 +1209,17 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
                 """
 
             cursor.execute(query)
+            connection.commit()
+
+        # Update the riverID column if the river exists in the Rivers table
+        for i, reach in reaches_gdf.iterrows():
+            query2 = f"""
+            UPDATE "{schema}"."Reaches"
+            SET "RiverID" = (SELECT "RiverID" FROM "{schema}"."Rivers" WHERE "Name" = CAST(NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)))
+            WHERE "Name" = '{reach['Name']}'
+            """
+
+            cursor.execute(query2)
             connection.commit()
 
         if "buffered_reaches" in gpkg_layers:
