@@ -485,100 +485,95 @@ def postgresql_setup(config_file):
 
     # create the Reaches table
     reaches_query = f"""
-    CREATE TABLE IF NOT EXISTS "{schema}"."Reaches"
-    (
-        "ReachID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-        "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
-        "RiverID" smallint,
-        "ClimateClass" smallint,
-        "WidthMin" double precision,
-        "WidthMean" double precision,
-        "WidthMax" double precision,
-        "RKm" double precision,
-        "sword_x" double precision,
-        "sword_y" double precision,
-        "sword_reach_id" bigint,
-        "sword_reach_len" double precision,
-        "sword_n_nodes" double precision,
-        "sword_wse" double precision,
-        "sword_wse_var" double precision,
-        "sword_width" double precision,
-        "sword_width_var" double precision,
-        "sword_facc" double precision,
-        "sword_n_chan_max" smallint,
-        "sword_n_chan_mod" smallint,
-        "sword_obstr_type" smallint,
-        "sword_grod_id" integer,
-        "sword_hfalls_id" double precision,
-        "sword_slope" double precision,
-        "sword_dist_out" double precision,
-        "sword_lakeflag" smallint,
-        "sword_max_width" double precision,
-        "sword_n_rch_up" smallint,
-        "sword_n_rch_dn" smallint,
-        "sword_rch_id_up" bigint,
-        "sword_rch_id_dn" bigint,
-        "sword_swot_orbit" smallint,
-        "sword_swot_obs" double precision,
-        "sword_type" double precision,
-        "sword_river_name" VARCHAR(254),
-        "sword_edit_flag" smallint DEFAULT 0,
-        "sword_trib_flag" smallint,
-        "sword_path_freq" smallint,
-        "sword_path_order" smallint,
-        "sword_path_segs" smallint,
-        "sword_main_side" smallint,
-        "sword_strm_order" smallint,
-        "sword_end_reach" smallint,
-        "sword_network" integer,
-        "region" VARCHAR(254),
-        "region_id" smallint,
-        "buffered_geometry" geometry,
-        "geometry" geometry NOT NULL,
+    CREATE TABLE IF NOT EXISTS "{schema}"."Reaches" (
+        "ReachID" INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (
+            INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1
+        ),
+        "Name" CHARACTER VARYING(255) COLLATE PG_CATALOG."default" NOT NULL,
+        "RiverID" SMALLINT,
+        "ClimateClass" SMALLINT,
+        "WidthMin" DOUBLE PRECISION,
+        "WidthMean" DOUBLE PRECISION,
+        "WidthMax" DOUBLE PRECISION,
+        "RKm" DOUBLE PRECISION,
+        -- "sword_x" DOUBLE PRECISION,
+        -- "sword_y" DOUBLE PRECISION,
+        "sword_reach_id" BIGINT,
+        -- "sword_reach_len" DOUBLE PRECISION,
+        -- "sword_n_nodes" DOUBLE PRECISION,
+        -- "sword_wse" DOUBLE PRECISION,
+        -- "sword_wse_var" DOUBLE PRECISION,
+        -- "sword_width" DOUBLE PRECISION,
+        -- "sword_width_var" DOUBLE PRECISION,
+        -- "sword_facc" DOUBLE PRECISION,
+        -- "sword_n_chan_max" SMALLINT,
+        -- "sword_n_chan_mod" SMALLINT,
+        -- "sword_obstr_type" SMALLINT,
+        -- "sword_grod_id" INTEGER,
+        -- "sword_hfalls_id" DOUBLE PRECISION,
+        -- "sword_slope" DOUBLE PRECISION,
+        -- "sword_dist_out" DOUBLE PRECISION,
+        -- "sword_lakeflag" SMALLINT,
+        -- "sword_max_width" DOUBLE PRECISION,
+        -- "sword_n_rch_up" SMALLINT,
+        -- "sword_n_rch_dn" SMALLINT,
+        -- "sword_rch_id_up" BIGINT,
+        -- "sword_rch_id_dn" BIGINT,
+        -- "sword_swot_orbit" SMALLINT,
+        -- "sword_swot_obs" DOUBLE PRECISION,
+        -- "sword_type" DOUBLE PRECISION,
+        -- "sword_river_name" VARCHAR(254),
+        -- "sword_edit_flag" SMALLINT DEFAULT 0,
+        -- "sword_trib_flag" SMALLINT,
+        -- "sword_path_freq" SMALLINT,
+        -- "sword_path_order" SMALLINT,
+        -- "sword_path_segs" SMALLINT,
+        -- "sword_main_side" SMALLINT,
+        -- "sword_strm_order" SMALLINT,
+        -- "sword_end_reach" SMALLINT,
+        -- "sword_network" INTEGER,
+        -- "region" VARCHAR(254),
+        -- "region_id" SMALLINT,
+        "buffered_geometry" GEOMETRY,
+        "geometry" GEOMETRY NOT NULL,
         CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
-        CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
-            REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE CASCADE
-            NOT VALID
-    )
-
-    TABLESPACE pg_default;
+        CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID") REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE NOT VALID
+    ) TABLESPACE PG_DEFAULT;
 
     ALTER TABLE IF EXISTS "{schema}"."Reaches"
         OWNER to {user};
     """
     cursor.execute(reaches_query)
 
-    # create the Nodes table
-    nodes_query = f"""
-    CREATE TABLE IF NOT EXISTS "{schema}"."Nodes"
-    (
-        "NodeID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-        "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
-        "ReachID" integer,
-        "ClimateClass" smallint,
-        "WidthMin" double precision,
-        "WidthMean" double precision,
-        "WidthMax" double precision,
-        "RKm" double precision,
-        "geometry" geometry NOT NULL,
-        "buffered_geometry" geometry,
-        CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
-        CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
-        CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
-            REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE CASCADE
-            NOT VALID
-    )
+    # # create the Nodes table
+    # nodes_query = f"""
+    # CREATE TABLE IF NOT EXISTS "{schema}"."Nodes"
+    # (
+    #     "NodeID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    #     "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    #     "ReachID" integer,
+    #     "ClimateClass" smallint,
+    #     "WidthMin" double precision,
+    #     "WidthMean" double precision,
+    #     "WidthMax" double precision,
+    #     "RKm" double precision,
+    #     "geometry" geometry NOT NULL,
+    #     "buffered_geometry" geometry,
+    #     CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
+    #     CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
+    #     CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
+    #         REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
+    #         ON UPDATE CASCADE
+    #         ON DELETE CASCADE
+    #         NOT VALID
+    # )
 
-    TABLESPACE pg_default;
+    # TABLESPACE pg_default;
 
-    ALTER TABLE IF EXISTS "{schema}"."Reaches"
-        OWNER to {user};
-    """
-    cursor.execute(nodes_query)
+    # ALTER TABLE IF EXISTS "{schema}"."Reaches"
+    #     OWNER to {user};
+    # """
+    # cursor.execute(nodes_query)
 
     # Create the DamData table
     dam_data_query = f"""
@@ -1115,9 +1110,101 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
         for i, reach in reaches_gdf.iterrows():
 
             query = f"""
-                INSERT INTO "{schema}"."Reaches" ("Name", "RiverID", "ClimateClass", "WidthMin", "WidthMean", "WidthMax", "RKm", "geometry")
-                SELECT '{reach['Name']}', (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = '{reach['river_name']}'), CAST(NULLIF('{str(reach['koppen'])}', 'NaN') AS smallint), CAST(NULLIF('{str(reach['WidthMin'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMean'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMax'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['RKm'])}','NaN') AS double precision), 'SRID={srid};{reach['geometry'].wkt}'
-                WHERE NOT EXISTS (SELECT * FROM {schema}."Reaches" WHERE "Name" = '{reach['Name']}')
+                INSERT INTO 
+                    "{schema}"."Reaches" (
+                        "Name",
+                        "RiverID",
+                        "ClimateClass",
+                        "WidthMin",
+                        "WidthMean",
+                        "WidthMax",
+                        "RKm",
+                        "sword_reach_id",
+                        -- "sword_x",
+                        -- "sword_y",
+                        -- "sword_reach_len",
+                        -- "sword_n_nodes",
+                        -- "sword_wse",
+                        -- "sword_wse_var",
+                        -- "sword_width",
+                        -- "sword_width_var",
+                        -- "sword_facc",
+                        -- "sword_n_chan_max",
+                        -- "sword_n_chan_mod",
+                        -- "sword_obstr_type",
+                        -- "sword_grod_id",
+                        -- "sword_hfalls_id",
+                        -- "sword_slope",
+                        -- "sword_dist_out",
+                        -- "sword_lakeflag",
+                        -- "sword_max_width",
+                        -- "sword_n_rch_up",
+                        -- "sword_n_rch_dn",
+                        -- "sword_rch_id_up",
+                        -- "sword_rch_id_dn",
+                        -- "sword_swot_orbit",
+                        -- "sword_swot_obs",
+                        -- "sword_type",
+                        -- "sword_river_name",
+                        -- "sword_edit_flag",
+                        -- "sword_trib_flag",
+                        -- "sword_path_freq",
+                        -- "sword_path_order",
+                        -- "sword_path_segs",
+                        -- "sword_main_side",
+                        -- "sword_strm_order",
+                        -- "sword_end_reach",
+                        -- "sword_network",
+                        "geometry"
+                    )
+                SELECT
+                    '{reach['Name']}',
+                    (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = CAST(NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255))),
+                    CAST(NULLIF('{str(reach['koppen'])}', 'nan') AS smallint),
+                    CAST(NULLIF('{str(reach['WidthMin'])}','nan') AS double precision),
+                    -- CAST(NULLIF('{str(reach['WidthMean'])}','nan') AS double precision),
+                    CAST(NULLIF('{str(reach['width'])}','nan') AS double precision),
+                    -- CAST(NULLIF('{str(reach['WidthMax'])}','nan') AS double precision),
+                    CAST(NULLIF('{str(reach['max_width'])}','nan') AS double precision),
+                    CAST(NULLIF('{str(reach['RKm'])}','nan') AS double precision),
+                    CAST(NULLIF('{str(int(reach['reach_id']))}','nan') AS bigint),
+                    -- {reach['x']},
+                    -- {reach['y']},
+                    -- {reach['reach_len']},
+                    -- {reach['n_nodes']},
+                    -- {reach['wse']}, 
+                    -- {reach['wse_var']},
+                    -- {reach['width']},
+                    -- {reach['width_var']},
+                    -- {reach['facc']},
+                    -- {reach['n_chan_max']},
+                    -- {reach['n_chan_mod']},
+                    -- {reach['obstr_type']},
+                    -- {reach['grod_id']},
+                    -- {reach['hfalls_id']},
+                    -- {reach['slope']},
+                    -- {reach['dist_out']},
+                    -- {reach['lakeflag']},
+                    -- {reach['max_width']},
+                    -- {reach['n_rch_up']},
+                    -- {reach['n_rch_dn']},
+                    -- CAST(NULLIF('{{{" ".join(str(reach['rch_id_up']).split()).replace(" ", ",")}}}', '{{None}}') AS bigint[]),
+                    -- CAST(NULLIF('{{{" ".join(str(reach['rch_id_dn']).split()).replace(" ", ",")}}}', '{{None}}') AS bigint[]),
+                    -- CAST(NULLIF('{{{" ".join(str(reach['swot_orbit']).split()).replace(" ", ",")}}}', '{{None}}') AS smallint[]),
+                    -- {reach['swot_obs']}, {reach['type']}, CAST(NULLIF('{str(reach['river_name'].replace("'", "''"))}','NODATA') AS VARCHAR(254)),
+                    -- CAST(NULLIF('{str(reach['edit_flag'])}','NaN') AS smallint),
+                    -- {reach['trib_flag']},
+                    -- {reach['path_freq']},
+                    -- {reach['path_order']}, 
+                    -- {reach['path_segs']},
+                    -- {reach['main_side']},
+                    -- {reach['strm_order']},
+                    -- {reach['end_reach']},
+                    -- {reach['network']},
+                    'SRID={srid};{reach['geometry'].wkt}'
+                WHERE NOT EXISTS (
+                    SELECT * FROM {schema}."Reaches" WHERE "Name" = '{reach['Name']}'
+                    )
                 """
 
             cursor.execute(query)
