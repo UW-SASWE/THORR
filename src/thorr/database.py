@@ -1058,7 +1058,11 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
             query = f"""
                 INSERT INTO "{schema}"."Dams" ("Name", "Reservoir", "AltName", "Country", "Year", "AreaSqKm", "CapacityMCM", "DepthM", "ElevationMASL", "MainUse", "LONG_DD", "LAT_DD", "DamGeometry")
                 SELECT '{str(dam['DAM_NAME']).replace("'", "''")}', NULLIF('{str(dam['RES_NAME']).replace("'", "''")}', ''), NULLIF('{str(dam['ALT_NAME'])}',''), '{dam['COUNTRY']}', NULLIF({null_or_value(dam['YEAR'])}, NULL), NULLIF({null_or_value(dam['AREA_SKM'])}, NULL), NULLIF({null_or_value(dam['CAP_MCM'])}, NULL), NULLIF({null_or_value(dam['DEPTH_M'])}, NULL), NULLIF({null_or_value(dam['ELEV_MASL'])}, NULL),  '{dam['MAIN_USE']}', {dam['LONG_DD']}, {dam['LAT_DD']}, 'SRID={srid};{dam['geometry'].wkt}'
-                WHERE NOT EXISTS (SELECT * FROM "{schema}"."Dams" WHERE "Name" = '{str(dam['DAM_NAME']).replace("'", "''")}');
+                WHERE NOT EXISTS (
+                    SELECT
+                        *
+                    FROM "{schema}"."Dams" 
+                    WHERE "Name" = '{str(dam['DAM_NAME']).replace("'", "''")}');
                 """
 
             cursor.execute(query)
@@ -1209,7 +1213,12 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
                     -- {reach['network']},
                     'SRID={srid};{reach['geometry'].wkt}'
                 WHERE NOT EXISTS (
-                    SELECT * FROM {schema}."Reaches" WHERE "Name" = '{reach['Name']}'
+                    SELECT 
+                        *
+                    FROM
+                        {schema}."Reaches"
+                    WHERE
+                        "Name" = '{reach['Name']}'
                     )
                 """
 
