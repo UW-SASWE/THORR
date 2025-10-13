@@ -958,7 +958,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
                 SELECT
                     '{river['river_name'].replace("'", "''")}',
                     'SRID={srid};{river['geometry'].wkt}'
-                WHERE NOT EXISTS (SELECT * FROM "{schema}"."Rivers" WHERE "Name" = CAST(NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)))
+                WHERE NOT EXISTS (SELECT * FROM "{schema}"."Rivers" WHERE "Name" = CAST(NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)) AND NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL)
                 """
             
             cursor.execute(query)
