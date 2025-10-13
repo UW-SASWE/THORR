@@ -953,26 +953,37 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
             query = f"""
                 INSERT INTO "{schema}"."Rivers" (
                     "Name",
+                    "RegionID",
                     "geometry"
                     )
                 SELECT
                     '{river['river_name'].replace("'", "''")}',
+                    (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['Region']}'),
                     'SRID={srid};{river['geometry'].wkt}'
-                WHERE NOT EXISTS (SELECT * FROM "{schema}"."Rivers" WHERE "Name" = CAST(NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)) AND NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL)
+                WHERE NOT EXISTS (
+                    SELECT 
+                        *
+                    FROM 
+                        "{schema}"."Rivers" 
+                    WHERE 
+                        "Name" = CAST(NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)) 
+                        AND
+                        NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL)
+                        AND "RegionID" IS NOT (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['Region']}')
                 """
             
             cursor.execute(query)
             connection.commit()
 
-            # Update the RegionID column if the region exists in the regions table
-            query2 = f"""
-            UPDATE "{schema}"."Rivers"
-            SET "RegionID" = (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['Region']}')
-            WHERE "Name" = '{river['river_name'].replace("'", "''")}'
-            """
+            # # Update the RegionID column if the region exists in the regions table
+            # query2 = f"""
+            # UPDATE "{schema}"."Rivers"
+            # SET "RegionID" = (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['Region']}')
+            # WHERE "Name" = '{river['river_name'].replace("'", "''")}'
+            # """
 
-            cursor.execute(query2)
-            connection.commit()
+            # cursor.execute(query2)
+            # connection.commit()
 
         # # Update the MajorRiverID column if the river exists in the Rivers table
         # if "basins" in gpkg_layers:
