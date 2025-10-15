@@ -958,7 +958,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
                     )
                 SELECT
                     '{river['river_name'].replace("'", "''")}',
-                    (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['Region']}'),
+                    (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['region']}'),
                     'SRID={srid};{river['geometry'].wkt}'
                 WHERE NOT EXISTS (
                     SELECT 
@@ -966,10 +966,10 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
                     FROM 
                         "{schema}"."Rivers" 
                     WHERE 
-                        "Name" = CAST(NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)) 
-                        AND
-                        NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL)
-                        AND "RegionID" IS NOT (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['Region']}')
+                        "Name" = CAST(NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255))
+                        AND "RegionID" = (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['region']}'))
+                    AND
+                        NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL
                 """
             
             cursor.execute(query)
@@ -1180,7 +1180,25 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
                     )
                 SELECT
                     '{reach['Name']}',
-                    (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = CAST(NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255))),
+                    (
+                    SELECT
+                        "RiverID" 
+                    FROM
+                        "{schema}"."Rivers" 
+                    WHERE
+                        "Name" = CAST(
+                            NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)
+                        )
+                        AND NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL
+                        AND "RegionID" = (
+                            SELECT
+                                "RegionID"
+                            FROM 
+                                "{schema}"."Regions"
+                            WHERE
+                                "Name" = '{reach['region']}'
+                        )
+                    ),
                     CAST(NULLIF('{str(reach['koppen'])}', 'nan') AS smallint),
                     CAST(NULLIF('{str(reach['WidthMin'])}','nan') AS double precision),
                     -- CAST(NULLIF('{str(reach['WidthMean'])}','nan') AS double precision),
@@ -1231,21 +1249,58 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
                     WHERE
                         "Name" = '{reach['Name']}'
                     )
+                AND EXISTS (
+                    SELECT
+                        "RiverID" 
+                    FROM
+                        "{schema}"."Rivers" 
+                    WHERE
+                        "Name" = CAST(
+                            NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)
+                        )
+                        AND NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL
+                        AND "RegionID" = (
+                            SELECT
+                                "RegionID"
+                            FROM 
+                                "{schema}"."Regions"
+                            WHERE
+                                "Name" = '{reach['region']}'
+                        )
+                    )
                 """
 
             cursor.execute(query)
             connection.commit()
 
-        # Update the riverID column if the river exists in the Rivers table
-        for i, reach in reaches_gdf.iterrows():
-            query2 = f"""
-            UPDATE "{schema}"."Reaches"
-            SET "RiverID" = (SELECT "RiverID" FROM "{schema}"."Rivers" WHERE "Name" = CAST(NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)))
-            WHERE "Name" = '{reach['Name']}'
-            """
-
-            cursor.execute(query2)
-            connection.commit()
+        # # Update the riverID column if the river exists in the Rivers table
+        # for i, reach in reaches_gdf.iterrows():
+        #     query2 = f"""
+        #     UPDATE "{schema}"."Reaches"
+        #     SET
+        #         "RiverID" = (
+        #         SELECT
+        #             "RiverID" 
+        #         FROM
+        #             "{schema}"."Rivers" 
+        #         WHERE
+        #             "Name" = CAST(
+        #                 NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)
+        #             )
+        #             AND NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL
+        #             AND "RegionID" = (
+        #                 SELECT
+        #                     "RegionID"
+        #                 FROM 
+        #                     "{schema}"."Regions"
+        #                 WHERE
+        #                     "Name" = '{reach['region']}'
+        #             )
+        #         )
+        #     """
+            
+        #     cursor.execute(query2)
+        #     connection.commit()
 
         if "buffered_reaches" in gpkg_layers:
             buffered_reaches_gdf = gpd.read_file(
