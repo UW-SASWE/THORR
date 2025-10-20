@@ -3,7 +3,7 @@ from typing_extensions import Annotated
 from thorr.core import *
 from thorr.utils import create_config_file, download_data
 from thorr.database import db_setup
-from thorr.data import retrieval
+from thorr.data import retrieval, processing
 
 from pathlib import Path
 
@@ -72,6 +72,17 @@ def estimate_temperature(
         est_temp_reaches(config_path, element_type)
     elif element_type == "reservoirs":
         est_temp_reservoirs(config_path, element_type)
+
+
+@app.command()
+def prep_reaches(
+    config_path: Annotated[str, typer.Argument(help="Path to the configuration file")],
+    koppen: Annotated[
+        str, typer.Argument(help="Path to the Koppen climate classification file")
+    ] = None,
+):
+
+    processing.prep_reaches(config_path, koppen=koppen)
 
 
 @app.command()
