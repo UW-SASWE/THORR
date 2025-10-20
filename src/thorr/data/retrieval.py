@@ -13,7 +13,7 @@ from random import randint
 import json
 import datetime
 
-from thorr.utils import read_config, Logger, validate_start_end_dates
+from thorr.utils import read_config, Logger, validate_start_end_dates, fetch_reach_gdf, fetch_reservoir_gdf
 from thorr.database import Connect as db_connect
 
 REGIONS = {
@@ -1440,139 +1440,6 @@ def runReachExtraction(
             logger.info(f"{river} done!")
         else:
             print(f"{river} done!")
-
-
-def fetch_reservoir_gdf(db, db_type="postgresql"):
-    if db_type == "postgresql":
-        schema = db.schema
-        query = f"""
-        SELECT
-            "DamID" AS dam_id,
-            "Name" AS DAM_NAME,
-            ST_AsBinary("ReservoirGeometry") AS geometry,
-            ST_SRID("ReservoirGeometry") AS srid
-        FROM
-            {schema}."Dams"
-        ORDER By
-            "DamID"
-        """
-        connection = db.connection
-        cursor = connection.cursor()
-        cursor.execute(query)
-        reservoirs_gdf = pd.DataFrame(
-            cursor.fetchall(), columns=["dam_id", "DAM_NAME", "geometry", "srid"]
-        )
-        reservoirs_gdf["geometry"] = gpd.GeoSeries.from_wkb(reservoirs_gdf["geometry"])
-        reservoirs_gdf = gpd.GeoDataFrame(reservoirs_gdf, geometry="geometry")
-        reservoirs_gdf = reservoirs_gdf.set_crs(epsg=reservoirs_gdf["srid"].iloc[0])
-
-    elif db_type == "mysql":
-        query = f"""
-        SELECT
-            DamID AS DAM_ID,
-            Name AS DAM_NAME,
-            ST_AsText(ReservoirGeometry, 'axis-order=long-lat') AS geometry,
-            ST_SRID(geometry) AS SRID
-        FROM
-            Dams
-        """
-        connection = db.connection
-        cursor = connection.cursor()
-        cursor.execute(query)
-        reservoirs_gdf = pd.DataFrame(
-            cursor.fetchall(), columns=["dam_id", "DAM_NAME", "geometry"]
-        )
-        reservoirs_gdf["geometry"] = gpd.GeoSeries.from_wkt(reservoirs_gdf["geometry"])
-        reservoirs_gdf = gpd.GeoDataFrame(reservoirs_gdf, geometry="geometry")
-        reservoirs_gdf = reservoirs_gdf.set_crs(epsg=reservoirs_gdf["srid"].iloc[0])
-
-    return reservoirs_gdf
-
-
-def fetch_reach_gdf(db, db_type="postgresql", region=None):
-    if db_type == "postgresql":
-        schema = db.schema
-
-        # check if region exists in REGIONS dictionary
-        if region in REGIONS:
-            region_name = REGIONS[region]
-        elif region in REGIONS.values():
-            region_name = region
-        else:
-            region_name = None
-
-        if region_name is not None:
-            filter_clause = f"""
-            WHERE
-                "RiverID" IN (
-                    SELECT
-                        "RiverID"
-                    FROM
-                        {schema}."Rivers"
-                    WHERE
-                        "RegionID" = (
-                            SELECT
-                                "RegionID"
-                            FROM
-                                {schema}."Regions"
-                            WHERE
-                                "Name" = '{region_name}'
-                        )
-                )
-            """
-        else:
-            filter_clause = ""
-        
-        query = f"""
-        SELECT
-            "ReachID" AS reach_id,
-            "Name" AS reach_name,
-            "RiverID" AS river_id,
-            ST_AsBinary("buffered_geometry") AS geometry,
-            ST_SRID("buffered_geometry") AS srid
-        FROM
-            {schema}."Reaches"
-        {filter_clause}
-        ORDER By
-            "ReachID"
-        """
-        connection = db.connection
-        cursor = connection.cursor()
-        cursor.execute(query)
-        reaches_gdf = pd.DataFrame(
-            cursor.fetchall(),
-            columns=["reach_id", "reach_name", "river_id", "geometry", "srid"],
-        )
-        reaches_gdf["geometry"] = gpd.GeoSeries.from_wkb(reaches_gdf["geometry"])
-        reaches_gdf = gpd.GeoDataFrame(reaches_gdf, geometry="geometry")
-        reaches_gdf = reaches_gdf.set_crs(epsg=reaches_gdf["srid"].iloc[0])
-
-    elif db_type == "mysql":
-        query = f"""
-        SELECT
-            ReachID AS reach_id,
-            Name AS reach_name,
-            RiverID AS river_id,
-            ST_AsText(geometry, 'axis-order=long-lat') AS geometry,
-            ST_SRID(geometry) AS SRID
-        FROM
-            Reaches
-        ORDER By
-            ReachID
-        """
-        connection = db.connection
-        cursor = connection.cursor()
-        cursor.execute(query)
-        reaches_gdf = pd.DataFrame(
-            cursor.fetchall(),
-            columns=["reach_id", "reach_name", "river_id", "geometry", "srid"],
-        )
-        reaches_gdf["geometry"] = gpd.GeoSeries.from_wkt(reaches_gdf["geometry"])
-        reaches_gdf = gpd.GeoDataFrame(reaches_gdf, geometry="geometry")
-        reaches_gdf = reaches_gdf.set_crs(epsg=reaches_gdf["srid"].iloc[0])
-
-    return reaches_gdf
-
 
 def get_reservoir_data(
     db,
