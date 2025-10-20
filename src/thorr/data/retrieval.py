@@ -16,6 +16,29 @@ import datetime
 from thorr.utils import read_config, Logger, validate_start_end_dates
 from thorr.database import Connect as db_connect
 
+REGIONS = {
+    "global": 'Global',
+    "ucr": 'Upper Colorado Region',
+    "glr": 'Great Lakes Region',
+    "ohr": 'Ohio Region',
+    "lcr": 'Lower Colorado Region',
+    "pnr": 'Pacific Northwest Region',
+    "umr": 'Upper Mississippi Region',
+    "car": 'Caribbean Region',
+    "tnr": 'Tennessee Region',
+    "rgr": 'Rio Grande Region',
+    "sag": 'South Atlantic-Gulf Region',
+    "mar": 'Mid Atlantic Region',
+    "tgr": 'Texas-Gulf Region',
+    "srr": 'Souris-Red-Rainy Region',
+    "akr": 'Alaska Region',
+    "mir": 'Missouri Region',
+    "ner": 'New England Region',
+    "awr": 'Arkansas-White-Red Region',
+    "cal": 'California Region',
+    "lmr": 'Lower Mississippi Region',
+}
+
 
 def divideDates(startDate, endDate):
     """
@@ -1466,9 +1489,40 @@ def fetch_reservoir_gdf(db, db_type="postgresql"):
     return reservoirs_gdf
 
 
-def fetch_reach_gdf(db, db_type="postgresql"):
+def fetch_reach_gdf(db, db_type="postgresql", region=None):
     if db_type == "postgresql":
         schema = db.schema
+
+        # check if region exists in REGIONS dictionary
+        if region in REGIONS:
+            region_name = REGIONS[region]
+        elif region in REGIONS.values():
+            region_name = region
+        else:
+            region_name = None
+
+        if region_name is not None:
+            filter_clause = f"""
+            WHERE
+                "RiverID" IN (
+                    SELECT
+                        "RiverID"
+                    FROM
+                        {schema}."Rivers"
+                    WHERE
+                        "RegionID" = (
+                            SELECT
+                                "RegionID"
+                            FROM
+                                {schema}."Regions"
+                            WHERE
+                                "Name" = '{region_name}'
+                        )
+                )
+            """
+        else:
+            filter_clause = ""
+        
         query = f"""
         SELECT
             "ReachID" AS reach_id,
@@ -1478,6 +1532,7 @@ def fetch_reach_gdf(db, db_type="postgresql"):
             ST_SRID("buffered_geometry") AS srid
         FROM
             {schema}."Reaches"
+        {filter_clause}
         ORDER By
             "ReachID"
         """
@@ -1635,6 +1690,7 @@ def get_reach_data(
     end_date,
     # ndwi_threshold=0.2,
     # imageCollection="LANDSAT/LC08/C02/T1_L2",
+    region=None,
     logger=None,
 ):
     service_account = ee_credentials["service_account"]
@@ -1643,7 +1699,7 @@ def get_reach_data(
     )
     ee.Initialize(credentials)
 
-    reaches_gdf = fetch_reach_gdf(db, db_type)
+    reaches_gdf = fetch_reach_gdf(db, db_type, region=region)
     reaches_gdf = reaches_gdf.to_crs(epsg=4326)
 
     # reaches = reaches_gdf["reach_name"].to_list()
