@@ -13,6 +13,30 @@ from logging.handlers import TimedRotatingFileHandler
 import datetime
 
 
+REGIONS = {
+    "global": 'Global',
+    "ucr": 'Upper Colorado Region',
+    "glr": 'Great Lakes Region',
+    "ohr": 'Ohio Region',
+    "lcr": 'Lower Colorado Region',
+    "pnr": 'Pacific Northwest Region',
+    "umr": 'Upper Mississippi Region',
+    "car": 'Caribbean Region',
+    "tnr": 'Tennessee Region',
+    "rgr": 'Rio Grande Region',
+    "sag": 'South Atlantic-Gulf Region',
+    "mar": 'Mid Atlantic Region',
+    "tgr": 'Texas-Gulf Region',
+    "srr": 'Souris-Red-Rainy Region',
+    "akr": 'Alaska Region',
+    "mir": 'Missouri Region',
+    "ner": 'New England Region',
+    "awr": 'Arkansas-White-Red Region',
+    "cal": 'California Region',
+    "lmr": 'Lower Mississippi Region',
+}
+
+
 def create_config_file(proj_dir, config_filepath: Path, name=None, region=None) -> None:
     if not name:
         name = proj_dir.split("/")[-1]
@@ -309,7 +333,7 @@ def fetch_reservoir_gdf(db, db_type="postgresql"):
     return reservoirs_gdf
 
 
-def fetch_reach_gdf(db, db_type="postgresql", region=None):
+def fetch_reach_gdf(db, db_type="postgresql", region=None, geometry_type="buffered"):
     if db_type == "postgresql":
         schema = db.schema
 
@@ -343,13 +367,19 @@ def fetch_reach_gdf(db, db_type="postgresql", region=None):
         else:
             filter_clause = ""
         
+        if geometry_type == "buffered":
+            geometry_field = "buffered_geometry"
+        else:
+            geometry_field = "geometry"
+
         query = f"""
         SELECT
             "ReachID" AS reach_id,
             "Name" AS reach_name,
             "RiverID" AS river_id,
-            ST_AsBinary("buffered_geometry") AS geometry,
-            ST_SRID("buffered_geometry") AS srid
+            "WidthMean",
+            ST_AsBinary("{geometry_field}") AS geometry,
+            ST_SRID("{geometry_field}") AS srid
         FROM
             {schema}."Reaches"
         {filter_clause}
@@ -361,7 +391,7 @@ def fetch_reach_gdf(db, db_type="postgresql", region=None):
         cursor.execute(query)
         reaches_gdf = pd.DataFrame(
             cursor.fetchall(),
-            columns=["reach_id", "reach_name", "river_id", "geometry", "srid"],
+            columns=["reach_id", "reach_name", "river_id", "WidthMean", "geometry", "srid"],
         )
         reaches_gdf["geometry"] = gpd.GeoSeries.from_wkb(reaches_gdf["geometry"])
         reaches_gdf = gpd.GeoDataFrame(reaches_gdf, geometry="geometry")
@@ -393,3 +423,94 @@ def fetch_reach_gdf(db, db_type="postgresql", region=None):
 
     return reaches_gdf
 
+def fetch_river_gdf(db, db_type="postgresql"):
+    if db_type == "postgresql":
+        schema = db.schema
+        query = f"""
+        SELECT
+            "RiverID" AS river_id,
+            "Name" AS river_name,
+            ST_AsBinary("geometry") AS geometry,
+            ST_SRID("geometry") AS srid
+        FROM
+            {schema}."Rivers"
+        ORDER By
+            "RiverID"
+        """
+        connection = db.connection
+        cursor = connection.cursor()
+        cursor.execute(query)
+        rivers_gdf = pd.DataFrame(
+            cursor.fetchall(), columns=["river_id", "river_name", "geometry", "srid"]
+        )
+        rivers_gdf["geometry"] = gpd.GeoSeries.from_wkb(rivers_gdf["geometry"])
+        rivers_gdf = gpd.GeoDataFrame(rivers_gdf, geometry="geometry")
+        rivers_gdf = rivers_gdf.set_crs(epsg=rivers_gdf["srid"].iloc[0])
+
+    elif db_type == "mysql":
+        query = f"""
+        SELECT
+            RiverID AS river_id,
+            Name AS river_name,
+            ST_AsText(Geometry, 'axis-order=long-lat') AS geometry,
+            ST_SRID(geometry) AS SRID
+        FROM
+            Rivers
+        """
+        connection = db.connection
+        cursor = connection.cursor()
+        cursor.execute(query)
+        rivers_gdf = pd.DataFrame(
+            cursor.fetchall(), columns=["river_id", "river_name", "geometry"]
+        )
+        rivers_gdf["geometry"] = gpd.GeoSeries.from_wkt(rivers_gdf["geometry"])
+        rivers_gdf = gpd.GeoDataFrame(rivers_gdf, geometry="geometry")
+        rivers_gdf = rivers_gdf.set_crs(epsg=rivers_gdf["srid"].iloc[0])
+
+    return rivers_gdf
+
+def fetch_region_gdf(db, db_type="postgresql"):
+    if db_type == "postgresql":
+        schema = db.schema
+        query = f"""
+        SELECT
+            "RegionID" AS region_id,
+            "Name" AS region_name,
+            ST_AsBinary("geometry") AS geometry,
+            ST_SRID("geometry") AS srid
+        FROM
+            {schema}."Regions"
+        ORDER By
+            "RegionID"
+        """
+        connection = db.connection
+        cursor = connection.cursor()
+        cursor.execute(query)
+        regions_gdf = pd.DataFrame(
+            cursor.fetchall(), columns=["region_id", "region_name", "geometry", "srid"]
+        )
+        regions_gdf["geometry"] = gpd.GeoSeries.from_wkb(regions_gdf["geometry"])
+        regions_gdf = gpd.GeoDataFrame(regions_gdf, geometry="geometry")
+        regions_gdf = regions_gdf.set_crs(epsg=regions_gdf["srid"].iloc[0])
+
+    elif db_type == "mysql":
+        query = f"""
+        SELECT
+            RegionID AS region_id,
+            Name AS region_name,
+            ST_AsText(Geometry, 'axis-order=long-lat') AS geometry,
+            ST_SRID(geometry) AS SRID
+        FROM
+            Regions
+        """
+        connection = db.connection
+        cursor = connection.cursor()
+        cursor.execute(query)
+        regions_gdf = pd.DataFrame(
+            cursor.fetchall(), columns=["region_id", "region_name", "geometry"]
+        )
+        regions_gdf["geometry"] = gpd.GeoSeries.from_wkt(regions_gdf["geometry"])
+        regions_gdf = gpd.GeoDataFrame(regions_gdf, geometry="geometry")
+        regions_gdf = regions_gdf.set_crs(epsg=regions_gdf["srid"].iloc[0])
+
+    return regions_gdf
