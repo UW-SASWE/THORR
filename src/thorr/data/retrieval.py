@@ -13,30 +13,36 @@ from random import randint
 import json
 import datetime
 
-from thorr.utils import read_config, Logger, validate_start_end_dates, fetch_reach_gdf, fetch_reservoir_gdf
+from thorr.utils import (
+    read_config,
+    Logger,
+    validate_start_end_dates,
+    fetch_reach_gdf,
+    fetch_reservoir_gdf,
+)
 from thorr.database import Connect as db_connect
 
 REGIONS = {
-    "global": 'Global',
-    "ucr": 'Upper Colorado Region',
-    "glr": 'Great Lakes Region',
-    "ohr": 'Ohio Region',
-    "lcr": 'Lower Colorado Region',
-    "pnr": 'Pacific Northwest Region',
-    "umr": 'Upper Mississippi Region',
-    "car": 'Caribbean Region',
-    "tnr": 'Tennessee Region',
-    "rgr": 'Rio Grande Region',
-    "sag": 'South Atlantic-Gulf Region',
-    "mar": 'Mid Atlantic Region',
-    "tgr": 'Texas-Gulf Region',
-    "srr": 'Souris-Red-Rainy Region',
-    "akr": 'Alaska Region',
-    "mir": 'Missouri Region',
-    "ner": 'New England Region',
-    "awr": 'Arkansas-White-Red Region',
-    "cal": 'California Region',
-    "lmr": 'Lower Mississippi Region',
+    "global": "Global",
+    "ucr": "Upper Colorado Region",
+    "glr": "Great Lakes Region",
+    "ohr": "Ohio Region",
+    "lcr": "Lower Colorado Region",
+    "pnr": "Pacific Northwest Region",
+    "umr": "Upper Mississippi Region",
+    "car": "Caribbean Region",
+    "tnr": "Tennessee Region",
+    "rgr": "Rio Grande Region",
+    "sag": "South Atlantic-Gulf Region",
+    "mar": "Mid Atlantic Region",
+    "tgr": "Texas-Gulf Region",
+    "srr": "Souris-Red-Rainy Region",
+    "akr": "Alaska Region",
+    "mir": "Missouri Region",
+    "ner": "New England Region",
+    "awr": "Arkansas-White-Red Region",
+    "cal": "California Region",
+    "lmr": "Lower Mississippi Region",
 }
 
 
@@ -580,32 +586,61 @@ def entryToDB(
     elif db_type == "postgresql":
         schema = db.schema
 
-        if table_name == "DamData":
-            data = data.fillna("NULL")
+        # if table_name == "DamData":
+        #     data = data.fillna("NULL")
 
-            for i, row in data.iterrows():
-                query = f"""
-                INSERT INTO {schema}."{table_name}" ("Date", "DamID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
-                SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
-                WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "DamID" = {element_id})
-                """
+        #     for i, row in data.iterrows():
+        #         query = f"""
+        #         INSERT INTO {schema}."{table_name}" ("Date", "DamID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
+        #         SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
+        #         WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "DamID" = {element_id})
+        #         """
 
-                # print(query)
-                cursor.execute(query)
-                connection.commit()
-        elif table_name == "ReachData":
-            data = data.fillna("NULL")
+        #         # print(query)
+        #         cursor.execute(query)
+        #         connection.commit()
+        # elif table_name == "ReachData":
+        #     data = data.fillna("NULL")
 
-            for i, row in data.iterrows():
-                query = f"""
-                INSERT INTO {schema}."{table_name}" ("Date", "ReachID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
-                SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
-                WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "ReachID" = {element_id})
-                """
+        #     for i, row in data.iterrows():
+        #         query = f"""
+        #         INSERT INTO {schema}."{table_name}" ("Date", "ReachID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
+        #         SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
+        #         WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "ReachID" = {element_id})
+        #         """
 
-                # print(query)
-                cursor.execute(query)
-                connection.commit()
+        #         # print(query)
+        #         cursor.execute(query)
+        #         connection.commit()
+
+        match table_name:
+            case "DamData":
+                data = data.fillna("NULL")
+
+                for i, row in data.iterrows():
+                    query = f"""
+                    INSERT INTO {schema}."{table_name}" ("Date", "DamID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
+                    SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
+                    WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "DamID" = {element_id})
+                    """
+
+                    # print(query)
+                    cursor.execute(query)
+                    connection.commit()
+        
+            case "ReachData" | "ReachHLSS30" | "ReachHLSL30":
+                data = data.fillna("NULL")
+
+                for i, row in data.iterrows():
+                    query = f"""
+                    INSERT INTO {schema}."{table_name}" ("Date", "ReachID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
+                    SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
+                    WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "ReachID" = {element_id})
+                    """
+
+                    # print(query)
+                    cursor.execute(query)
+                    connection.commit()
 
 
 def damwiseExtraction(
@@ -1441,6 +1476,7 @@ def runReachExtraction(
         else:
             print(f"{river} done!")
 
+
 def get_reservoir_data(
     db,
     db_type,
@@ -1668,6 +1704,7 @@ def retrieve(config_path, element_type="reaches"):
     config_dict = read_config(Path(config_path))
 
     proj_dir = Path(config_dict["project"]["project_dir"])
+    region = config_dict["project"]["region"]
     ee_credentials = {
         "service_account": config_dict["ee"]["service_account"],
         "private_key_path": config_dict["ee"]["private_key_path"],
@@ -1714,7 +1751,14 @@ def retrieve(config_path, element_type="reaches"):
 
     if element_type == "reaches":
         get_reach_data(
-            db, db_type, data_dir, ee_credentials, start_date, end_date, logger=log
+            db,
+            db_type,
+            data_dir,
+            ee_credentials,
+            start_date,
+            end_date,
+            logger=log,
+            region=region,
         )
         # print("Retrieving reaches data")
         # pass
