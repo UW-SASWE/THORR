@@ -632,8 +632,9 @@ def postgresql_setup(config_file):
     reach_hlsl30_query = f"""
     CREATE TABLE IF NOT EXISTS {schema}."ReachHLSL30"
     (
-        id bigint NOT NULL,
-        reach_id integer NOT NULL,
+        "ID" bigint NOT NULL,
+        "Date" date NOT NULL,
+        "ReachID" integer NOT NULL,
         b01_mean double precision,
         b01_median double precision,
         b01_std double precision,
@@ -664,8 +665,8 @@ def postgresql_setup(config_file):
         b11_mean double precision,
         b11_median double precision,
         b11_std double precision,
-        CONSTRAINT "ReachHLSL30_pkey" PRIMARY KEY (id),
-        CONSTRAINT "FK_ReachHLSL_ReachID" FOREIGN KEY (reach_id)
+        CONSTRAINT "ReachHLSL30_pkey" PRIMARY KEY ("ID"),
+        CONSTRAINT "FK_ReachHLSL_ReachID" FOREIGN KEY ("ReachID")
             REFERENCES {schema}."Reaches" ("ReachID") MATCH SIMPLE
             ON UPDATE CASCADE
             ON DELETE CASCADE
@@ -816,8 +817,9 @@ def postgresql_setup(config_file):
     reach_hlss30_query = f"""
     CREATE TABLE IF NOT EXISTS {schema}."ReachHLSS30"
     (
-        id bigint NOT NULL,
-        reach_id integer NOT NULL,
+        "ID" bigint NOT NULL,
+        "Date" date NOT NULL,
+        "ReachID" integer NOT NULL,
         b01_mean double precision,
         b01_median double precision,
         b01_std double precision,
@@ -857,8 +859,8 @@ def postgresql_setup(config_file):
         b10_mean double precision,
         b10_median double precision,
         b10_std double precision,
-        CONSTRAINT "ReachHLSS30_pkey" PRIMARY KEY (id),
-        CONSTRAINT "FK_ReachHLSS30_ReachID" FOREIGN KEY (reach_id)
+        CONSTRAINT "ReachHLSS30_pkey" PRIMARY KEY ("ID"),
+        CONSTRAINT "FK_ReachHLSS30_ReachID" FOREIGN KEY ("ReachID")
             REFERENCES {schema}."Reaches" ("ReachID") MATCH SIMPLE
             ON UPDATE CASCADE
             ON DELETE CASCADE
