@@ -77,12 +77,12 @@ def estimate_temperature(
 @app.command()
 def prep_reaches(
     config_path: Annotated[str, typer.Argument(help="Path to the configuration file")],
-    koppen: Annotated[
+    koppen_path: Annotated[
         str, typer.Argument(help="Path to the Koppen climate classification file")
     ] = None,
 ):
 
-    processing.prep_reaches(config_path, koppen=koppen)
+    processing.prep_reaches(config_path, koppen_path=koppen_path)
 
 
 @app.command()
