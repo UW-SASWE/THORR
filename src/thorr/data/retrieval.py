@@ -461,6 +461,205 @@ def extractL4TempSeries(
         return None
 
 
+def extractHLSL30BandData(
+    element,
+    startDate,
+    endDate,
+    # ndwi_threshold=0.2,
+    imageCollection="NASA/HLS/HLSL30/v002",
+    logger=None,
+    element_type="reach",):
+
+    hlsl30 = ee.ImageCollection(imageCollection).filterDate(startDate, endDate).filterBounds(element)
+
+    def extractData(date):
+        date = ee.Date(date)
+
+        processed_hlsl30 = hlsl30.filterDate(date, date.advance(1, "day"))
+        hlsl30_mosaic = processed_hlsl30.mosaic()
+
+        waterMask = hlsl30_mosaic.select("Fmask").bitwiseAnd(int("100000", 2)).neq(0)
+        nonWaterMask = hlsl30_mosaic.select("Fmask").bitwiseAnd(int("100000", 2)).eq(0)
+
+        hlsl30_water = (
+            processed_hlsl30.reduce(ee.Reducer.mean())
+            .updateMask(waterMask).set("system:time_start", date)
+        ).clip(element.geometry())
+
+        band_data = {
+            "B1": {"b1_mean": None, "b1_median": None, "b1_std": None},
+            "B2": {"b2_mean": None, "b2_median": None, "b2_std": None},
+            "B3": {"b3_mean": None, "b3_median": None, "b3_std": None},
+            "B4": {"b4_mean": None, "b4_median": None, "b4_std": None},
+            "B5": {"b5_mean": None, "b5_median": None, "b5_std": None},
+            "B6": {"b6_mean": None, "b6_median": None, "b6_std": None},
+            "B7": {"b7_mean": None, "b7_median": None, "b7_std": None},
+            "B9": {"b9_mean": None, "b9_median": None, "b9_std": None},
+            "B10": {"b10_mean": None, "b10_median": None, "b10_std": None},
+            "B11": {"b11_mean": None, "b11_median": None, "b11_std": None},
+        }
+
+        for band in band_data.keys():
+            band_data[band][f"{band.lower()}_mean"] = hlsl30_water.select(f"{band.upper()}_mean").reduceRegion(
+                reducer=ee.Reducer.mean(),
+                geometry=element.geometry(),
+                scale=30,
+            )
+            band_data[band][f"{band.lower()}_median"] = hlsl30_water.select(f"{band.upper()}_mean").reduceRegion(
+                reducer=ee.Reducer.median(),
+                geometry=element.geometry(),
+                scale=30,
+            )
+            band_data[band][f"{band.lower()}_std"] = hlsl30_water.select(f"{band.upper()}_mean").reduceRegion(
+                reducer=ee.Reducer.stdDev(),
+                geometry=element.geometry(),
+                scale=30,
+            )
+        
+        return ee.Feature(
+            None,
+            {
+                "date": date.format("YYYY-MM-dd"),
+                **band_data["B1"],
+                **band_data["B2"],
+                **band_data["B3"],
+                **band_data["B4"],
+                **band_data["B5"],
+                **band_data["B6"],
+                **band_data["B7"],
+                **band_data["B9"],
+                **band_data["B10"],
+                **band_data["B11"],
+            },
+        )
+
+    try:
+        dates = ee.List(
+            hlsl30.map(
+                lambda image: ee.Feature(
+                    None, {"date": image.date().format("YYYY-MM-dd")}
+                )
+            )
+            .distinct("date")
+            .aggregate_array("date")
+        )
+        dataSeries = ee.FeatureCollection(dates.map(extractData))
+        return dataSeries
+    except Exception as e:
+        print(e, startDate, endDate)
+
+    #     # return dataSeries
+    # except Exception as e:
+    #     # print(e, startDate, endDate)
+    #     if logger is not None:
+    #         logger.info(f"{e}")
+    #     else:
+    #         print(f"{e}")
+    #     return None
+
+def extractHLSS30BandData(
+    element,
+    startDate,
+    endDate,
+    # ndwi_threshold=0.2,
+    imageCollection="NASA/HLS/HLSS30/v002",
+    logger=None,
+    element_type="reach",):
+
+    hlss30 = ee.ImageCollection(imageCollection).filterDate(startDate, endDate).filterBounds(element)
+
+    def extractData(date):
+        date = ee.Date(date)
+
+        processed_hlss30 = hlss30.filterDate(date, date.advance(1, "day"))
+        hlss30_mosaic = processed_hlss30.mosaic()
+
+        waterMask = hlss30_mosaic.select("Fmask").bitwiseAnd(int("100000", 2)).neq(0)
+        nonWaterMask = hlss30_mosaic.select("Fmask").bitwiseAnd(int("100000", 2)).eq(0)
+
+        hlss30_water = (
+            processed_hlss30.reduce(ee.Reducer.mean())
+            .updateMask(waterMask).set("system:time_start", date)
+        ).clip(element.geometry())
+
+        band_data = {
+            "B1": {"b1_mean": None, "b1_median": None, "b1_std": None},
+            "B2": {"b2_mean": None, "b2_median": None, "b2_std": None},
+            "B3": {"b3_mean": None, "b3_median": None, "b3_std": None},
+            "B4": {"b4_mean": None, "b4_median": None, "b4_std": None},
+            "B5": {"b5_mean": None, "b5_median": None, "b5_std": None},
+            "B6": {"b6_mean": None, "b6_median": None, "b6_std": None},
+            "B7": {"b7_mean": None, "b7_median": None, "b7_std": None},
+            "B8": {"b8_mean": None, "b8_median": None, "b8_std": None},
+            "B8A": {"b8a_mean": None, "b8a_median": None, "b8a_std": None},
+            "B9": {"b9_mean": None, "b9_median": None, "b9_std": None},
+            "B10": {"b10_mean": None, "b10_median": None, "b10_std": None},
+            "B11": {"b11_mean": None, "b11_median": None, "b11_std": None},
+            "B12": {"b12_mean": None, "b12_median": None, "b12_std": None},
+
+        }
+
+        for band in band_data.keys():
+            band_data[band][f"{band.lower()}_mean"] = hlss30_water.select(f"{band.upper()}_mean").reduceRegion(
+                reducer=ee.Reducer.mean(),
+                geometry=element.geometry(),
+                scale=30,
+            )
+            band_data[band][f"{band.lower()}_median"] = hlss30_water.select(f"{band.upper()}_mean").reduceRegion(
+                reducer=ee.Reducer.median(),
+                geometry=element.geometry(),
+                scale=30,
+            )
+            band_data[band][f"{band.lower()}_std"] = hlss30_water.select(f"{band.upper()}_mean").reduceRegion(
+                reducer=ee.Reducer.stdDev(),
+                geometry=element.geometry(),
+                scale=30,
+            )
+        
+        return ee.Feature(
+            None,
+            {
+                "date": date.format("YYYY-MM-dd"),
+                **band_data["B1"],
+                **band_data["B2"],
+                **band_data["B3"],
+                **band_data["B4"],
+                **band_data["B5"],
+                **band_data["B6"],
+                **band_data["B7"],
+                **band_data["B8"],
+                **band_data["B8A"],
+                **band_data["B9"],
+                **band_data["B10"],
+                **band_data["B11"],
+                **band_data["B12"],
+            },
+        )
+
+    try:
+        dates = ee.List(
+            hlss30.map(
+                lambda image: ee.Feature(
+                    None, {"date": image.date().format("YYYY-MM-dd")}
+                )
+            )
+            .distinct("date")
+            .aggregate_array("date")
+        )
+        dataSeries = ee.FeatureCollection(dates.map(extractData))
+        return dataSeries
+    except Exception as e:
+        print(e, startDate, endDate)
+
+    #     # return dataSeries
+    # except Exception as e:
+    #     # print(e, startDate, endDate)
+    #     if logger is not None:
+    #         logger.info(f"{e}")
+    #     else:
+    #         print(f"{e}")
+    #     return None
+
 def ee_to_df(featureCollection):
     """
     Convert an ee.FeatureCollection to a pandas.DataFrame
@@ -533,14 +732,24 @@ def entryToDB(
     data = data.copy()
     data[entry_key["Date"]] = pd.to_datetime(data[entry_key["Date"]])
     data = data[[value for value in entry_key.values() if value]]
-    data = data.dropna(
-        how="all",
-        subset=[
-            value
-            for value in entry_key.values()
-            if value not in [entry_key["Date"], entry_key["Mission"]]
-        ],
-    )
+    if table_name == "DamData" or table_name == "ReachData":
+        data = data.dropna(
+            how="all",
+            subset=[
+                value
+                for value in entry_key.values()
+                if value not in [entry_key["Date"], entry_key["Mission"]]
+            ],
+        )
+    else:
+        data = data.dropna(
+            how="all",
+            subset=[
+                value
+                for value in entry_key.values()
+                if value not in [entry_key["Date"]]
+            ],
+        )
     # data = data[data[value_col] != -9999]
     data = data.sort_values(by=entry_key["Date"])
 
@@ -628,13 +837,27 @@ def entryToDB(
                     cursor.execute(query)
                     connection.commit()
         
-            case "ReachData" | "ReachHLSS30" | "ReachHLSL30":
+            case "ReachData":
                 data = data.fillna("NULL")
 
                 for i, row in data.iterrows():
                     query = f"""
                     INSERT INTO {schema}."{table_name}" ("Date", "ReachID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
                     SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
+                    WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "ReachID" = {element_id})
+                    """
+
+                    # print(query)
+                    cursor.execute(query)
+                    connection.commit()
+            
+            case "ReachHLSS30" | "ReachHLSL30":
+                data = data.fillna("NULL")
+
+                for i, row in data.iterrows():
+                    query = f"""
+                    INSERT INTO {schema}."{table_name}" ("Date", "ReachID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
+                    SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"]]])}
                     WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "ReachID" = {element_id})
                     """
 
@@ -944,6 +1167,28 @@ def reachwiseExtraction(
                     logger,
                     "reach",
                 )
+            case "NASA/HLS/HLSL30/v002":
+                # print('extracting HLSL30 data')
+                dataSeries = extractHLSL30BandData(
+                    reach,
+                    startDate_,
+                    endDate_,
+                    # ndwi_threshold,
+                    imageCollection,
+                    logger,
+                    "reach",
+                )
+            case "NASA/HLS/HLSS30/v002":
+                # print('extracting HLSS30 data')
+                dataSeries = extractHLSS30BandData(
+                    reach,
+                    startDate_,
+                    endDate_,
+                    # ndwi_threshold,
+                    imageCollection,
+                    logger,
+                    "reach",
+                )
             case _:
                 pass
 
@@ -984,20 +1229,32 @@ def reachwiseExtraction(
             #     .astype(float)
             # )
 
-            dataSeries["watertemp(C)"] = (
-                dataSeries["watertemp(C)"]
-                .apply(lambda x: x["Celcius_mean"])
-                .astype(float)
-            )
-            dataSeries["landtemp(C)"] = (
-                dataSeries["landtemp(C)"]
-                .apply(lambda x: x["Celcius_mean"])
-                .astype(float)
-            )
-            dataSeries["NDVI"] = (
-                dataSeries["NDVI"].apply(lambda x: x["NDVI_mean"]).astype(float)
-            )
-            dataSeries["Mission"] = missions[imageCollection]
+            match imageCollection:
+                case "LANDSAT/LC09/C02/T1_L2" | "LANDSAT/LC08/C02/T1_L2" | "LANDSAT/LT04/C02/T1_L2" | "LANDSAT/LT05/C02/T1_L2" | "LANDSAT/LE07/C02/T1_L2":    
+                    dataSeries["watertemp(C)"] = (
+                        dataSeries["watertemp(C)"]
+                        .apply(lambda x: x["Celcius_mean"])
+                        .astype(float)
+                    )
+
+                    dataSeries["landtemp(C)"] = (
+                        dataSeries["landtemp(C)"]
+                        .apply(lambda x: x["Celcius_mean"])
+                        .astype(float)
+                    )
+                    dataSeries["NDVI"] = (
+                        dataSeries["NDVI"].apply(lambda x: x["NDVI_mean"]).astype(float)
+                    )
+                    dataSeries["Mission"] = missions[imageCollection]
+                case "NASA/HLS/HLSL30/v002" | "NASA/HLS/HLSS30/v002":
+                    for column in dataSeries.columns:
+                        if column != "date":
+                            dataSeries[column] = (
+                                dataSeries[column]
+                                .apply(lambda x: x[column.upper().split('_')[0] + '_mean'])
+                                .astype(float)
+                            )
+                    # print(dataSeries.head())
 
             # append time series to list
             # waterTempSeriesList.append(waterTempSeries)
@@ -1064,22 +1321,116 @@ def reachwiseExtraction(
     #     date_col="date",
     #     value_col="NDVI",
     # )
-
-    entryToDB(
-        dataSeries_df,
-        "ReachData",
-        reach_id,
-        # connection,
-        entry_key={
-            "Date": "date",
-            "LandTempC": "landtemp(C)",
-            "WaterTempC": "watertemp(C)",
-            "NDVI": "NDVI",
-            "Mission": "Mission",
-        },
-        db=db,
-        db_type=db_type,
-    )
+    
+    if imageCollection == "NASA/HLS/HLSL30/v002":
+        entryToDB(
+            dataSeries_df,
+            "ReachHLSL30",
+            reach_id,
+            # connection,
+            entry_key={
+                "Date": "date",
+                "b01_mean": "b1_mean",
+                "b01_median": "b1_median",
+                "b01_std": "b1_std",
+                "b02_mean": "b2_mean",
+                "b02_median": "b2_median",
+                "b02_std": "b2_std",
+                "b03_mean": "b3_mean",
+                "b03_median": "b3_median",
+                "b03_std": "b3_std",
+                "b04_mean": "b4_mean",
+                "b04_median": "b4_median",
+                "b04_std": "b4_std",
+                "b05_mean": "b5_mean",
+                "b05_median": "b5_median",
+                "b05_std": "b5_std",
+                "b06_mean": "b6_mean",
+                "b06_median": "b6_median",
+                "b06_std": "b6_std",
+                "b07_mean": "b7_mean",
+                "b07_median": "b7_median",
+                "b07_std": "b7_std",
+                "b09_mean": "b9_mean",
+                "b09_median": "b9_median",
+                "b09_std": "b9_std",
+                "b10_mean": "b10_mean",
+                "b10_median": "b10_median",
+                "b10_std": "b10_std",
+                "b11_mean": "b11_mean",
+                "b11_median": "b11_median",
+                "b11_std": "b11_std",
+            },
+            db=db,
+            db_type=db_type,
+        )
+    elif imageCollection == "NASA/HLS/HLSS30/v002":
+        entryToDB(
+            dataSeries_df,
+            "ReachHLSS30",
+            reach_id,
+            # connection,
+            entry_key={
+                "Date": "date",
+                "b01_mean": "b1_mean",
+                "b01_median": "b1_median",
+                "b01_std": "b1_std",
+                "b02_mean": "b2_mean",
+                "b02_median": "b2_median",
+                "b02_std": "b2_std",
+                "b03_mean": "b3_mean",
+                "b03_median": "b3_median",
+                "b03_std": "b3_std",
+                "b04_mean": "b4_mean",
+                "b04_median": "b4_median",
+                "b04_std": "b4_std",
+                "b05_mean": "b5_mean",
+                "b05_median": "b5_median",
+                "b05_std": "b5_std",
+                "b06_mean": "b6_mean",
+                "b06_median": "b6_median",
+                "b06_std": "b6_std",
+                "b07_mean": "b7_mean",
+                "b07_median": "b7_median",
+                "b07_std": "b7_std",
+                "b08_mean": "b8_mean",
+                "b08_median": "b8_median",
+                "b08_std": "b8_std",
+                "b8a_mean": "b8a_mean",
+                "b8a_median": "b8a_median",
+                "b8a_std": "b8a_std",
+                "b09_mean": "b9_mean",
+                "b09_median": "b9_median",
+                "b09_std": "b9_std",
+                "b10_mean": "b10_mean",
+                "b10_median": "b10_median",
+                "b10_std": "b10_std",
+                "b11_mean": "b11_mean",
+                "b11_median": "b11_median",
+                "b11_std": "b11_std",
+                "b12_mean": "b12_mean",
+                "b12_median": "b12_median",
+                "b12_std": "b12_std",
+            },
+            db=db,
+            db_type=db_type,
+        )
+    else:
+        entryToDB(
+            dataSeries_df,
+            "ReachData",
+            reach_id,
+            # connection,
+            entry_key={
+                "Date": "date",
+                "LandTempC": "landtemp(C)",
+                "WaterTempC": "watertemp(C)",
+                "NDVI": "NDVI",
+                "Mission": "Mission",
+            },
+            db=db,
+            db_type=db_type,
+        )
 
 
 def runReservoirExtraction(
@@ -1317,6 +1668,57 @@ def runReachExtraction(
             # reach_ids = gdf["reach_id"].tolist()
 
         for reach_id in reach_ids:
+            
+            
+
+            # hlss30 data
+            if datetime.datetime.strptime(
+                end_date, "%Y-%m-%d"
+            ) >= datetime.datetime.strptime("2015-11-15", "%Y-%m-%d"):
+                reachwiseExtraction(
+                    reaches,
+                    reach_id,
+                    # dam_name,
+                    max(
+                        datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                        datetime.datetime.strptime("2015-11-15", "%Y-%m-%d"),
+                    ).strftime(
+                        "%Y-%m-%d"
+                    ),  # clip the start date to 2015-11-15
+                    end_date,
+                    # ndwi_threshold,
+                    imageCollection="NASA/HLS/HLSS30/v002",
+                    checkpoint_path=checkpoint_path,
+                    db=db,
+                    db_type=db_type,
+                    # connection=connection,
+                    logger=logger,
+                )
+
+            # hlsl30 data
+            if datetime.datetime.strptime(
+                end_date, "%Y-%m-%d"
+            ) >= datetime.datetime.strptime("2013-04-01", "%Y-%m-%d"):
+                reachwiseExtraction(
+                    reaches,
+                    reach_id,
+                    # dam_name,
+                    max(
+                        datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                        datetime.datetime.strptime("2013-04-01", "%Y-%m-%d"),
+                    ).strftime(
+                        "%Y-%m-%d"
+                    ),  # clip the start date to 2013-04-01
+                    end_date,
+                    # ndwi_threshold,
+                    imageCollection="NASA/HLS/HLSL30/v002",
+                    checkpoint_path=checkpoint_path,
+                    db=db,
+                    db_type=db_type,
+                    # connection=connection,
+                    logger=logger,
+                )
+
             # Landsat9 Data
             if datetime.datetime.strptime(
                 end_date, "%Y-%m-%d"
