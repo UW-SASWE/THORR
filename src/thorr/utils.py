@@ -14,26 +14,26 @@ import datetime
 
 
 REGIONS = {
-    "global": 'Global',
-    "ucr": 'Upper Colorado Region',
-    "glr": 'Great Lakes Region',
-    "ohr": 'Ohio Region',
-    "lcr": 'Lower Colorado Region',
-    "pnr": 'Pacific Northwest Region',
-    "umr": 'Upper Mississippi Region',
-    "car": 'Caribbean Region',
-    "tnr": 'Tennessee Region',
-    "rgr": 'Rio Grande Region',
-    "sag": 'South Atlantic-Gulf Region',
-    "mar": 'Mid Atlantic Region',
-    "tgr": 'Texas-Gulf Region',
-    "srr": 'Souris-Red-Rainy Region',
-    "akr": 'Alaska Region',
-    "mir": 'Missouri Region',
-    "ner": 'New England Region',
-    "awr": 'Arkansas-White-Red Region',
-    "cal": 'California Region',
-    "lmr": 'Lower Mississippi Region',
+    "global": "Global",
+    "ucr": "Upper Colorado Region",
+    "glr": "Great Lakes Region",
+    "ohr": "Ohio Region",
+    "lcr": "Lower Colorado Region",
+    "pnr": "Pacific Northwest Region",
+    "umr": "Upper Mississippi Region",
+    "car": "Caribbean Region",
+    "tnr": "Tennessee Region",
+    "rgr": "Rio Grande Region",
+    "sag": "South Atlantic-Gulf Region",
+    "mar": "Mid Atlantic Region",
+    "tgr": "Texas-Gulf Region",
+    "srr": "Souris-Red-Rainy Region",
+    "akr": "Alaska Region",
+    "mir": "Missouri Region",
+    "ner": "New England Region",
+    "awr": "Arkansas-White-Red Region",
+    "cal": "California Region",
+    "lmr": "Lower Mississippi Region",
 }
 
 
@@ -285,7 +285,6 @@ def validate_start_end_dates(start_date, end_date, logger=None):
     return start_date, end_date
 
 
-
 def fetch_reservoir_gdf(db, db_type="postgresql"):
     if db_type == "postgresql":
         schema = db.schema
@@ -366,7 +365,7 @@ def fetch_reach_gdf(db, db_type="postgresql", region=None, geometry_type="buffer
             """
         else:
             filter_clause = ""
-        
+
         if geometry_type == "buffered":
             geometry_field = "buffered_geometry"
         else:
@@ -386,12 +385,20 @@ def fetch_reach_gdf(db, db_type="postgresql", region=None, geometry_type="buffer
         ORDER By
             "ReachID"
         """
+
         connection = db.connection
         cursor = connection.cursor()
         cursor.execute(query)
         reaches_gdf = pd.DataFrame(
             cursor.fetchall(),
-            columns=["reach_id", "reach_name", "river_id", "WidthMean", "geometry", "srid"],
+            columns=[
+                "reach_id",
+                "reach_name",
+                "river_id",
+                "WidthMean",
+                "geometry",
+                "srid",
+            ],
         )
         reaches_gdf["geometry"] = gpd.GeoSeries.from_wkb(reaches_gdf["geometry"])
         reaches_gdf = gpd.GeoDataFrame(reaches_gdf, geometry="geometry")
@@ -422,6 +429,7 @@ def fetch_reach_gdf(db, db_type="postgresql", region=None, geometry_type="buffer
         reaches_gdf = reaches_gdf.set_crs(epsg=reaches_gdf["srid"].iloc[0])
 
     return reaches_gdf
+
 
 def fetch_river_gdf(db, db_type="postgresql"):
     if db_type == "postgresql":
@@ -468,6 +476,7 @@ def fetch_river_gdf(db, db_type="postgresql"):
         rivers_gdf = rivers_gdf.set_crs(epsg=rivers_gdf["srid"].iloc[0])
 
     return rivers_gdf
+
 
 def fetch_region_gdf(db, db_type="postgresql"):
     if db_type == "postgresql":
