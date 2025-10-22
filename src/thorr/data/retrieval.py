@@ -468,9 +468,14 @@ def extractHLSL30BandData(
     # ndwi_threshold=0.2,
     imageCollection="NASA/HLS/HLSL30/v002",
     logger=None,
-    element_type="reach",):
+    element_type="reach",
+):
 
-    hlsl30 = ee.ImageCollection(imageCollection).filterDate(startDate, endDate).filterBounds(element)
+    hlsl30 = (
+        ee.ImageCollection(imageCollection)
+        .filterDate(startDate, endDate)
+        .filterBounds(element)
+    )
 
     def extractData(date):
         date = ee.Date(date)
@@ -483,7 +488,8 @@ def extractHLSL30BandData(
 
         hlsl30_water = (
             processed_hlsl30.reduce(ee.Reducer.mean())
-            .updateMask(waterMask).set("system:time_start", date)
+            .updateMask(waterMask)
+            .set("system:time_start", date)
         ).clip(element.geometry())
 
         band_data = {
@@ -500,22 +506,28 @@ def extractHLSL30BandData(
         }
 
         for band in band_data.keys():
-            band_data[band][f"{band.lower()}_mean"] = hlsl30_water.select(f"{band.upper()}_mean").reduceRegion(
+            band_data[band][f"{band.lower()}_mean"] = hlsl30_water.select(
+                f"{band.upper()}_mean"
+            ).reduceRegion(
                 reducer=ee.Reducer.mean(),
                 geometry=element.geometry(),
                 scale=30,
             )
-            band_data[band][f"{band.lower()}_median"] = hlsl30_water.select(f"{band.upper()}_mean").reduceRegion(
+            band_data[band][f"{band.lower()}_median"] = hlsl30_water.select(
+                f"{band.upper()}_mean"
+            ).reduceRegion(
                 reducer=ee.Reducer.median(),
                 geometry=element.geometry(),
                 scale=30,
             )
-            band_data[band][f"{band.lower()}_std"] = hlsl30_water.select(f"{band.upper()}_mean").reduceRegion(
+            band_data[band][f"{band.lower()}_std"] = hlsl30_water.select(
+                f"{band.upper()}_mean"
+            ).reduceRegion(
                 reducer=ee.Reducer.stdDev(),
                 geometry=element.geometry(),
                 scale=30,
             )
-        
+
         return ee.Feature(
             None,
             {
@@ -557,6 +569,7 @@ def extractHLSL30BandData(
     #         print(f"{e}")
     #     return None
 
+
 def extractHLSS30BandData(
     element,
     startDate,
@@ -564,9 +577,14 @@ def extractHLSS30BandData(
     # ndwi_threshold=0.2,
     imageCollection="NASA/HLS/HLSS30/v002",
     logger=None,
-    element_type="reach",):
+    element_type="reach",
+):
 
-    hlss30 = ee.ImageCollection(imageCollection).filterDate(startDate, endDate).filterBounds(element)
+    hlss30 = (
+        ee.ImageCollection(imageCollection)
+        .filterDate(startDate, endDate)
+        .filterBounds(element)
+    )
 
     def extractData(date):
         date = ee.Date(date)
@@ -579,7 +597,8 @@ def extractHLSS30BandData(
 
         hlss30_water = (
             processed_hlss30.reduce(ee.Reducer.mean())
-            .updateMask(waterMask).set("system:time_start", date)
+            .updateMask(waterMask)
+            .set("system:time_start", date)
         ).clip(element.geometry())
 
         band_data = {
@@ -596,26 +615,31 @@ def extractHLSS30BandData(
             "B10": {"b10_mean": None, "b10_median": None, "b10_std": None},
             "B11": {"b11_mean": None, "b11_median": None, "b11_std": None},
             "B12": {"b12_mean": None, "b12_median": None, "b12_std": None},
-
         }
 
         for band in band_data.keys():
-            band_data[band][f"{band.lower()}_mean"] = hlss30_water.select(f"{band.upper()}_mean").reduceRegion(
+            band_data[band][f"{band.lower()}_mean"] = hlss30_water.select(
+                f"{band.upper()}_mean"
+            ).reduceRegion(
                 reducer=ee.Reducer.mean(),
                 geometry=element.geometry(),
                 scale=30,
             )
-            band_data[band][f"{band.lower()}_median"] = hlss30_water.select(f"{band.upper()}_mean").reduceRegion(
+            band_data[band][f"{band.lower()}_median"] = hlss30_water.select(
+                f"{band.upper()}_mean"
+            ).reduceRegion(
                 reducer=ee.Reducer.median(),
                 geometry=element.geometry(),
                 scale=30,
             )
-            band_data[band][f"{band.lower()}_std"] = hlss30_water.select(f"{band.upper()}_mean").reduceRegion(
+            band_data[band][f"{band.lower()}_std"] = hlss30_water.select(
+                f"{band.upper()}_mean"
+            ).reduceRegion(
                 reducer=ee.Reducer.stdDev(),
                 geometry=element.geometry(),
                 scale=30,
             )
-        
+
         return ee.Feature(
             None,
             {
@@ -659,6 +683,7 @@ def extractHLSS30BandData(
     #     else:
     #         print(f"{e}")
     #     return None
+
 
 def ee_to_df(featureCollection):
     """
@@ -836,7 +861,7 @@ def entryToDB(
                     # print(query)
                     cursor.execute(query)
                     connection.commit()
-        
+
             case "ReachData":
                 data = data.fillna("NULL")
 
@@ -850,7 +875,7 @@ def entryToDB(
                     # print(query)
                     cursor.execute(query)
                     connection.commit()
-            
+
             case "ReachHLSS30" | "ReachHLSL30":
                 data = data.fillna("NULL")
 
@@ -948,7 +973,7 @@ def damwiseExtraction(
             case "NASA/HLS/HLSL30/v002":
                 pass
             case "NASA/HLS/HLSS30/v002":
-                pass 
+                pass
             case _:
                 pass
 
@@ -1230,7 +1255,13 @@ def reachwiseExtraction(
             # )
 
             match imageCollection:
-                case "LANDSAT/LC09/C02/T1_L2" | "LANDSAT/LC08/C02/T1_L2" | "LANDSAT/LT04/C02/T1_L2" | "LANDSAT/LT05/C02/T1_L2" | "LANDSAT/LE07/C02/T1_L2":    
+                case (
+                    "LANDSAT/LC09/C02/T1_L2"
+                    | "LANDSAT/LC08/C02/T1_L2"
+                    | "LANDSAT/LT04/C02/T1_L2"
+                    | "LANDSAT/LT05/C02/T1_L2"
+                    | "LANDSAT/LE07/C02/T1_L2"
+                ):
                     dataSeries["watertemp(C)"] = (
                         dataSeries["watertemp(C)"]
                         .apply(lambda x: x["Celcius_mean"])
@@ -1251,7 +1282,9 @@ def reachwiseExtraction(
                         if column != "date":
                             dataSeries[column] = (
                                 dataSeries[column]
-                                .apply(lambda x: x[column.upper().split('_')[0] + '_mean'])
+                                .apply(
+                                    lambda x: x[column.upper().split("_")[0] + "_mean"]
+                                )
                                 .astype(float)
                             )
                     # print(dataSeries.head())
@@ -1321,7 +1354,7 @@ def reachwiseExtraction(
     #     date_col="date",
     #     value_col="NDVI",
     # )
-    
+
     if imageCollection == "NASA/HLS/HLSL30/v002":
         entryToDB(
             dataSeries_df,
@@ -1668,8 +1701,6 @@ def runReachExtraction(
             # reach_ids = gdf["reach_id"].tolist()
 
         for reach_id in reach_ids:
-            
-            
 
             # hlss30 data
             if datetime.datetime.strptime(

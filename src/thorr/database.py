@@ -59,7 +59,7 @@ class Connect:
                     port=db_config["database"]["port"],
                 )
 
-                database=db_config["database"]["database"]
+                database = db_config["database"]["database"]
                 cursor = self.connection.cursor()
 
                 # Create database if it doesn't exist
@@ -200,7 +200,6 @@ def mysql_setup(config_file):
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
     """
     cursor.execute(regions_query)
-
 
     # Create the Rivers table
     rivers_query = """
@@ -1054,8 +1053,6 @@ def postgresql_setup(config_file):
     pass
 
 
-
-
 # function to set up a fresh database
 def db_setup(config_file, upload_gis_=False):
     db_config = read_config(config_file)
@@ -1308,8 +1305,6 @@ def mysql_upload_gis(config_file, gpkg, gpkg_layers):
 
                 cursor.execute(query)
                 connection.commit()
-            
-
 
 
 def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
@@ -1338,8 +1333,6 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
             cursor.execute(query)
             connection.commit()
 
-    
-
     if "regions" in gpkg_layers:
 
         # print( gpkg, gpkg_layers)
@@ -1367,7 +1360,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
             #     SELECT '{river['GNIS_Name']}', {river['LengthKM']}, 'SRID={srid};{river['geometry'].wkt}'
             #     WHERE NOT EXISTS (SELECT * FROM "{schema}"."Rivers" WHERE "Name" = '{river['GNIS_Name']}')
             #     """
-            
+
             query = f"""
                 INSERT INTO "{schema}"."Rivers" (
                     "Name",
@@ -1389,7 +1382,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
                     AND
                         NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL
                 """
-            
+
             cursor.execute(query)
             connection.commit()
 
@@ -1545,7 +1538,6 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
         # for i, reach in reaches_gdf.iterrows():
         #     # Iinsert reach data into the table if the entry doesn't already exist
 
-
         for i, reach in reaches_gdf.iterrows():
 
             query = f"""
@@ -1698,9 +1690,9 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
         #     SET
         #         "RiverID" = (
         #         SELECT
-        #             "RiverID" 
+        #             "RiverID"
         #         FROM
-        #             "{schema}"."Rivers" 
+        #             "{schema}"."Rivers"
         #         WHERE
         #             "Name" = CAST(
         #                 NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)
@@ -1709,14 +1701,14 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
         #             AND "RegionID" = (
         #                 SELECT
         #                     "RegionID"
-        #                 FROM 
+        #                 FROM
         #                     "{schema}"."Regions"
         #                 WHERE
         #                     "Name" = '{reach['region']}'
         #             )
         #         )
         #     """
-            
+
         #     cursor.execute(query2)
         #     connection.commit()
 
@@ -1739,7 +1731,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
 def upload_gis(config_file, gpkg, gpkg_layers, db_type="mysql"):
     print("Uploading GIS data to database...")
-    gpkg_layers = {k: v for k, v in gpkg_layers.items() if v} # remove empty layer keys
+    gpkg_layers = {k: v for k, v in gpkg_layers.items() if v}  # remove empty layer keys
     if db_type == "mysql":
         mysql_upload_gis(
             config_file,
