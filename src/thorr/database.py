@@ -604,7 +604,7 @@ def postgresql_setup(config_file):
     query = f"""
     CREATE TABLE IF NOT EXISTS "{schema}"."ReachData"
     (
-        "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+        "ID" bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
         "Date" date NOT NULL,
         "ReachID" integer NOT NULL,
         "LandTempC" double precision,
@@ -632,7 +632,7 @@ def postgresql_setup(config_file):
     reach_hlsl30_query = f"""
     CREATE TABLE IF NOT EXISTS {schema}."ReachHLSL30"
     (
-        "ID" bigint NOT NULL,
+        "ID" bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
         "Date" date NOT NULL,
         "ReachID" integer NOT NULL,
         b01_mean double precision,
@@ -817,7 +817,7 @@ def postgresql_setup(config_file):
     reach_hlss30_query = f"""
     CREATE TABLE IF NOT EXISTS {schema}."ReachHLSS30"
     (
-        "ID" bigint NOT NULL,
+        "ID" bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
         "Date" date NOT NULL,
         "ReachID" integer NOT NULL,
         b01_mean double precision,
