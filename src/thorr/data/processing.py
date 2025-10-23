@@ -525,14 +525,14 @@ def prep_reaches(config_path, koppen_path):
     # geopackage_path = config_dict["data"]["gis_geopackage"]
     regions_gdf = fetch_region_gdf(db)
     rivers_gdf = fetch_river_gdf(db)
-    reaches_gdf = fetch_reach_gdf(db, geometry_type="geometry")
+    reaches_gdf = fetch_reach_gdf(db, geometry_type="geometry", select_unbuffered_only=True)
 
     # sort regions by name
-    regions_gdf.sort_values("Name", inplace=True)
+    regions_gdf.sort_values("region_id", inplace=True)
     # sort rivers by region and then by river name
-    rivers_gdf.sort_values(["region", "river_name"], inplace=True)
+    rivers_gdf.sort_values(["river_id"], inplace=True)
     # sort reaches by region and then by river name and reach_id
-    reaches_gdf.sort_values(["region", "river_name", "reach_id"], inplace=True)
+    reaches_gdf.sort_values(["river_id", "reach_id"], inplace=True)
 
     rivers_gdf['geometry'] = rivers_gdf['geometry'].apply(lambda x: linemerge(x) if x.geom_type == 'MultiLineString' else x)
     reaches_gdf['geometry'] = reaches_gdf['geometry'].apply(lambda x: linemerge(x) if x.geom_type == 'MultiLineString' else x)
