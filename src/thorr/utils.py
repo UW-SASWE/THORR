@@ -15,25 +15,25 @@ import datetime
 
 REGIONS = {
     "global": "Global",
-    "ucr": "Upper Colorado Region",
-    "glr": "Great Lakes Region",
-    "ohr": "Ohio Region",
-    "lcr": "Lower Colorado Region",
-    "pnr": "Pacific Northwest Region",
-    "umr": "Upper Mississippi Region",
-    "car": "Caribbean Region",
-    "tnr": "Tennessee Region",
-    "rgr": "Rio Grande Region",
-    "sag": "South Atlantic-Gulf Region",
-    "mar": "Mid Atlantic Region",
-    "tgr": "Texas-Gulf Region",
-    "srr": "Souris-Red-Rainy Region",
     "akr": "Alaska Region",
-    "mir": "Missouri Region",
-    "ner": "New England Region",
     "awr": "Arkansas-White-Red Region",
     "cal": "California Region",
+    "car": "Caribbean Region",
+    "glr": "Great Lakes Region",
+    "lcr": "Lower Colorado Region",
     "lmr": "Lower Mississippi Region",
+    "mar": "Mid Atlantic Region",
+    "mir": "Missouri Region",
+    "ner": "New England Region",
+    "ohr": "Ohio Region",
+    "pnr": "Pacific Northwest Region",
+    "rgr": "Rio Grande Region",
+    "srr": "Souris-Red-Rainy Region",
+    "sag": "South Atlantic-Gulf Region",
+    "tnr": "Tennessee Region",
+    "tgr": "Texas-Gulf Region",
+    "ucr": "Upper Colorado Region",
+    "umr": "Upper Mississippi Region",
 }
 
 
@@ -332,7 +332,13 @@ def fetch_reservoir_gdf(db, db_type="postgresql"):
     return reservoirs_gdf
 
 
-def fetch_reach_gdf(db, db_type="postgresql", region=None, geometry_type="buffered"):
+def fetch_reach_gdf(
+    db,
+    db_type="postgresql",
+    region=None,
+    geometry_type="buffered",
+    select_unbuffered_only=False,
+):
     if db_type == "postgresql":
         schema = db.schema
 
@@ -368,8 +374,29 @@ def fetch_reach_gdf(db, db_type="postgresql", region=None, geometry_type="buffer
 
         if geometry_type == "buffered":
             geometry_field = "buffered_geometry"
+            if (select_unbuffered_only) and filter_clause == "":
+                filter_clause = f"""
+                WHERE
+                    buffered_geometry IS NULL
+                """
+            elif (select_unbuffered_only) and filter_clause != "":
+                filter_clause += f"""
+                AND
+                    buffered_geometry IS NULL
+                """
+
         else:
             geometry_field = "geometry"
+            if (select_unbuffered_only) and filter_clause == "":
+                filter_clause = f"""
+                WHERE
+                    buffered_geometry IS NULL
+                """
+            elif (select_unbuffered_only) and filter_clause != "":
+                filter_clause += f"""
+                AND
+                    buffered_geometry IS NULL
+                """
 
         query = f"""
         SELECT
