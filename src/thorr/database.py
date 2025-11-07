@@ -544,6 +544,7 @@ def postgresql_setup(config_file):
     """
     cursor.execute(reaches_query)
 
+
     # # create the Nodes table
     # nodes_query = f"""
     # CREATE TABLE IF NOT EXISTS "{schema}"."Nodes"
