@@ -14,7 +14,7 @@ import datetime
 
 
 REGIONS = {
-    "global": "Global",
+    # "global": "Global",
     "akr": "Alaska Region",
     "awr": "Arkansas-White-Red Region",
     "cal": "California Region",
