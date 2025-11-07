@@ -3,7 +3,7 @@ from typing_extensions import Annotated
 from thorr.core import *
 from thorr.utils import create_config_file, download_data
 from thorr.database import db_setup
-from thorr.data import retrieval, processing
+from thorr.data import retrieval, retrieval_stations, processing
 
 from pathlib import Path
 
@@ -59,6 +59,26 @@ def retrieve_data(
     ] = "reaches",
 ):
     retrieval.retrieve(config_path, element_type)
+
+## This portion is for research purposes only ##
+@app.command()
+def retrieve_selected(
+    config_path: Annotated[str, typer.Argument(help="Path to the configuration file")],
+    element_type: Annotated[
+        str, typer.Option(help="Type of element to retrieve (reaches or reservoirs)")
+    ] = "reaches",
+):
+    retrieval.retrieve_selected(config_path, element_type)
+
+## This portion is for research purposes only ##
+@app.command()
+def retrieve_station_buffer(
+    config_path: Annotated[str, typer.Argument(help="Path to the configuration file")],
+    element_type: Annotated[
+        str, typer.Option(help="Type of element to retrieve (reaches or reservoirs)")
+    ] = "reaches",
+):
+    retrieval_stations.retrieve(config_path)
 
 
 @app.command()
