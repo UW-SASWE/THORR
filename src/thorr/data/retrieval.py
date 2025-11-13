@@ -654,7 +654,6 @@ def extractHLSS30BandData(
     logger=None,
     element_type="reach",
 ):
-
     hlss30 = (
         ee.ImageCollection(imageCollection)
         .filterDate(startDate, endDate)
@@ -1245,7 +1244,6 @@ def reachwiseExtraction(
         # waterTempSeries = geemap.ee_to_pandas(waterTempSeries)
         # landTempSeries = geemap.ee_to_pandas(landTempSeries)
 
-        # print("Breakpoint damwise 1")
         match imageCollection:
             case "LANDSAT/LC09/C02/T1_L2" | "LANDSAT/LC08/C02/T1_L2":
                 dataSeries = extractTempSeries(
@@ -1294,6 +1292,7 @@ def reachwiseExtraction(
                     "reach",
                 )
             case _:
+                dataSeries = None
                 pass
 
         # print("Breakpoint damwise 2")
@@ -1773,8 +1772,6 @@ def runReachExtraction(
         )
 
         reach_ids = reaches_gdf[reaches_gdf["river_id"] == river]["reach_id"].tolist()
-
-        # print(reach_ids)
         reach_ids = reach_ids[checkpoint["reach_index"] :]
 
         ## Seems redundant. Removing for now. ##
