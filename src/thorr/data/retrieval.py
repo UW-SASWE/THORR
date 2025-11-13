@@ -1777,17 +1777,23 @@ def runReachExtraction(
         # print(reach_ids)
         reach_ids = reach_ids[checkpoint["reach_index"] :]
 
-        reaches = geemap.shp_to_ee(data_dir / "reaches" / "rivers.shp")
+        ## Seems redundant. Removing for now. ##
+        # # print(reach_ids)
 
-        if reach_ids is None:
-            ee_reach_ids = reaches.select("reach_id", retainGeometry=False).getInfo()
-            reach_ids = [i["properties"]["reach_id"] for i in ee_reach_ids["features"]][
-                checkpoint["reach_index"] :
-            ]
-            # reach_ids = gdf["reach_id"].tolist()
+        # reaches = geemap.shp_to_ee(data_dir / "reaches" / "rivers.shp")
+
+        # if reach_ids is None:
+        #     ee_reach_ids = reaches.select("reach_id", retainGeometry=False).getInfo()
+        #     reach_ids = [i["properties"]["reach_id"] for i in ee_reach_ids["features"]][
+        #         checkpoint["reach_index"] :
+        #     ]
+        #     # reach_ids = gdf["reach_id"].tolist()
+        ####################################
 
         for reach_id in reach_ids:
-            
+            reaches = geemap.gdf_to_ee(
+                reaches_gdf[reaches_gdf["reach_id"] == reach_id]
+            )
             # hlss30 data
             if datetime.datetime.strptime(
                 end_date, "%Y-%m-%d"
