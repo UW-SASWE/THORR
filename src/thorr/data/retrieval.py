@@ -554,11 +554,13 @@ def extractHLSL30BandData(
         processed_hlsl30 = hlsl30.filterDate(date, date.advance(1, "day"))
         hlsl30_mosaic = processed_hlsl30.mosaic()
 
+        qa_mask = hlsl30_mosaic.select("Fmask").bitwiseAnd(int("11111", 2)).eq(0)
         waterMask = hlsl30_mosaic.select("Fmask").bitwiseAnd(int("100000", 2)).neq(0)
         nonWaterMask = hlsl30_mosaic.select("Fmask").bitwiseAnd(int("100000", 2)).eq(0)
 
         hlsl30_water = (
             processed_hlsl30.reduce(ee.Reducer.mean())
+            .updateMask(qa_mask)
             .updateMask(waterMask)
             .set("system:time_start", date)
         ).clip(element.geometry())
@@ -665,11 +667,13 @@ def extractHLSS30BandData(
         processed_hlss30 = hlss30.filterDate(date, date.advance(1, "day"))
         hlss30_mosaic = processed_hlss30.mosaic()
 
+        qa_mask = hlss30_mosaic.select("Fmask").bitwiseAnd(int("11111", 2)).eq(0)
         waterMask = hlss30_mosaic.select("Fmask").bitwiseAnd(int("100000", 2)).neq(0)
         nonWaterMask = hlss30_mosaic.select("Fmask").bitwiseAnd(int("100000", 2)).eq(0)
 
         hlss30_water = (
             processed_hlss30.reduce(ee.Reducer.mean())
+            .updateMask(qa_mask)
             .updateMask(waterMask)
             .set("system:time_start", date)
         ).clip(element.geometry())
