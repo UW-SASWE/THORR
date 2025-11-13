@@ -1376,173 +1376,180 @@ def reachwiseExtraction(
         s_time = randint(3, 8)
         time.sleep(s_time)
 
-    # concatenate all time series
-    # waterTempSeries_df = pd.concat(waterTempSeriesList, ignore_index=True)
-    # landTempSeries_df = pd.concat(landTempSeriesList, ignore_index=True)
-    dataSeries_df = pd.concat(dataSeriesList, ignore_index=True)
+    try:
+        # concatenate all time series
+        # waterTempSeries_df = pd.concat(waterTempSeriesList, ignore_index=True)
+        # landTempSeries_df = pd.concat(landTempSeriesList, ignore_index=True)
+        dataSeries_df = pd.concat(dataSeriesList, ignore_index=True)
 
-    # sort by date
-    # waterTempSeries_df.sort_values(by="date", inplace=True)
-    # landTempSeries_df.sort_values(by="date", inplace=True)
-    dataSeries_df.sort_values(by="date", inplace=True)
-    # #drop null values
-    # # waterTempSeries_df.dropna(inplace=True)
-    # # landTempSeries_df.dropna(inplace=True)
-    # dataSeries_df.dropna(inplace=True)
-    # remove duplicates
-    # waterTempSeries_df.drop_duplicates(subset="date", inplace=True)
-    # landTempSeries_df.drop_duplicates(subset="date", inplace=True)
-    dataSeries_df.drop_duplicates(subset="date", inplace=True)
+        # sort by date
+        # waterTempSeries_df.sort_values(by="date", inplace=True)
+        # landTempSeries_df.sort_values(by="date", inplace=True)
+        dataSeries_df.sort_values(by="date", inplace=True)
+        # #drop null values
+        # # waterTempSeries_df.dropna(inplace=True)
+        # # landTempSeries_df.dropna(inplace=True)
+        # dataSeries_df.dropna(inplace=True)
+        # remove duplicates
+        # waterTempSeries_df.drop_duplicates(subset="date", inplace=True)
+        # landTempSeries_df.drop_duplicates(subset="date", inplace=True)
+        dataSeries_df.drop_duplicates(subset="date", inplace=True)
 
-    # save time series to csv
-    # waterTempSeries_df.to_csv(
-    #     data_dir / "reaches" / f"{reach_id}_watertemp.csv", index=False
-    # )
-    # landTempSeries_df.to_csv(
-    #     data_dir / "reaches" / f"{reach_id}_landtemp.csv", index=False
-    # )
-    # print(dataSeries_df.head())
-    # dataSeries_df.to_csv(
-    #     data_dir / "reservoir" / f"{reach_id}.csv", index=False
-    # )
+        # save time series to csv
+        # waterTempSeries_df.to_csv(
+        #     data_dir / "reaches" / f"{reach_id}_watertemp.csv", index=False
+        # )
+        # landTempSeries_df.to_csv(
+        #     data_dir / "reaches" / f"{reach_id}_landtemp.csv", index=False
+        # )
+        # print(dataSeries_df.head())
+        # dataSeries_df.to_csv(
+        #     data_dir / "reservoir" / f"{reach_id}.csv", index=False
+        # )
 
-    # # land temp
-    # entryToDB(
-    #     dataSeries_df,
-    #     "ReachLandsatLandTemp",
-    #     reach_id,
-    #     connection,
-    #     date_col="date",
-    #     value_col="landtemp(C)",
-    # )
-    # # water temp
-    # entryToDB(
-    #     dataSeries_df,
-    #     "ReachLandsatWaterTemp",
-    #     reach_id,
-    #     connection,
-    #     date_col="date",
-    #     value_col="watertemp(C)",
-    # )
-    # # NDVI
-    # entryToDB(
-    #     dataSeries_df,
-    #     "ReachNDVI",
-    #     reach_id,
-    #     connection,
-    #     date_col="date",
-    #     value_col="NDVI",
-    # )
-
-    if imageCollection == "NASA/HLS/HLSL30/v002":
-        entryToDB(
-            dataSeries_df,
-            "ReachHLSL30",
-            reach_id,
-            # connection,
-            entry_key={
-                "Date": "date",
-                "b01_mean": "b1_mean",
-                "b01_median": "b1_median",
-                "b01_std": "b1_std",
-                "b02_mean": "b2_mean",
-                "b02_median": "b2_median",
-                "b02_std": "b2_std",
-                "b03_mean": "b3_mean",
-                "b03_median": "b3_median",
-                "b03_std": "b3_std",
-                "b04_mean": "b4_mean",
-                "b04_median": "b4_median",
-                "b04_std": "b4_std",
-                "b05_mean": "b5_mean",
-                "b05_median": "b5_median",
-                "b05_std": "b5_std",
-                "b06_mean": "b6_mean",
-                "b06_median": "b6_median",
-                "b06_std": "b6_std",
-                "b07_mean": "b7_mean",
-                "b07_median": "b7_median",
-                "b07_std": "b7_std",
-                "b09_mean": "b9_mean",
-                "b09_median": "b9_median",
-                "b09_std": "b9_std",
-                "b10_mean": "b10_mean",
-                "b10_median": "b10_median",
-                "b10_std": "b10_std",
-                "b11_mean": "b11_mean",
-                "b11_median": "b11_median",
-                "b11_std": "b11_std",
-            },
-            db=db,
-            db_type=db_type,
-        )
-    elif imageCollection == "NASA/HLS/HLSS30/v002":
-        entryToDB(
-            dataSeries_df,
-            "ReachHLSS30",
-            reach_id,
-            # connection,
-            entry_key={
-                "Date": "date",
-                "b01_mean": "b1_mean",
-                "b01_median": "b1_median",
-                "b01_std": "b1_std",
-                "b02_mean": "b2_mean",
-                "b02_median": "b2_median",
-                "b02_std": "b2_std",
-                "b03_mean": "b3_mean",
-                "b03_median": "b3_median",
-                "b03_std": "b3_std",
-                "b04_mean": "b4_mean",
-                "b04_median": "b4_median",
-                "b04_std": "b4_std",
-                "b05_mean": "b5_mean",
-                "b05_median": "b5_median",
-                "b05_std": "b5_std",
-                "b06_mean": "b6_mean",
-                "b06_median": "b6_median",
-                "b06_std": "b6_std",
-                "b07_mean": "b7_mean",
-                "b07_median": "b7_median",
-                "b07_std": "b7_std",
-                "b08_mean": "b8_mean",
-                "b08_median": "b8_median",
-                "b08_std": "b8_std",
-                "b8a_mean": "b8a_mean",
-                "b8a_median": "b8a_median",
-                "b8a_std": "b8a_std",
-                "b09_mean": "b9_mean",
-                "b09_median": "b9_median",
-                "b09_std": "b9_std",
-                "b10_mean": "b10_mean",
-                "b10_median": "b10_median",
-                "b10_std": "b10_std",
-                "b11_mean": "b11_mean",
-                "b11_median": "b11_median",
-                "b11_std": "b11_std",
-                "b12_mean": "b12_mean",
-                "b12_median": "b12_median",
-                "b12_std": "b12_std",
-            },
-            db=db,
-            db_type=db_type,
-        )
-    else:
-        entryToDB(
-            dataSeries_df,
-            "ReachData",
-            reach_id,
-            # connection,
-            entry_key={
-                "Date": "date",
-                "LandTempC": "landtemp(C)",
-                "WaterTempC": "watertemp(C)",
-                "NDVI": "NDVI",
-                "Mission": "Mission",
-            },
-            db=db,
-            db_type=db_type,
-        )
+        # # land temp
+        # entryToDB(
+        #     dataSeries_df,
+        #     "ReachLandsatLandTemp",
+        #     reach_id,
+        #     connection,
+        #     date_col="date",
+        #     value_col="landtemp(C)",
+        # )
+        # # water temp
+        # entryToDB(
+        #     dataSeries_df,
+        #     "ReachLandsatWaterTemp",
+        #     reach_id,
+        #     connection,
+        #     date_col="date",
+        #     value_col="watertemp(C)",
+        # )
+        # # NDVI
+        # entryToDB(
+        #     dataSeries_df,
+        #     "ReachNDVI",
+        #     reach_id,
+        #     connection,
+        #     date_col="date",
+        #     value_col="NDVI",
+        # )
+        if imageCollection == "NASA/HLS/HLSL30/v002":
+            entryToDB(
+                dataSeries_df,
+                "ReachHLSL30",
+                reach_id,
+                # connection,
+                entry_key={
+                    "Date": "date",
+                    "b01_mean": "b1_mean",
+                    "b01_median": "b1_median",
+                    "b01_std": "b1_std",
+                    "b02_mean": "b2_mean",
+                    "b02_median": "b2_median",
+                    "b02_std": "b2_std",
+                    "b03_mean": "b3_mean",
+                    "b03_median": "b3_median",
+                    "b03_std": "b3_std",
+                    "b04_mean": "b4_mean",
+                    "b04_median": "b4_median",
+                    "b04_std": "b4_std",
+                    "b05_mean": "b5_mean",
+                    "b05_median": "b5_median",
+                    "b05_std": "b5_std",
+                    "b06_mean": "b6_mean",
+                    "b06_median": "b6_median",
+                    "b06_std": "b6_std",
+                    "b07_mean": "b7_mean",
+                    "b07_median": "b7_median",
+                    "b07_std": "b7_std",
+                    "b09_mean": "b9_mean",
+                    "b09_median": "b9_median",
+                    "b09_std": "b9_std",
+                    "b10_mean": "b10_mean",
+                    "b10_median": "b10_median",
+                    "b10_std": "b10_std",
+                    "b11_mean": "b11_mean",
+                    "b11_median": "b11_median",
+                    "b11_std": "b11_std",
+                },
+                db=db,
+                db_type=db_type,
+            )
+        elif imageCollection == "NASA/HLS/HLSS30/v002":
+            entryToDB(
+                dataSeries_df,
+                "ReachHLSS30",
+                reach_id,
+                # connection,
+                entry_key={
+                    "Date": "date",
+                    "b01_mean": "b1_mean",
+                    "b01_median": "b1_median",
+                    "b01_std": "b1_std",
+                    "b02_mean": "b2_mean",
+                    "b02_median": "b2_median",
+                    "b02_std": "b2_std",
+                    "b03_mean": "b3_mean",
+                    "b03_median": "b3_median",
+                    "b03_std": "b3_std",
+                    "b04_mean": "b4_mean",
+                    "b04_median": "b4_median",
+                    "b04_std": "b4_std",
+                    "b05_mean": "b5_mean",
+                    "b05_median": "b5_median",
+                    "b05_std": "b5_std",
+                    "b06_mean": "b6_mean",
+                    "b06_median": "b6_median",
+                    "b06_std": "b6_std",
+                    "b07_mean": "b7_mean",
+                    "b07_median": "b7_median",
+                    "b07_std": "b7_std",
+                    "b08_mean": "b8_mean",
+                    "b08_median": "b8_median",
+                    "b08_std": "b8_std",
+                    "b8a_mean": "b8a_mean",
+                    "b8a_median": "b8a_median",
+                    "b8a_std": "b8a_std",
+                    "b09_mean": "b9_mean",
+                    "b09_median": "b9_median",
+                    "b09_std": "b9_std",
+                    "b10_mean": "b10_mean",
+                    "b10_median": "b10_median",
+                    "b10_std": "b10_std",
+                    "b11_mean": "b11_mean",
+                    "b11_median": "b11_median",
+                    "b11_std": "b11_std",
+                    "b12_mean": "b12_mean",
+                    "b12_median": "b12_median",
+                    "b12_std": "b12_std",
+                },
+                db=db,
+                db_type=db_type,
+            )
+        else:
+            entryToDB(
+                dataSeries_df,
+                "ReachData",
+                reach_id,
+                # connection,
+                entry_key={
+                    "Date": "date",
+                    "LandTempC": "landtemp(C)",
+                    "WaterTempC": "watertemp(C)",
+                    "NDVI": "NDVI",
+                    "Mission": "Mission",
+                },
+                db=db,
+                db_type=db_type,
+            )
+    except Exception as e:
+        if logger is not None:
+            logger.error(f"Error processing reach ID {reach_id}: {e}")
+            logger.info(f"No data found for reach ID: {reach_id}")
+        else:
+            print(f"Error processing reach ID {reach_id}: {e}")
+            print(f"No data found for reach ID: {reach_id}")
 
 
 def runReservoirExtraction(
