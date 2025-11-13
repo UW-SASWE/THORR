@@ -1367,6 +1367,7 @@ def reachwiseExtraction(
                             )
                     # print(dataSeries.head())
 
+            # print(dataSeries.head())
             # append time series to list
             # waterTempSeriesList.append(waterTempSeries)
             # landTempSeriesList.append(landTempSeries)
