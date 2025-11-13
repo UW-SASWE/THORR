@@ -1228,7 +1228,7 @@ def reachwiseExtraction(
 
     # print(checkpoint)
 
-    dates = divideDates(startDate, endDate)
+    dates = divideDates(startDate, endDate, how="yearly")
     waterTempSeriesList = []
     landTempSeriesList = []
 
