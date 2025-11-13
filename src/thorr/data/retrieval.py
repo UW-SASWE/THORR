@@ -1312,10 +1312,7 @@ def reachwiseExtraction(
         #     # ndwi_threshold,
         #     imageCollection,
         # )
-        if dataSeries is not None:
-            if (
-                dataSeries.size().getInfo()
-            ):  # truthy check to see if the dataSeries is not empty
+        if (dataSeries is not None) and (dataSeries.size().getInfo()):
                 dataSeries = geemap.ee_to_df(dataSeries)
         else:
             dataSeries = pd.DataFrame()
