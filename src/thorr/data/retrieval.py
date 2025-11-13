@@ -99,19 +99,20 @@ def divideDates(startDate, endDate, how="yearly"):
         while currentDate <= endDate_:
             yearStart = currentDate.replace(
                 # month=1, #not necessary to start from January
-                day=1)
-            yearEnd = currentDate.replace(year=currentDate.year + 1, month=1, day=1) - datetime.timedelta(days=1)
+                day=1
+            )
+            yearEnd = currentDate.replace(
+                year=currentDate.year + 1, month=1, day=1
+            ) - datetime.timedelta(days=1)
 
             if yearEnd > endDate_:
                 yearEnd = endDate_
 
-            dates.append(
-                [yearStart.strftime("%Y-%m-%d"), yearEnd.strftime("%Y-%m-%d")]
-            )
+            dates.append([yearStart.strftime("%Y-%m-%d"), yearEnd.strftime("%Y-%m-%d")])
             currentDate = yearEnd + datetime.timedelta(days=1)
 
         return dates
-    
+
     ## Legacy code for other time divisions ##
     # elif how == "bi-weekly":
     #     # divide the timeframe into bi-weekly periods
@@ -130,7 +131,7 @@ def divideDates(startDate, endDate, how="yearly"):
     #         currentDate = periodEnd + datetime.timedelta(days=1)
 
     #     return dates
-    
+
     # # get years from start and end dates
     # # startYear = pd.to_datetime(startDate).year
     # # endYear = pd.to_datetime(endDate).year
@@ -404,7 +405,9 @@ def extractTempSeries(
         # print('There was an error')
         if logger is not None:
             logger.error(f"{e}")
-            logger.info(f"Error extracting L4/5/7 data for dates {startDate} to {endDate}")
+            logger.info(
+                f"Error extracting L4/5/7 data for dates {startDate} to {endDate}"
+            )
         else:
             print(f"{e}")
             print(f"Error extracting L4/5/7 data for dates {startDate} to {endDate}")
@@ -523,7 +526,9 @@ def extractL4TempSeries(
         # print('There was an error')
         if logger is not None:
             logger.error(f"{e}")
-            logger.info(f"Error extracting L4/5/7 data for dates {startDate} to {endDate}")
+            logger.info(
+                f"Error extracting L4/5/7 data for dates {startDate} to {endDate}"
+            )
         else:
             print(f"{e}")
             print(f"Error extracting L4/5/7 data for dates {startDate} to {endDate}")
@@ -636,12 +641,14 @@ def extractHLSL30BandData(
         # print(e, startDate, endDate)
         if logger is not None:
             logger.error(f"{e}")
-            logger.info(f"Error extracting HLS L30 data for dates {startDate} to {endDate}")
+            logger.info(
+                f"Error extracting HLS L30 data for dates {startDate} to {endDate}"
+            )
         else:
             print(f"{e}")
             print(f"Error extracting HLS L30 data for dates {startDate} to {endDate}")
         dataSeries = None
-    
+
     return dataSeries
 
 
@@ -754,12 +761,14 @@ def extractHLSS30BandData(
         # print(e, startDate, endDate)
         if logger is not None:
             logger.error(f"{e}")
-            logger.info(f"Error extracting HLS S30 data for dates {startDate} to {endDate}")
+            logger.info(
+                f"Error extracting HLS S30 data for dates {startDate} to {endDate}"
+            )
         else:
             print(f"{e}")
             print(f"Error extracting HLS S30 data for dates {startDate} to {endDate}")
         dataSeries = None
-    
+
     return dataSeries
 
 
@@ -1788,9 +1797,7 @@ def runReachExtraction(
         ####################################
 
         for reach_id in reach_ids:
-            reaches = geemap.gdf_to_ee(
-                reaches_gdf[reaches_gdf["reach_id"] == reach_id]
-            )
+            reaches = geemap.gdf_to_ee(reaches_gdf[reaches_gdf["reach_id"] == reach_id])
             # hlss30 data
             if datetime.datetime.strptime(
                 end_date, "%Y-%m-%d"
@@ -2121,7 +2128,7 @@ def get_reach_data(
     # imageCollection="LANDSAT/LC08/C02/T1_L2",
     region=None,
     logger=None,
-    selected_reaches=None, # Only for research purposes
+    selected_reaches=None,  # Only for research purposes
 ):
     service_account = ee_credentials["service_account"]
     credentials = ee.ServiceAccountCredentials(
@@ -2231,6 +2238,7 @@ def get_reach_data(
     else:
         print("All done!")
 
+
 ## for research purposes only
 def get_station_buffer_data(
     db,
@@ -2245,7 +2253,7 @@ def get_station_buffer_data(
     # imageCollection="LANDSAT/LC08/C02/T1_L2",
     region=None,
     logger=None,
-    selected_reaches=None, # Only for research purposes
+    selected_reaches=None,  # Only for research purposes
 ):
     service_account = ee_credentials["service_account"]
     credentials = ee.ServiceAccountCredentials(
@@ -2353,7 +2361,10 @@ def get_station_buffer_data(
         logger.info("All done!")
     else:
         print("All done!")
+
+
 ## end of research purposes only
+
 
 def retrieve(config_path, element_type="reaches"):
 
@@ -2483,7 +2494,6 @@ def retrieve_selected(config_path, element_type="reaches"):
     if selected_ids is not None:
         selected_ids = [int(i) for i in selected_ids.split(",")]
 
-    
     if element_type == "reaches":
         get_reach_data(
             db,
@@ -2522,7 +2532,7 @@ def retrieve_station_buffer(config_path, element_type="reaches"):
 
     reaches_dir = data_dir / "reaches"
     reaches_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # get start date from config file
     if (
         "start_date" not in config_dict["project"]
@@ -2550,7 +2560,6 @@ def retrieve_station_buffer(config_path, element_type="reaches"):
     if selected_ids is not None:
         selected_ids = [int(i) for i in selected_ids.split(",")]
 
-    
     get_station_buffer_data(
         db,
         db_type,
