@@ -46,9 +46,9 @@ REGIONS = {
 }
 
 
-def divideDates(startDate, endDate):
+def divideDates(startDate, endDate, how="yearly"):
     """
-    Divide the timeframe into years
+    Divide the timeframe into years, or months
 
     Parameters:
     -----------
@@ -67,28 +67,48 @@ def divideDates(startDate, endDate):
     startDate_ = datetime.datetime.strptime(startDate, "%Y-%m-%d")
     endDate_ = datetime.datetime.strptime(endDate, "%Y-%m-%d")
 
-    # get years from start and end dates
-    # startYear = pd.to_datetime(startDate).year
-    # endYear = pd.to_datetime(endDate).year
-    startYear = startDate_.year
-    endYear = endDate_.year
-
-    # divide the timeframe into years
-    dates = []
-    for year in range(startYear, endYear + 1):
-        if year == startYear and year == endYear:
-            dates.append([startDate, endDate])
-        elif year == startYear:
-            dates.append([startDate, f"{year}-12-31"])
-        elif year == endYear:
-            # if the difference end date and start of the year is less than 30 days, then replace the end date of the previous append with the end date
-            # the purpose of this is to avoid having a date range of less than 30 days (especially at the beginning of the last year)
-            if (endDate_ - datetime.datetime(year, 1, 1)).days < 45:
-                dates[-1][1] = endDate
+    if how == "monthly":
+        # divide the timeframe into months
+        dates = []
+        currentDate = startDate_
+        while currentDate <= endDate_:
+            monthStart = currentDate.replace(day=1)
+            if currentDate.month == 12:
+                monthEnd = currentDate.replace(
+                    year=currentDate.year + 1, month=1, day=1
+                ) - datetime.timedelta(days=1)
             else:
-                dates.append([f"{year}-01-01", endDate])
-        else:
-            dates.append([f"{year}-01-01", f"{year}-12-31"])
+                monthEnd = currentDate.replace(
+                    month=currentDate.month + 1, day=1
+                ) - datetime.timedelta(days=1)
+
+            if monthEnd > endDate_:
+                monthEnd = endDate_
+
+            dates.append(
+                [monthStart.strftime("%Y-%m-%d"), monthEnd.strftime("%Y-%m-%d")]
+            )
+            currentDate = monthEnd + datetime.timedelta(days=1)
+
+        return dates
+
+    elif how == "yearly":
+        # divide the timeframe into years
+        dates = []
+        currentDate = startDate_
+        while currentDate <= endDate_:
+            yearStart = currentDate.replace(
+                # month=1, #not necessary to start from January
+                day=1)
+            yearEnd = currentDate.replace(year=currentDate.year + 1, month=1, day=1) - datetime.timedelta(days=1)
+
+            if yearEnd > endDate_:
+                yearEnd = endDate_
+
+            dates.append(
+                [yearStart.strftime("%Y-%m-%d"), yearEnd.strftime("%Y-%m-%d")]
+            )
+            currentDate = yearEnd + datetime.timedelta(days=1)
 
     return dates
 
