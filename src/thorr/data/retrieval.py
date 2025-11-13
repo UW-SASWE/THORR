@@ -399,14 +399,18 @@ def extractTempSeries(
         )
         dataSeries = ee.FeatureCollection(dates.map(extractData))
 
-        return dataSeries
+        # return dataSeries
     except Exception as e:
-        # print(e, startDate, endDate)
+        # print('There was an error')
         if logger is not None:
-            logger.info(f"{e}")
+            logger.error(f"{e}")
+            logger.info(f"Error extracting L4/5/7 data for dates {startDate} to {endDate}")
         else:
             print(f"{e}")
-        return None
+            print(f"Error extracting L4/5/7 data for dates {startDate} to {endDate}")
+        dataSeries = None
+
+    return dataSeries
 
 
 def extractL4TempSeries(
