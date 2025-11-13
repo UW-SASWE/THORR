@@ -397,9 +397,7 @@ def extractTempSeries(
             .distinct("date")
             .aggregate_array("date")
         )
-
         dataSeries = ee.FeatureCollection(dates.map(extractData))
-        # print(startDate, endDate)
 
         return dataSeries
     except Exception as e:
