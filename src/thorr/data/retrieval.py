@@ -744,18 +744,20 @@ def extractHLSS30BandData(
             .aggregate_array("date")
         )
         dataSeries = ee.FeatureCollection(dates.map(extractData))
-        return dataSeries
-    except Exception as e:
-        print(e, startDate, endDate)
-
-    #     # return dataSeries
+        # return dataSeries
     # except Exception as e:
-    #     # print(e, startDate, endDate)
-    #     if logger is not None:
-    #         logger.info(f"{e}")
-    #     else:
-    #         print(f"{e}")
-    #     return None
+    #     print(e, startDate, endDate)
+    except Exception as e:
+        # print(e, startDate, endDate)
+        if logger is not None:
+            logger.error(f"{e}")
+            logger.info(f"Error extracting HLS S30 data for dates {startDate} to {endDate}")
+        else:
+            print(f"{e}")
+            print(f"Error extracting HLS S30 data for dates {startDate} to {endDate}")
+        dataSeries = None
+    
+    return dataSeries
 
 
 def ee_to_df(featureCollection):
