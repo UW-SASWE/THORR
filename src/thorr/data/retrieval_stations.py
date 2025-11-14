@@ -46,9 +46,9 @@ REGIONS = {
 }
 
 
-def divideDates(startDate, endDate):
+def divideDates(startDate, endDate, how="yearly"):
     """
-    Divide the timeframe into years
+    Divide the timeframe into years, or months
 
     Parameters:
     -----------
@@ -67,30 +67,96 @@ def divideDates(startDate, endDate):
     startDate_ = datetime.datetime.strptime(startDate, "%Y-%m-%d")
     endDate_ = datetime.datetime.strptime(endDate, "%Y-%m-%d")
 
-    # get years from start and end dates
-    # startYear = pd.to_datetime(startDate).year
-    # endYear = pd.to_datetime(endDate).year
-    startYear = startDate_.year
-    endYear = endDate_.year
-
-    # divide the timeframe into years
-    dates = []
-    for year in range(startYear, endYear + 1):
-        if year == startYear and year == endYear:
-            dates.append([startDate, endDate])
-        elif year == startYear:
-            dates.append([startDate, f"{year}-12-31"])
-        elif year == endYear:
-            # if the difference end date and start of the year is less than 30 days, then replace the end date of the previous append with the end date
-            # the purpose of this is to avoid having a date range of less than 30 days (especially at the beginning of the last year)
-            if (endDate_ - datetime.datetime(year, 1, 1)).days < 45:
-                dates[-1][1] = endDate
+    if how == "monthly":
+        # divide the timeframe into months
+        dates = []
+        currentDate = startDate_
+        while currentDate <= endDate_:
+            monthStart = currentDate.replace(day=1)
+            if currentDate.month == 12:
+                monthEnd = currentDate.replace(
+                    year=currentDate.year + 1, month=1, day=1
+                ) - datetime.timedelta(days=1)
             else:
-                dates.append([f"{year}-01-01", endDate])
-        else:
-            dates.append([f"{year}-01-01", f"{year}-12-31"])
+                monthEnd = currentDate.replace(
+                    month=currentDate.month + 1, day=1
+                ) - datetime.timedelta(days=1)
 
-    return dates
+            if monthEnd > endDate_:
+                monthEnd = endDate_
+
+            dates.append(
+                [monthStart.strftime("%Y-%m-%d"), monthEnd.strftime("%Y-%m-%d")]
+            )
+            currentDate = monthEnd + datetime.timedelta(days=1)
+
+        return dates
+
+    elif how == "yearly":
+        # divide the timeframe into years
+        dates = []
+        currentDate = startDate_
+        while currentDate <= endDate_:
+            yearStart = currentDate.replace(
+                # month=1, #not necessary to start from January
+                day=1
+            )
+            yearEnd = currentDate.replace(
+                year=currentDate.year + 1, month=1, day=1
+            ) - datetime.timedelta(days=1)
+
+            if yearEnd > endDate_:
+                yearEnd = endDate_
+
+            dates.append([yearStart.strftime("%Y-%m-%d"), yearEnd.strftime("%Y-%m-%d")])
+            currentDate = yearEnd + datetime.timedelta(days=1)
+
+        return dates
+
+    ## Legacy code for other time divisions ##
+    # elif how == "bi-weekly":
+    #     # divide the timeframe into bi-weekly periods
+    #     dates = []
+    #     currentDate = startDate_
+    #     while currentDate <= endDate_:
+    #         periodStart = currentDate
+    #         periodEnd = currentDate + datetime.timedelta(days=13)
+
+    #         if periodEnd > endDate_:
+    #             periodEnd = endDate_
+
+    #         dates.append(
+    #             [periodStart.strftime("%Y-%m-%d"), periodEnd.strftime("%Y-%m-%d")]
+    #         )
+    #         currentDate = periodEnd + datetime.timedelta(days=1)
+
+    #     return dates
+
+    # # get years from start and end dates
+    # # startYear = pd.to_datetime(startDate).year
+    # # endYear = pd.to_datetime(endDate).year
+    # startYear = startDate_.year
+    # endYear = endDate_.year
+
+    # # divide the timeframe into years
+    # dates = []
+    # for year in range(startYear, endYear + 1):
+    #     if year == startYear and year == endYear:
+    #         dates.append([startDate, endDate])
+    #     elif year == startYear:
+    #         dates.append([startDate, f"{year}-12-31"])
+    #     elif year == endYear:
+    #         # if the difference end date and start of the year is less than 30 days, then replace the end date of the previous append with the end date
+    #         # the purpose of this is to avoid having a date range of less than 30 days (especially at the beginning of the last year)
+    #         if (endDate_ - datetime.datetime(year, 1, 1)).days < 45:
+    #             dates[-1][1] = endDate
+    #         else:
+    #             dates.append([f"{year}-01-01", endDate])
+    #     else:
+    #         dates.append([f"{year}-01-01", f"{year}-12-31"])
+
+    # return date
+    ## Legacy code for other time divisions ##
 
 
 def prepL8(image):
@@ -332,18 +398,22 @@ def extractTempSeries(
             .distinct("date")
             .aggregate_array("date")
         )
-
         dataSeries = ee.FeatureCollection(dates.map(extractData))
-        # print(startDate, endDate)
 
-        return dataSeries
+        # return dataSeries
     except Exception as e:
-        # print(e, startDate, endDate)
+        # print('There was an error')
         if logger is not None:
-            logger.info(f"{e}")
+            logger.error(f"{e}")
+            logger.info(
+                f"Error extracting L4/5/7 data for dates {startDate} to {endDate}"
+            )
         else:
             print(f"{e}")
-        return None
+            print(f"Error extracting L4/5/7 data for dates {startDate} to {endDate}")
+        dataSeries = None
+
+    return dataSeries
 
 
 def extractL4TempSeries(
@@ -451,14 +521,20 @@ def extractL4TempSeries(
         dataSeries = ee.FeatureCollection(dates.map(extractData))
         # print(startDate, endDate, "No error")
 
-        return dataSeries
+        # return dataSeries
     except Exception as e:
         # print('There was an error')
         if logger is not None:
-            logger.info(f"{e}")
+            logger.error(f"{e}")
+            logger.info(
+                f"Error extracting L4/5/7 data for dates {startDate} to {endDate}"
+            )
         else:
             print(f"{e}")
-        return None
+            print(f"Error extracting L4/5/7 data for dates {startDate} to {endDate}")
+        dataSeries = None
+
+    return dataSeries
 
 
 def extractHLSL30BandData(
@@ -558,18 +634,22 @@ def extractHLSL30BandData(
             .aggregate_array("date")
         )
         dataSeries = ee.FeatureCollection(dates.map(extractData))
-        return dataSeries
-    except Exception as e:
-        print(e, startDate, endDate)
-
-    #     # return dataSeries
+        # return dataSeries
     # except Exception as e:
-    #     # print(e, startDate, endDate)
-    #     if logger is not None:
-    #         logger.info(f"{e}")
-    #     else:
-    #         print(f"{e}")
-    #     return None
+    #     print(e, startDate, endDate)
+    except Exception as e:
+        # print(e, startDate, endDate)
+        if logger is not None:
+            logger.error(f"{e}")
+            logger.info(
+                f"Error extracting HLS L30 data for dates {startDate} to {endDate}"
+            )
+        else:
+            print(f"{e}")
+            print(f"Error extracting HLS L30 data for dates {startDate} to {endDate}")
+        dataSeries = None
+
+    return dataSeries
 
 
 def extractHLSS30BandData(
@@ -581,7 +661,6 @@ def extractHLSS30BandData(
     logger=None,
     element_type="reach",
 ):
-
     hlss30 = (
         ee.ImageCollection(imageCollection)
         .filterDate(startDate, endDate)
@@ -675,18 +754,22 @@ def extractHLSS30BandData(
             .aggregate_array("date")
         )
         dataSeries = ee.FeatureCollection(dates.map(extractData))
-        return dataSeries
-    except Exception as e:
-        print(e, startDate, endDate)
-
-    #     # return dataSeries
+        # return dataSeries
     # except Exception as e:
-    #     # print(e, startDate, endDate)
-    #     if logger is not None:
-    #         logger.info(f"{e}")
-    #     else:
-    #         print(f"{e}")
-    #     return None
+    #     print(e, startDate, endDate)
+    except Exception as e:
+        # print(e, startDate, endDate)
+        if logger is not None:
+            logger.error(f"{e}")
+            logger.info(
+                f"Error extracting HLS S30 data for dates {startDate} to {endDate}"
+            )
+        else:
+            print(f"{e}")
+            print(f"Error extracting HLS S30 data for dates {startDate} to {endDate}")
+        dataSeries = None
+
+    return dataSeries
 
 
 def ee_to_df(featureCollection):
@@ -1153,7 +1236,7 @@ def reachwiseExtraction(
 
     # print(checkpoint)
 
-    dates = divideDates(startDate, endDate)
+    dates = divideDates(startDate, endDate, how="yearly")
     waterTempSeriesList = []
     landTempSeriesList = []
 
@@ -1170,7 +1253,6 @@ def reachwiseExtraction(
         # waterTempSeries = geemap.ee_to_pandas(waterTempSeries)
         # landTempSeries = geemap.ee_to_pandas(landTempSeries)
 
-        # print("Breakpoint damwise 1")
         match imageCollection:
             case "LANDSAT/LC09/C02/T1_L2" | "LANDSAT/LC08/C02/T1_L2":
                 dataSeries = extractTempSeries(
@@ -1219,6 +1301,7 @@ def reachwiseExtraction(
                     "reach",
                 )
             case _:
+                dataSeries = None
                 pass
 
         # print("Breakpoint damwise 2")
@@ -1229,12 +1312,8 @@ def reachwiseExtraction(
         #     # ndwi_threshold,
         #     imageCollection,
         # )
-        # if dataSeries is not None:
-        if (
-            dataSeries.size().getInfo()
-        ):  # truthy check to see if the dataSeries is not empty
-            # print(dataSeries.size().getInfo())
-            dataSeries = geemap.ee_to_df(dataSeries)
+        if (dataSeries is not None) and (dataSeries.size().getInfo()):
+                dataSeries = geemap.ee_to_df(dataSeries)
         else:
             dataSeries = pd.DataFrame()
 
@@ -1302,173 +1381,180 @@ def reachwiseExtraction(
         s_time = randint(3, 8)
         time.sleep(s_time)
 
-    # concatenate all time series
-    # waterTempSeries_df = pd.concat(waterTempSeriesList, ignore_index=True)
-    # landTempSeries_df = pd.concat(landTempSeriesList, ignore_index=True)
-    dataSeries_df = pd.concat(dataSeriesList, ignore_index=True)
+    try:
+        # concatenate all time series
+        # waterTempSeries_df = pd.concat(waterTempSeriesList, ignore_index=True)
+        # landTempSeries_df = pd.concat(landTempSeriesList, ignore_index=True)
+        dataSeries_df = pd.concat(dataSeriesList, ignore_index=True)
 
-    # sort by date
-    # waterTempSeries_df.sort_values(by="date", inplace=True)
-    # landTempSeries_df.sort_values(by="date", inplace=True)
-    dataSeries_df.sort_values(by="date", inplace=True)
-    # #drop null values
-    # # waterTempSeries_df.dropna(inplace=True)
-    # # landTempSeries_df.dropna(inplace=True)
-    # dataSeries_df.dropna(inplace=True)
-    # remove duplicates
-    # waterTempSeries_df.drop_duplicates(subset="date", inplace=True)
-    # landTempSeries_df.drop_duplicates(subset="date", inplace=True)
-    dataSeries_df.drop_duplicates(subset="date", inplace=True)
+        # sort by date
+        # waterTempSeries_df.sort_values(by="date", inplace=True)
+        # landTempSeries_df.sort_values(by="date", inplace=True)
+        dataSeries_df.sort_values(by="date", inplace=True)
+        # #drop null values
+        # # waterTempSeries_df.dropna(inplace=True)
+        # # landTempSeries_df.dropna(inplace=True)
+        # dataSeries_df.dropna(inplace=True)
+        # remove duplicates
+        # waterTempSeries_df.drop_duplicates(subset="date", inplace=True)
+        # landTempSeries_df.drop_duplicates(subset="date", inplace=True)
+        dataSeries_df.drop_duplicates(subset="date", inplace=True)
 
-    # save time series to csv
-    # waterTempSeries_df.to_csv(
-    #     data_dir / "reaches" / f"{reach_id}_watertemp.csv", index=False
-    # )
-    # landTempSeries_df.to_csv(
-    #     data_dir / "reaches" / f"{reach_id}_landtemp.csv", index=False
-    # )
-    # print(dataSeries_df.head())
-    # dataSeries_df.to_csv(
-    #     data_dir / "reservoir" / f"{reach_id}.csv", index=False
-    # )
+        # save time series to csv
+        # waterTempSeries_df.to_csv(
+        #     data_dir / "reaches" / f"{reach_id}_watertemp.csv", index=False
+        # )
+        # landTempSeries_df.to_csv(
+        #     data_dir / "reaches" / f"{reach_id}_landtemp.csv", index=False
+        # )
+        # print(dataSeries_df.head())
+        # dataSeries_df.to_csv(
+        #     data_dir / "reservoir" / f"{reach_id}.csv", index=False
+        # )
 
-    # # land temp
-    # entryToDB(
-    #     dataSeries_df,
-    #     "ReachLandsatLandTemp",
-    #     reach_id,
-    #     connection,
-    #     date_col="date",
-    #     value_col="landtemp(C)",
-    # )
-    # # water temp
-    # entryToDB(
-    #     dataSeries_df,
-    #     "ReachLandsatWaterTemp",
-    #     reach_id,
-    #     connection,
-    #     date_col="date",
-    #     value_col="watertemp(C)",
-    # )
-    # # NDVI
-    # entryToDB(
-    #     dataSeries_df,
-    #     "ReachNDVI",
-    #     reach_id,
-    #     connection,
-    #     date_col="date",
-    #     value_col="NDVI",
-    # )
-
-    if imageCollection == "NASA/HLS/HLSL30/v002":
-        entryToDB(
-            dataSeries_df,
-            "StationHLSL30",
-            reach_id,
-            # connection,
-            entry_key={
-                "Date": "date",
-                "b01_mean": "b1_mean",
-                "b01_median": "b1_median",
-                "b01_std": "b1_std",
-                "b02_mean": "b2_mean",
-                "b02_median": "b2_median",
-                "b02_std": "b2_std",
-                "b03_mean": "b3_mean",
-                "b03_median": "b3_median",
-                "b03_std": "b3_std",
-                "b04_mean": "b4_mean",
-                "b04_median": "b4_median",
-                "b04_std": "b4_std",
-                "b05_mean": "b5_mean",
-                "b05_median": "b5_median",
-                "b05_std": "b5_std",
-                "b06_mean": "b6_mean",
-                "b06_median": "b6_median",
-                "b06_std": "b6_std",
-                "b07_mean": "b7_mean",
-                "b07_median": "b7_median",
-                "b07_std": "b7_std",
-                "b09_mean": "b9_mean",
-                "b09_median": "b9_median",
-                "b09_std": "b9_std",
-                "b10_mean": "b10_mean",
-                "b10_median": "b10_median",
-                "b10_std": "b10_std",
-                "b11_mean": "b11_mean",
-                "b11_median": "b11_median",
-                "b11_std": "b11_std",
-            },
-            db=db,
-            db_type=db_type,
-        )
-    elif imageCollection == "NASA/HLS/HLSS30/v002":
-        entryToDB(
-            dataSeries_df,
-            "StationHLSS30",
-            reach_id,
-            # connection,
-            entry_key={
-                "Date": "date",
-                "b01_mean": "b1_mean",
-                "b01_median": "b1_median",
-                "b01_std": "b1_std",
-                "b02_mean": "b2_mean",
-                "b02_median": "b2_median",
-                "b02_std": "b2_std",
-                "b03_mean": "b3_mean",
-                "b03_median": "b3_median",
-                "b03_std": "b3_std",
-                "b04_mean": "b4_mean",
-                "b04_median": "b4_median",
-                "b04_std": "b4_std",
-                "b05_mean": "b5_mean",
-                "b05_median": "b5_median",
-                "b05_std": "b5_std",
-                "b06_mean": "b6_mean",
-                "b06_median": "b6_median",
-                "b06_std": "b6_std",
-                "b07_mean": "b7_mean",
-                "b07_median": "b7_median",
-                "b07_std": "b7_std",
-                "b08_mean": "b8_mean",
-                "b08_median": "b8_median",
-                "b08_std": "b8_std",
-                "b8a_mean": "b8a_mean",
-                "b8a_median": "b8a_median",
-                "b8a_std": "b8a_std",
-                "b09_mean": "b9_mean",
-                "b09_median": "b9_median",
-                "b09_std": "b9_std",
-                "b10_mean": "b10_mean",
-                "b10_median": "b10_median",
-                "b10_std": "b10_std",
-                "b11_mean": "b11_mean",
-                "b11_median": "b11_median",
-                "b11_std": "b11_std",
-                "b12_mean": "b12_mean",
-                "b12_median": "b12_median",
-                "b12_std": "b12_std",
-            },
-            db=db,
-            db_type=db_type,
-        )
-    else:
-        entryToDB(
-            dataSeries_df,
-            "StationData",
-            reach_id,
-            # connection,
-            entry_key={
-                "Date": "date",
-                "LandTempC": "landtemp(C)",
-                "WaterTempC": "watertemp(C)",
-                "NDVI": "NDVI",
-                "Mission": "Mission",
-            },
-            db=db,
-            db_type=db_type,
-        )
+        # # land temp
+        # entryToDB(
+        #     dataSeries_df,
+        #     "ReachLandsatLandTemp",
+        #     reach_id,
+        #     connection,
+        #     date_col="date",
+        #     value_col="landtemp(C)",
+        # )
+        # # water temp
+        # entryToDB(
+        #     dataSeries_df,
+        #     "ReachLandsatWaterTemp",
+        #     reach_id,
+        #     connection,
+        #     date_col="date",
+        #     value_col="watertemp(C)",
+        # )
+        # # NDVI
+        # entryToDB(
+        #     dataSeries_df,
+        #     "ReachNDVI",
+        #     reach_id,
+        #     connection,
+        #     date_col="date",
+        #     value_col="NDVI",
+        # )
+        if imageCollection == "NASA/HLS/HLSL30/v002":
+            entryToDB(
+                dataSeries_df,
+                "StationHLSL30",
+                reach_id,
+                # connection,
+                entry_key={
+                    "Date": "date",
+                    "b01_mean": "b1_mean",
+                    "b01_median": "b1_median",
+                    "b01_std": "b1_std",
+                    "b02_mean": "b2_mean",
+                    "b02_median": "b2_median",
+                    "b02_std": "b2_std",
+                    "b03_mean": "b3_mean",
+                    "b03_median": "b3_median",
+                    "b03_std": "b3_std",
+                    "b04_mean": "b4_mean",
+                    "b04_median": "b4_median",
+                    "b04_std": "b4_std",
+                    "b05_mean": "b5_mean",
+                    "b05_median": "b5_median",
+                    "b05_std": "b5_std",
+                    "b06_mean": "b6_mean",
+                    "b06_median": "b6_median",
+                    "b06_std": "b6_std",
+                    "b07_mean": "b7_mean",
+                    "b07_median": "b7_median",
+                    "b07_std": "b7_std",
+                    "b09_mean": "b9_mean",
+                    "b09_median": "b9_median",
+                    "b09_std": "b9_std",
+                    "b10_mean": "b10_mean",
+                    "b10_median": "b10_median",
+                    "b10_std": "b10_std",
+                    "b11_mean": "b11_mean",
+                    "b11_median": "b11_median",
+                    "b11_std": "b11_std",
+                },
+                db=db,
+                db_type=db_type,
+            )
+        elif imageCollection == "NASA/HLS/HLSS30/v002":
+            entryToDB(
+                dataSeries_df,
+                "StationHLSS30",
+                reach_id,
+                # connection,
+                entry_key={
+                    "Date": "date",
+                    "b01_mean": "b1_mean",
+                    "b01_median": "b1_median",
+                    "b01_std": "b1_std",
+                    "b02_mean": "b2_mean",
+                    "b02_median": "b2_median",
+                    "b02_std": "b2_std",
+                    "b03_mean": "b3_mean",
+                    "b03_median": "b3_median",
+                    "b03_std": "b3_std",
+                    "b04_mean": "b4_mean",
+                    "b04_median": "b4_median",
+                    "b04_std": "b4_std",
+                    "b05_mean": "b5_mean",
+                    "b05_median": "b5_median",
+                    "b05_std": "b5_std",
+                    "b06_mean": "b6_mean",
+                    "b06_median": "b6_median",
+                    "b06_std": "b6_std",
+                    "b07_mean": "b7_mean",
+                    "b07_median": "b7_median",
+                    "b07_std": "b7_std",
+                    "b08_mean": "b8_mean",
+                    "b08_median": "b8_median",
+                    "b08_std": "b8_std",
+                    "b8a_mean": "b8a_mean",
+                    "b8a_median": "b8a_median",
+                    "b8a_std": "b8a_std",
+                    "b09_mean": "b9_mean",
+                    "b09_median": "b9_median",
+                    "b09_std": "b9_std",
+                    "b10_mean": "b10_mean",
+                    "b10_median": "b10_median",
+                    "b10_std": "b10_std",
+                    "b11_mean": "b11_mean",
+                    "b11_median": "b11_median",
+                    "b11_std": "b11_std",
+                    "b12_mean": "b12_mean",
+                    "b12_median": "b12_median",
+                    "b12_std": "b12_std",
+                },
+                db=db,
+                db_type=db_type,
+            )
+        else:
+            entryToDB(
+                dataSeries_df,
+                "StationData",
+                reach_id,
+                # connection,
+                entry_key={
+                    "Date": "date",
+                    "LandTempC": "landtemp(C)",
+                    "WaterTempC": "watertemp(C)",
+                    "NDVI": "NDVI",
+                    "Mission": "Mission",
+                },
+                db=db,
+                db_type=db_type,
+            )
+    except Exception as e:
+        if logger is not None:
+            logger.error(f"Error processing reach ID {reach_id}: {e}")
+            logger.info(f"No data found for reach ID: {reach_id}")
+        else:
+            print(f"Error processing reach ID {reach_id}: {e}")
+            print(f"No data found for reach ID: {reach_id}")
 
 
 def runReservoirExtraction(
@@ -1692,21 +1778,23 @@ def runReachExtraction(
         )
 
         reach_ids = reaches_gdf[reaches_gdf["river_id"] == river]["reach_id"].tolist()
-
-        # print(reach_ids)
         reach_ids = reach_ids[checkpoint["reach_index"] :]
 
-        reaches = geemap.shp_to_ee(data_dir / "reaches" / "rivers.shp")
+        ## Seems redundant. Removing for now. ##
+        # # print(reach_ids)
 
-        if reach_ids is None:
-            ee_reach_ids = reaches.select("reach_id", retainGeometry=False).getInfo()
-            reach_ids = [i["properties"]["reach_id"] for i in ee_reach_ids["features"]][
-                checkpoint["reach_index"] :
-            ]
-            # reach_ids = gdf["reach_id"].tolist()
+        # reaches = geemap.shp_to_ee(data_dir / "reaches" / "rivers.shp")
+
+        # if reach_ids is None:
+        #     ee_reach_ids = reaches.select("reach_id", retainGeometry=False).getInfo()
+        #     reach_ids = [i["properties"]["reach_id"] for i in ee_reach_ids["features"]][
+        #         checkpoint["reach_index"] :
+        #     ]
+        #     # reach_ids = gdf["reach_id"].tolist()
+        ####################################
 
         for reach_id in reach_ids:
-            
+            reaches = geemap.gdf_to_ee(reaches_gdf[reaches_gdf["reach_id"] == reach_id])
             # hlss30 data
             if datetime.datetime.strptime(
                 end_date, "%Y-%m-%d"
@@ -2062,8 +2150,6 @@ def get_reach_data(
     # reaches = reaches_gdf["reach_name"].to_list()
 
     rivers = reaches_gdf["river_id"].unique()
-    # print(len(rivers))
-    # print(len(reaches_gdf))
 
     try:
         with open(data_dir / "reaches" / "checkpoint.json", "r") as f:
