@@ -1,0 +1,6 @@
+Attribute_name,Description
+conditions,Data on the conditions of reach/river/dam/project. Refer to conditions_data for detailed description of the possible types of conditions represented in the data.
+fish_count_ad,Total count of adult fish passing. Additional breakdown of fish types and their counts may be available. Refer to fish_data for detailed descriptions of the fish types.
+fish_count_ju,Total count of juvenile fish passing. Additional breakdown of fish types and their counts may be available. Refer to fish_data for detailed descriptions of the fish types.
+pit_tag_ad,PIT tag observations of adult fish
+pit_tag_ju,PIT tag observations of juvenile fish
