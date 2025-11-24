@@ -1,10 +1,9 @@
 from thorr.utils import read_config, Logger, validate_start_end_dates
-from thorr.database import Connect as db_connect
+from thorr.database import Connect as db_connect, copy_dataframe as copy
 
 from pathlib import Path
 import pandas as pd
 from joblib import load
-
 
 # temperature estimate
 def est_temp_reaches(config_path, element_type="reaches"):
@@ -81,6 +80,7 @@ def est_temp_reaches(config_path, element_type="reaches"):
         )
         df["Date"] = pd.to_datetime(df["Date"])
 
+    log.info("Data has been downloaded from the database.")
     # create a DOY column
     df["DOY"] = df["Date"].dt.dayofyear
     # fill na values of the mean width values with 15
@@ -99,36 +99,25 @@ def est_temp_reaches(config_path, element_type="reaches"):
     # estimate models
     df["EstTempC"] = ml_model.predict(df[features])
 
+    log.info("Temperature estimates have been generated.")
     # upload estimates to the database
     if db_type == "postgresql":
-        for i, row in df.iterrows():
-            # if i % 10000 == 0:
-            #     print(f"Processing row {i} of {len(df)}")
-
-            query2 = f"""
-            UPDATE {schema}."ReachData"
-            SET
-                "EstTempC" = {round(row['EstTempC'], 2)}
-            WHERE
-                (
-                    "ReachID" = (
-                        SELECT
-                            "ReachID"
-                        FROM
-                            {schema}."Reaches"
-                        WHERE
-                            "Name" = '{row['Name']}'
-                    )
-                )
-                AND ("Date" = '{row['Date']}')
-                AND ("EstTempC" IS NULL);
-            """
-
-            with connection.cursor() as cursor:
-                cursor.execute(query2)
-                connection.commit()
+        mergesql =f'''            UPDATE {schema}."ReachData" as perm
+                    SET
+                        "EstTempC" = round((tmp."EstTempC"::numeric),2)
+                    FROM reachdatatmp as tmp
+                    WHERE
+                        (
+                            perm."ReachID" = tmp."ReachID" and perm."Date" = tmp."Date" and perm."EstTempC" is NULL
+                        );
+        '''
+        temptable = f'CREATE TEMP TABLE reachdatatmp AS SELECT "ReachID","Date","EstTempC" from {schema}."ReachData" '
+        with connection.cursor() as cursor:
+           cursor.execute(temptable)
+           copy(cursor,df[["ReachID","Date","EstTempC"]],'reachdatatmp',log=log)
+           cursor.execute(mergesql)
     elif db_type == "mysql":
-        # TODO: implement the query for mysql
+    # TODO: implement the query for mysql
         pass
 
     log.info("Temperature estimates have been successfully uploaded to the database.")
