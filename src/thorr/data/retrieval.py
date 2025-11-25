@@ -2433,3 +2433,137 @@ def retrieve(config_path, element_type="reaches"):
         # print("Retrieving reservoirs data")
 
     # print(proj_dir, ee_credentials)
+
+
+def retrieve_selected(config_path, element_type="reaches"):
+
+    config_dict = read_config(Path(config_path))
+
+    proj_dir = Path(config_dict["project"]["project_dir"])
+    region = config_dict["project"]["region"]
+    ee_credentials = {
+        "service_account": config_dict["ee"]["service_account"],
+        "private_key_path": config_dict["ee"]["private_key_path"],
+    }
+
+    log = Logger(
+        project_title=config_dict["project"]["name"],
+        logger_format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        log_dir=Path(proj_dir / "logs"),
+    ).get_logger()
+
+    db_type = config_dict["database"]["type"].lower()
+    db = db_connect(config_path, logger=log, db_type=db_type)
+
+    data_dir = proj_dir / "data" / "GEE"
+
+    if element_type == "reaches":
+        reaches_dir = data_dir / "reaches"
+        reaches_dir.mkdir(parents=True, exist_ok=True)
+    elif element_type == "reservoirs":
+        reservoirs_dir = data_dir / "reservoirs"
+        reservoirs_dir.mkdir(parents=True, exist_ok=True)
+
+    # get start date from config file
+    if (
+        "start_date" not in config_dict["project"]
+        or not config_dict["project"]["start_date"]
+    ):
+        start_date = None
+    else:
+        start_date = config_dict["project"]["start_date"]
+
+    # get end date from config file
+    if (
+        "end_date" not in config_dict["project"]
+        or not config_dict["project"]["end_date"]
+    ):
+        end_date = None
+    else:
+        end_date = config_dict["project"]["end_date"]
+
+    # validate start and end dates
+    start_date, end_date = validate_start_end_dates(start_date, end_date, logger=log)
+
+    selected_ids = config_dict["selection"].get("selected_ids", None)
+
+    # convert selected_ids to list
+    if selected_ids is not None:
+        selected_ids = [int(i) for i in selected_ids.split(",")]
+
+    if element_type == "reaches":
+        get_reach_data(
+            db,
+            db_type,
+            data_dir,
+            ee_credentials,
+            start_date,
+            end_date,
+            logger=log,
+            region=region,
+            selected_reaches=selected_ids,
+        )
+
+
+def retrieve_station_buffer(config_path, element_type="reaches"):
+
+    config_dict = read_config(Path(config_path))
+
+    proj_dir = Path(config_dict["project"]["project_dir"])
+    region = config_dict["project"]["region"]
+    ee_credentials = {
+        "service_account": config_dict["ee"]["service_account"],
+        "private_key_path": config_dict["ee"]["private_key_path"],
+    }
+
+    log = Logger(
+        project_title=config_dict["project"]["name"],
+        logger_format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        log_dir=Path(proj_dir / "logs"),
+    ).get_logger()
+
+    db_type = config_dict["database"]["type"].lower()
+    db = db_connect(config_path, logger=log, db_type=db_type)
+
+    data_dir = proj_dir / "data" / "GEE"
+
+    reaches_dir = data_dir / "reaches"
+    reaches_dir.mkdir(parents=True, exist_ok=True)
+
+    # get start date from config file
+    if (
+        "start_date" not in config_dict["project"]
+        or not config_dict["project"]["start_date"]
+    ):
+        start_date = None
+    else:
+        start_date = config_dict["project"]["start_date"]
+
+    # get end date from config file
+    if (
+        "end_date" not in config_dict["project"]
+        or not config_dict["project"]["end_date"]
+    ):
+        end_date = None
+    else:
+        end_date = config_dict["project"]["end_date"]
+
+    # validate start and end dates
+    start_date, end_date = validate_start_end_dates(start_date, end_date, logger=log)
+
+    selected_ids = config_dict["selection"].get("selected_ids", None)
+
+    # convert selected_ids to list
+    if selected_ids is not None:
+        selected_ids = [int(i) for i in selected_ids.split(",")]
+
+    get_station_buffer_data(
+        db,
+        db_type,
+        data_dir,
+        ee_credentials,
+        start_date,
+        end_date,
+        logger=log,
+        region=region,
+    )
