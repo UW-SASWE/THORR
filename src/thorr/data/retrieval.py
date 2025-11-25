@@ -2123,6 +2123,7 @@ def get_reach_data(
     end_date,
     # ndwi_threshold=0.2,
     # imageCollection="LANDSAT/LC08/C02/T1_L2",
+    region=None,
     logger=None,
 ):
     service_account = ee_credentials["service_account"]
@@ -2131,7 +2132,7 @@ def get_reach_data(
     )
     ee.Initialize(credentials)
 
-    reaches_gdf = fetch_reach_gdf(db, db_type)
+    reaches_gdf = fetch_reach_gdf(db, db_type, region=region)
     reaches_gdf = reaches_gdf.to_crs(epsg=4326)
 
     # reaches = reaches_gdf["reach_name"].to_list()
