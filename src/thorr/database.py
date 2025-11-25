@@ -1546,6 +1546,12 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
         srid = reaches_gdf.crs.to_epsg()
 
+        columns = reaches_gdf.columns.tolist()
+        for col_name in ["WidthMin", "WidthMean", "WidthMax", "RKm", "koppen"]:
+            # add empty columns if they don't exist
+            if col_name not in columns:
+                reaches_gdf[col_name] = np.nan
+
         # for i, reach in reaches_gdf.iterrows():
         #     # Iinsert reach data into the table if the entry doesn't already exist
         for i, reach in reaches_gdf.iterrows():
