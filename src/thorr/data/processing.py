@@ -613,30 +613,21 @@ def prep_reaches(config_path, koppen_path):
         processed_reaches["koppen"] = koppen_class
         processed_buffered_reaches["koppen"] = koppen_class
 
-    # sort the processed_reaches by RKm and river_name
-    processed_reaches.sort_values(
-        by=["river_name", "RKm"], ascending=[True, True], inplace=True
-    )
-    processed_buffered_reaches.sort_values(
-        by=["river_name", "RKm"], ascending=[True, True], inplace=True
-    )
-    # assign unique reach id (Name) to the reaches
-    # unique id = river_name [join with _] + "_" + rank of rkm
-    processed_reaches["Name"] = (
-        # join the spaces in the river name with "_" and add the rank of the reach
-        processed_reaches["river_name"].str.replace(" ", "_")
-        + "_"
-        + (processed_reaches.groupby("river_name").cumcount() + 1).astype(str)
-    )
-    
-    processed_buffered_reaches["Name"] = (
-        processed_buffered_reaches["river_name"].str.replace(" ", "_")
-        + "_"
-        + (processed_buffered_reaches.groupby("river_name").cumcount() + 1).astype(str)
-    )
-    # print(processed_reaches["Name"])
+        srid = processed_buffered_reaches.crs.to_epsg()
 
-    return processed_reaches, processed_buffered_reaches
+        schema = db.schema
+        connection = db.connection
+        cursor = connection.cursor()
+
+        for i, buffered_reach in processed_buffered_reaches.iterrows():
+            query = f"""
+                UPDATE "{schema}"."Reaches"
+                SET "buffered_geometry" = 'SRID={srid};{buffered_reach['geometry'].wkt}', "RKm" = {buffered_reach['RKm']}, "ClimateClass" = {buffered_reach['koppen']}
+                WHERE "ReachID" = '{buffered_reach['reach_id']}'
+                """
+
+            cursor.execute(query)
+            connection.commit()
 
 
 # # Example usage:
