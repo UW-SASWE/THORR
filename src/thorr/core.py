@@ -5,7 +5,6 @@ from pathlib import Path
 import pandas as pd
 from joblib import load
 
-
 # temperature estimate
 def est_temp_reaches(config_path, element_type="reaches"):
     config_dict = read_config(config_path)
@@ -119,7 +118,7 @@ def est_temp_reaches(config_path, element_type="reaches"):
             copy(cursor, df[["ReachID", "Date", "EstTempC"]], "reachdatatmp", log=log)
             cursor.execute(mergesql)
     elif db_type == "mysql":
-        # TODO: implement the query for mysql
+    # TODO: implement the query for mysql
         pass
 
     log.info("Temperature estimates have been successfully uploaded to the database.")
