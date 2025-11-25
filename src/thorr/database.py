@@ -1796,6 +1796,7 @@ def copy_dataframe(
 
 def upload_gis(config_file, gpkg, gpkg_layers, db_type="mysql"):
     print("Uploading GIS data to database...")
+    gpkg_layers = {k: v for k, v in gpkg_layers.items() if v}  # remove empty layer keys
     if db_type == "mysql":
         mysql_upload_gis(
             config_file,
