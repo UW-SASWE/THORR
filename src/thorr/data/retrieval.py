@@ -1213,6 +1213,7 @@ def reachwiseExtraction(
     db_type=None,
     # connection=None,
     logger=None,
+    date_division="yearly",
 ):
     # print('running damwiseExtraction')
     # print(dam_id)
@@ -1236,7 +1237,7 @@ def reachwiseExtraction(
 
     # print(checkpoint)
 
-    dates = divideDates(startDate, endDate, how="yearly")
+    dates = divideDates(startDate, endDate, how=date_division)
     waterTempSeriesList = []
     landTempSeriesList = []
 
@@ -1245,7 +1246,6 @@ def reachwiseExtraction(
     for date in dates:
         startDate_ = date[0]
         endDate_ = date[1]
-
         reach = reaches.filter(ee.Filter.eq("reach_id", reach_id))
         # waterTempSeries, landTempSeries= extractTempSeries(
         #     reservoir, startDate_, endDate_, ndwi_threshold, imageCollection
@@ -1312,9 +1312,47 @@ def reachwiseExtraction(
         #     # ndwi_threshold,
         #     imageCollection,
         # )
-        if (dataSeries is not None) and (dataSeries.size().getInfo()):
-                dataSeries = geemap.ee_to_df(dataSeries)
-        else:
+        try:
+            if (dataSeries is not None) and (dataSeries.size().getInfo()):
+                    dataSeries = geemap.ee_to_df(dataSeries)
+            else:
+                dataSeries = pd.DataFrame()
+        except Exception as e:
+            print(f"Error converting EE FeatureCollection to DataFrame for reach {reach_id} from {startDate_} to {endDate_} for collection {imageCollection}")
+            if logger is not None:
+                logger.error(f"{e}")
+                logger.info(
+                    f"Error converting EE FeatureCollection to DataFrame for reach {reach_id} from {startDate_} to {endDate_} for collection {imageCollection}"
+                )
+            else:
+                print(f"{e}")
+                print(
+                    f"Error converting EE FeatureCollection to DataFrame for reach {reach_id} from {startDate_} to {endDate_} for collection {imageCollection}"
+                )
+            if date_division == "yearly":
+                if logger is not None:
+                    logger.info(
+                        f"Attempting monthly extraction for reach {reach_id} from {startDate_} to {endDate_} for collection {imageCollection}"
+                    )
+                else:
+                    print(
+                        f"Attempting monthly extraction for reach {reach_id} from {startDate_} to {endDate_} for collection {imageCollection}"
+                    )
+                reachwiseExtraction(
+                    reaches,
+                    reach_id,
+                    # dam_name,
+                    startDate_,
+                    endDate_,
+                    ndwi_threshold,
+                    imageCollection,
+                    checkpoint_path,
+                    db,
+                    db_type,
+                    # connection,
+                    logger,
+                    date_division="monthly",
+                )
             dataSeries = pd.DataFrame()
 
         # print("Breakpoint damwise 3")
