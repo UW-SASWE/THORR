@@ -1770,30 +1770,6 @@ def copy_dataframe(
                 copy.write(data)
 
 
-def copy_dataframe(
-    cur,
-    df: pd.DataFrame,
-    table_name: str,
-) -> None:
-    """Upload a dataframe to the database using the COPY command.
-    derived from https://stackoverflow.com/questions/78732362/how-to-upload-pandas-data-frames-fast-with-psycopg3
-    """
-
-    # Create a buffer
-    buffer = StringIO()
-    df.to_csv(buffer, index=False, header=False, na_rep="NULL")
-    buffer.seek(0)
-
-    copy_sql = sql.SQL("COPY {} FROM STDIN WITH (FORMAT CSV, NULL 'NULL')").format(
-        sql.Identifier(table_name)
-    )
-    # Load data into the table using copy method
-    with buffer as f:
-        with cur.copy(copy_sql) as copy:
-            while data := f.read(10):
-                copy.write(data)
-
-
 def upload_gis(config_file, gpkg, gpkg_layers, db_type="mysql"):
     print("Uploading GIS data to database...")
     gpkg_layers = {k: v for k, v in gpkg_layers.items() if v}  # remove empty layer keys
