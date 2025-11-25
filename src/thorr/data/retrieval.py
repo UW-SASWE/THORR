@@ -1794,6 +1794,55 @@ def runReachExtraction(
         ####################################
 
         for reach_id in reach_ids:
+            reaches = geemap.gdf_to_ee(reaches_gdf[reaches_gdf["reach_id"] == reach_id])
+            # hlss30 data
+            if datetime.datetime.strptime(
+                end_date, "%Y-%m-%d"
+            ) >= datetime.datetime.strptime("2015-11-15", "%Y-%m-%d"):
+                reachwiseExtraction(
+                    reaches,
+                    reach_id,
+                    # dam_name,
+                    max(
+                        datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                        datetime.datetime.strptime("2015-11-15", "%Y-%m-%d"),
+                    ).strftime(
+                        "%Y-%m-%d"
+                    ),  # clip the start date to 2015-11-15
+                    end_date,
+                    # ndwi_threshold,
+                    imageCollection="NASA/HLS/HLSS30/v002",
+                    checkpoint_path=checkpoint_path,
+                    db=db,
+                    db_type=db_type,
+                    # connection=connection,
+                    logger=logger,
+                )
+
+            # hlsl30 data
+            if datetime.datetime.strptime(
+                end_date, "%Y-%m-%d"
+            ) >= datetime.datetime.strptime("2013-04-01", "%Y-%m-%d"):
+                reachwiseExtraction(
+                    reaches,
+                    reach_id,
+                    # dam_name,
+                    max(
+                        datetime.datetime.strptime(start_date, "%Y-%m-%d"),
+                        datetime.datetime.strptime("2013-04-01", "%Y-%m-%d"),
+                    ).strftime(
+                        "%Y-%m-%d"
+                    ),  # clip the start date to 2013-04-01
+                    end_date,
+                    # ndwi_threshold,
+                    imageCollection="NASA/HLS/HLSL30/v002",
+                    checkpoint_path=checkpoint_path,
+                    db=db,
+                    db_type=db_type,
+                    # connection=connection,
+                    logger=logger,
+                )
+
             # Landsat9 Data
             if datetime.datetime.strptime(
                 end_date, "%Y-%m-%d"
