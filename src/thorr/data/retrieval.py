@@ -2415,7 +2415,14 @@ def retrieve(config_path, element_type="reaches"):
 
     if element_type == "reaches":
         get_reach_data(
-            db, db_type, data_dir, ee_credentials, start_date, end_date, logger=log
+            db,
+            db_type,
+            data_dir,
+            ee_credentials,
+            start_date,
+            end_date,
+            logger=log,
+            region=region,
         )
         # print("Retrieving reaches data")
         # pass
