@@ -2,6 +2,9 @@ from pathlib import Path
 import configparser
 import requests
 import zipfile
+import pandas as pd
+import geopandas as gpd
+
 
 import logging
 import os
