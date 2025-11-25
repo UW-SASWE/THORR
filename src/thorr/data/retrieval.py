@@ -1318,7 +1318,6 @@ def reachwiseExtraction(
             else:
                 dataSeries = pd.DataFrame()
         except Exception as e:
-            print(f"Error converting EE FeatureCollection to DataFrame for reach {reach_id} from {startDate_} to {endDate_} for collection {imageCollection}")
             if logger is not None:
                 logger.error(f"{e}")
                 logger.info(
