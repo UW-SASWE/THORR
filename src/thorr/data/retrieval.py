@@ -1057,6 +1057,10 @@ def damwiseExtraction(
                     logger,
                     "dam",
                 )
+            case "NASA/HLS/HLSL30/v002":
+                pass
+            case "NASA/HLS/HLSS30/v002":
+                pass
             case _:
                 pass
 
