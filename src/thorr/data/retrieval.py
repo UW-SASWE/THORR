@@ -2142,6 +2142,7 @@ def get_reach_data(
     ## End of research purposes only
 
     # reaches = reaches_gdf["reach_name"].to_list()
+    # print(reaches_gdf[reaches_gdf["river_id"]==5])
 
     rivers = reaches_gdf["river_id"].unique()
 
