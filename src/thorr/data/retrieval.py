@@ -844,14 +844,24 @@ def entryToDB(
     data = data.copy()
     data[entry_key["Date"]] = pd.to_datetime(data[entry_key["Date"]])
     data = data[[value for value in entry_key.values() if value]]
-    data = data.dropna(
-        how="all",
-        subset=[
-            value
-            for value in entry_key.values()
-            if value not in [entry_key["Date"], entry_key["Mission"]]
-        ],
-    )
+    if table_name == "DamData" or table_name == "ReachData":
+        data = data.dropna(
+            how="all",
+            subset=[
+                value
+                for value in entry_key.values()
+                if value not in [entry_key["Date"], entry_key["Mission"]]
+            ],
+        )
+    else:
+        data = data.dropna(
+            how="all",
+            subset=[
+                value
+                for value in entry_key.values()
+                if value not in [entry_key["Date"]]
+            ],
+        )
     # data = data[data[value_col] != -9999]
     data = data.sort_values(by=entry_key["Date"])
 
