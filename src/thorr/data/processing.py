@@ -379,18 +379,17 @@ def process_sword_reaches(reaches, rivers, koppen_path):
     processed_reaches = pd.DataFrame()
     processed_buffered_reaches = pd.DataFrame()
 
-    for river_name in river_names:
+    for i, river in rivers.iterrows():
         RKm = []
         koppen = []
 
-        river = rivers[rivers["Name"] == river_name].copy()
         lat_0, lon_0 = (
-            river["geometry"].convex_hull.centroid.y.values[0],
-            river["geometry"].convex_hull.centroid.x.values[0],
+            river["geometry"].convex_hull.centroid.y,
+            river["geometry"].convex_hull.centroid.x,
         )
         projected_crs = f"+proj=aeqd +lat_0={lat_0} +lon_0={lon_0}"
-        river = river.to_crs(projected_crs)
-        projected_reaches = reaches[reaches["river_name"] == river["Name"]].copy()
+        projected_river = river["geometry"].to_crs(projected_crs)
+        # projected_reaches = reaches[reaches["river_name"] == river["Name"]].copy()
         # projected_reaches = projected_reaches.to_crs(projected_crs)
 
         # for i, reach in projected_reaches.iterrows():
