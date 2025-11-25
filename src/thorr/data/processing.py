@@ -575,7 +575,7 @@ def prep_reaches(config_path, koppen_path):
                 shapely.get_point(reach.geometry, 1),
             )
 
-            RKm.append(round(river.project(reach_start).values[0] * 1e-3, 3))
+            RKm.append(round(projected_river.project(reach_start).values[0] * 1e-3, 3))
 
         projected_reaches["RKm"] = RKm
         projected_reaches.fillna({"WidthMean": 30}, inplace=True)
