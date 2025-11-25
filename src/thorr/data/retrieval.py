@@ -2125,6 +2125,7 @@ def get_reach_data(
     # imageCollection="LANDSAT/LC08/C02/T1_L2",
     region=None,
     logger=None,
+    selected_reaches=None,  # Only for research purposes
 ):
     service_account = ee_credentials["service_account"]
     credentials = ee.ServiceAccountCredentials(
@@ -2134,6 +2135,11 @@ def get_reach_data(
 
     reaches_gdf = fetch_reach_gdf(db, db_type, region=region)
     reaches_gdf = reaches_gdf.to_crs(epsg=4326)
+
+    ## For research purposes only -- to limit the number of reaches to specific selected reaches
+    if selected_reaches is not None:
+        reaches_gdf = reaches_gdf[reaches_gdf["reach_id"].isin(selected_reaches)].copy()
+    ## End of research purposes only
 
     # reaches = reaches_gdf["reach_name"].to_list()
 
