@@ -600,18 +600,18 @@ def prep_reaches(config_path, koppen_path):
             crs=4326,
         )
 
-    # Extract Köppen class for each reach based on centroid and add to reaches_gdf
-    koppen_class = []
-    reprojected_reaches = processed_reaches.to_crs(koppen_raster.crs)
-    for i in range(len(reprojected_reaches)):
-        row = reprojected_reaches.iloc[i]
-        x = row.geometry.centroid.x
-        y = row.geometry.centroid.y
-        row, col = koppen_raster.index(x, y)
-        koppen_class.append(koppen_raster.read(1)[row, col])
+        # Extract Köppen class for each reach based on centroid and add to reaches_gdf
+        koppen_class = []
+        reprojected_reaches = processed_reaches.to_crs(koppen_raster.crs)
+        for i in range(len(reprojected_reaches)):
+            row = reprojected_reaches.iloc[i]
+            x = row.geometry.centroid.x
+            y = row.geometry.centroid.y
+            row, col = koppen_raster.index(x, y)
+            koppen_class.append(koppen_raster.read(1)[row, col])
 
-    processed_reaches["koppen"] = koppen_class
-    processed_buffered_reaches["koppen"] = koppen_class
+        processed_reaches["koppen"] = koppen_class
+        processed_buffered_reaches["koppen"] = koppen_class
 
     # sort the processed_reaches by RKm and river_name
     processed_reaches.sort_values(
