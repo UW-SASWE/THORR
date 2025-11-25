@@ -844,7 +844,7 @@ def entryToDB(
     data = data.copy()
     data[entry_key["Date"]] = pd.to_datetime(data[entry_key["Date"]])
     data = data[[value for value in entry_key.values() if value]]
-    if table_name == "DamData" or table_name == "ReachData":
+    if table_name == "DamData" or table_name == "StationData":
         data = data.dropna(
             how="all",
             subset=[
@@ -886,7 +886,7 @@ def entryToDB(
 
                 cursor.execute(query)
                 connection.commit()
-        elif table_name == "ReachData":
+        elif table_name == "StationData":
             data = data.fillna("NULL")
 
             # data.to_csv('data.csv')
@@ -897,9 +897,9 @@ def entryToDB(
             for i, row in data.iterrows():
                 # print(', '.join([str(row[value]) for value in entry_key.values() if value!=entry_key['Date']]))
                 query = f"""
-                INSERT INTO {table_name} (Date, ReachID, {', '.join([str(key) for key in entry_key.keys() if key!='Date'])})
+                INSERT INTO {table_name} (Date, StationID, {', '.join([str(key) for key in entry_key.keys() if key!='Date'])})
                 SELECT '{row[entry_key['Date']]}', {element_id}, {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
-                WHERE NOT EXISTS (SELECT * FROM {table_name} WHERE Date = '{row[entry_key['Date']]}' AND ReachID = {element_id})
+                WHERE NOT EXISTS (SELECT * FROM {table_name} WHERE Date = '{row[entry_key['Date']]}' AND StationID = {element_id})
                 """
 
                 cursor.execute(query)
@@ -920,14 +920,14 @@ def entryToDB(
         #         # print(query)
         #         cursor.execute(query)
         #         connection.commit()
-        # elif table_name == "ReachData":
+        # elif table_name == "StationData":
         #     data = data.fillna("NULL")
 
         #     for i, row in data.iterrows():
         #         query = f"""
-        #         INSERT INTO {schema}."{table_name}" ("Date", "ReachID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
+        #         INSERT INTO {schema}."{table_name}" ("Date", "StationID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
         #         SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
-        #         WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "ReachID" = {element_id})
+        #         WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "StationID" = {element_id})
         #         """
 
         #         # print(query)
@@ -949,28 +949,28 @@ def entryToDB(
                     cursor.execute(query)
                     connection.commit()
 
-            case "ReachData":
+            case "StationData":
                 data = data.fillna("NULL")
 
                 for i, row in data.iterrows():
                     query = f"""
-                    INSERT INTO {schema}."{table_name}" ("Date", "ReachID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
+                    INSERT INTO {schema}."{table_name}" ("Date", "StationID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
                     SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
-                    WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "ReachID" = {element_id})
+                    WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "StationID" = '{element_id}')
                     """
 
                     # print(query)
                     cursor.execute(query)
                     connection.commit()
 
-            case "ReachHLSS30" | "ReachHLSL30":
+            case "StationHLSS30" | "StationHLSL30":
                 data = data.fillna("NULL")
 
                 for i, row in data.iterrows():
                     query = f"""
-                    INSERT INTO {schema}."{table_name}" ("Date", "ReachID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
+                    INSERT INTO {schema}."{table_name}" ("Date", "StationID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
                     SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"]]])}
-                    WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "ReachID" = {element_id})
+                    WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "StationID" = '{element_id}')
                     """
 
                     # print(query)
@@ -1442,7 +1442,7 @@ def reachwiseExtraction(
         if imageCollection == "NASA/HLS/HLSL30/v002":
             entryToDB(
                 dataSeries_df,
-                "ReachHLSL30",
+                "StationHLSL30",
                 reach_id,
                 # connection,
                 entry_key={
@@ -1484,7 +1484,7 @@ def reachwiseExtraction(
         elif imageCollection == "NASA/HLS/HLSS30/v002":
             entryToDB(
                 dataSeries_df,
-                "ReachHLSS30",
+                "StationHLSS30",
                 reach_id,
                 # connection,
                 entry_key={
@@ -1535,7 +1535,7 @@ def reachwiseExtraction(
         else:
             entryToDB(
                 dataSeries_df,
-                "ReachData",
+                "StationData",
                 reach_id,
                 # connection,
                 entry_key={
@@ -2125,7 +2125,8 @@ def get_reach_data(
     # imageCollection="LANDSAT/LC08/C02/T1_L2",
     region=None,
     logger=None,
-    selected_reaches=None,  # Only for research purposes
+    selected_reaches=None, # Only for research purposes
+    gpkg_args=None
 ):
     service_account = ee_credentials["service_account"]
     credentials = ee.ServiceAccountCredentials(
@@ -2133,133 +2134,13 @@ def get_reach_data(
     )
     ee.Initialize(credentials)
 
-    reaches_gdf = fetch_reach_gdf(db, db_type, region=region)
+    # reaches_gdf = fetch_reach_gdf(db, db_type, region=region)
+    reaches_gdf = gpd.read_file(**gpkg_args)
     reaches_gdf = reaches_gdf.to_crs(epsg=4326)
+    reaches_gdf['river_id'] = 1
 
-    ## For research purposes only -- to limit the number of reaches to specific selected reaches
-    if selected_reaches is not None:
-        reaches_gdf = reaches_gdf[reaches_gdf["reach_id"].isin(selected_reaches)].copy()
-    ## End of research purposes only
-
-    # reaches = reaches_gdf["reach_name"].to_list()
-    # print(reaches_gdf[reaches_gdf["river_id"]==5])
-
-    rivers = reaches_gdf["river_id"].unique()
-
-    try:
-        with open(data_dir / "reaches" / "checkpoint.json", "r") as f:
-            checkpoint = json.load(f)
-    except Exception as e:
-        if logger is not None:
-            logger.error(f"Error: {e}")
-        else:
-            print(f"Error: {e}")
-
-        if logger is not None:
-            logger.info("Creating new checkpoint...")
-        else:
-            print("Creating new checkpoint...")
-        checkpoint = {"river_index": 0, "reach_index": 0}
-        # save checkpoint
-        json.dump(checkpoint, open(data_dir / "reaches" / "checkpoint.json", "w"))
-
-    repeated_tries = 0
-
-    while checkpoint["river_index"] < len(rivers):
-        try:
-            # extract temperature time series for each reach
-            runReachExtraction(
-                data_dir=data_dir,
-                rivers=rivers,
-                reaches_gdf=reaches_gdf,
-                start_date=start_date,
-                end_date=end_date,
-                checkpoint_path=data_dir / "reaches" / "checkpoint.json",
-                db=db,
-                db_type=db_type,
-                # connection=connection,
-                logger=logger,
-            )
-            repeated_tries = 0  # reset repeated_tries
-
-        except Exception as e:
-            if logger is not None:
-                logger.error(f"Error: {e}")
-            else:
-                print(f"Error: {e}")
-            # sleep for 0.5 - 3 minutes
-            s_time = randint(15, 45)
-            if logger is not None:
-                logger.info(f"Sleeping for {s_time} seconds...")
-            else:
-                print(f"Sleeping for {s_time} seconds...")
-            time.sleep(s_time)
-
-            if logger is not None:
-                logger.info("Restarting from checkpoint...")
-            else:
-                print("Restarting from checkpoint...")  # restart from checkpoint
-
-            repeated_tries += 1  # increment repeated_tries
-
-            # if repeated_tries > 3, increment river_index and reset reach_index
-            if repeated_tries > 5:
-                checkpoint["reach_index"] += 1
-                current_river = rivers[checkpoint["river_index"]]
-                if checkpoint["reach_index"] >= len(
-                    reaches_gdf[reaches_gdf["river_id"] == current_river][
-                        "reach_id"
-                    ].tolist()
-                ):
-                    checkpoint["reach_index"] = 0
-                    checkpoint["river_index"] += 1
-                repeated_tries = 0
-
-                # save checkpoint
-                json.dump(
-                    checkpoint, open(data_dir / "reaches" / "checkpoint.json", "w")
-                )
-
-        finally:
-            # save checkpoint
-            with open(data_dir / "reaches" / "checkpoint.json", "r") as f:
-                checkpoint = json.load(f)
-
-    if checkpoint["river_index"] >= len(rivers):
-        checkpoint["river_index"] = 0
-        checkpoint["reach_index"] = 0
-        json.dump(checkpoint, open(data_dir / "reaches" / "checkpoint.json", "w"))
-
-    if logger is not None:
-        logger.info("All done!")
-    else:
-        print("All done!")
-
-
-## for research purposes only
-def get_station_buffer_data(
-    db,
-    db_type,
-    data_dir,
-    # connection,
-    ee_credentials,
-    # temperature_gauges_shp,
-    start_date,
-    end_date,
-    # ndwi_threshold=0.2,
-    # imageCollection="LANDSAT/LC08/C02/T1_L2",
-    region=None,
-    logger=None,
-    selected_reaches=None,  # Only for research purposes
-):
-    service_account = ee_credentials["service_account"]
-    credentials = ee.ServiceAccountCredentials(
-        service_account, ee_credentials["private_key_path"]
-    )
-    ee.Initialize(credentials)
-
-    reaches_gdf = fetch_reach_gdf(db, db_type, region=region)
-    reaches_gdf = reaches_gdf.to_crs(epsg=4326)
+    # print(reaches_gdf.head())
+    # return
 
     ## For research purposes only -- to limit the number of reaches to specific selected reaches
     if selected_reaches is not None:
@@ -2358,9 +2239,6 @@ def get_station_buffer_data(
         logger.info("All done!")
     else:
         print("All done!")
-
-
-## end of research purposes only
 
 
 def retrieve(config_path, element_type="reaches"):
@@ -2373,6 +2251,15 @@ def retrieve(config_path, element_type="reaches"):
         "service_account": config_dict["ee"]["service_account"],
         "private_key_path": config_dict["ee"]["private_key_path"],
     }
+    gpkg = config_dict["data"].get("gis_geopackage", None)
+    buffered_stations_layer = config_dict["data.geopackage_layers"].get("buffered_stations", "buffered_stations")
+    # print(gpkg, buffered_stations_layer)
+    # return
+
+    gpkg_args = {
+        "filename": gpkg,
+        "layer": buffered_stations_layer
+    }
 
     log = Logger(
         project_title=config_dict["project"]["name"],
@@ -2423,6 +2310,7 @@ def retrieve(config_path, element_type="reaches"):
             end_date,
             logger=log,
             region=region,
+            gpkg_args=gpkg_args
         )
         # print("Retrieving reaches data")
         # pass
@@ -2433,137 +2321,3 @@ def retrieve(config_path, element_type="reaches"):
         # print("Retrieving reservoirs data")
 
     # print(proj_dir, ee_credentials)
-
-
-def retrieve_selected(config_path, element_type="reaches"):
-
-    config_dict = read_config(Path(config_path))
-
-    proj_dir = Path(config_dict["project"]["project_dir"])
-    region = config_dict["project"]["region"]
-    ee_credentials = {
-        "service_account": config_dict["ee"]["service_account"],
-        "private_key_path": config_dict["ee"]["private_key_path"],
-    }
-
-    log = Logger(
-        project_title=config_dict["project"]["name"],
-        logger_format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        log_dir=Path(proj_dir / "logs"),
-    ).get_logger()
-
-    db_type = config_dict["database"]["type"].lower()
-    db = db_connect(config_path, logger=log, db_type=db_type)
-
-    data_dir = proj_dir / "data" / "GEE"
-
-    if element_type == "reaches":
-        reaches_dir = data_dir / "reaches"
-        reaches_dir.mkdir(parents=True, exist_ok=True)
-    elif element_type == "reservoirs":
-        reservoirs_dir = data_dir / "reservoirs"
-        reservoirs_dir.mkdir(parents=True, exist_ok=True)
-
-    # get start date from config file
-    if (
-        "start_date" not in config_dict["project"]
-        or not config_dict["project"]["start_date"]
-    ):
-        start_date = None
-    else:
-        start_date = config_dict["project"]["start_date"]
-
-    # get end date from config file
-    if (
-        "end_date" not in config_dict["project"]
-        or not config_dict["project"]["end_date"]
-    ):
-        end_date = None
-    else:
-        end_date = config_dict["project"]["end_date"]
-
-    # validate start and end dates
-    start_date, end_date = validate_start_end_dates(start_date, end_date, logger=log)
-
-    selected_ids = config_dict["selection"].get("selected_ids", None)
-
-    # convert selected_ids to list
-    if selected_ids is not None:
-        selected_ids = [int(i) for i in selected_ids.split(",")]
-
-    if element_type == "reaches":
-        get_reach_data(
-            db,
-            db_type,
-            data_dir,
-            ee_credentials,
-            start_date,
-            end_date,
-            logger=log,
-            region=region,
-            selected_reaches=selected_ids,
-        )
-
-
-def retrieve_station_buffer(config_path, element_type="reaches"):
-
-    config_dict = read_config(Path(config_path))
-
-    proj_dir = Path(config_dict["project"]["project_dir"])
-    region = config_dict["project"]["region"]
-    ee_credentials = {
-        "service_account": config_dict["ee"]["service_account"],
-        "private_key_path": config_dict["ee"]["private_key_path"],
-    }
-
-    log = Logger(
-        project_title=config_dict["project"]["name"],
-        logger_format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        log_dir=Path(proj_dir / "logs"),
-    ).get_logger()
-
-    db_type = config_dict["database"]["type"].lower()
-    db = db_connect(config_path, logger=log, db_type=db_type)
-
-    data_dir = proj_dir / "data" / "GEE"
-
-    reaches_dir = data_dir / "reaches"
-    reaches_dir.mkdir(parents=True, exist_ok=True)
-
-    # get start date from config file
-    if (
-        "start_date" not in config_dict["project"]
-        or not config_dict["project"]["start_date"]
-    ):
-        start_date = None
-    else:
-        start_date = config_dict["project"]["start_date"]
-
-    # get end date from config file
-    if (
-        "end_date" not in config_dict["project"]
-        or not config_dict["project"]["end_date"]
-    ):
-        end_date = None
-    else:
-        end_date = config_dict["project"]["end_date"]
-
-    # validate start and end dates
-    start_date, end_date = validate_start_end_dates(start_date, end_date, logger=log)
-
-    selected_ids = config_dict["selection"].get("selected_ids", None)
-
-    # convert selected_ids to list
-    if selected_ids is not None:
-        selected_ids = [int(i) for i in selected_ids.split(",")]
-
-    get_station_buffer_data(
-        db,
-        db_type,
-        data_dir,
-        ee_credentials,
-        start_date,
-        end_date,
-        logger=log,
-        region=region,
-    )

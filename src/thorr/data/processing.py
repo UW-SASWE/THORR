@@ -5,9 +5,22 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import shapely
-from shapely.ops import split, snap
+from shapely.ops import split, snap, linemerge
 from shapely.geometry import LineString, Point
 import pandas as pd
+
+from thorr.utils import read_config
+
+
+from thorr.utils import (
+    read_config,
+    Logger,
+    validate_start_end_dates,
+    fetch_reach_gdf,
+    fetch_river_gdf,
+    fetch_region_gdf,
+)
+from thorr.database import Connect as db_connect
 
 import rasterio as rio
 
@@ -366,18 +379,194 @@ def process_sword_reaches(reaches, rivers, koppen_path):
     processed_reaches = pd.DataFrame()
     processed_buffered_reaches = pd.DataFrame()
 
-    for river_name in river_names:
+    for i, river in rivers.iterrows():
         RKm = []
         koppen = []
 
-        river = rivers[rivers["Name"] == river_name].copy()
         lat_0, lon_0 = (
-            river["geometry"].convex_hull.centroid.y.values[0],
-            river["geometry"].convex_hull.centroid.x.values[0],
+            river["geometry"].convex_hull.centroid.y,
+            river["geometry"].convex_hull.centroid.x,
         )
         projected_crs = f"+proj=aeqd +lat_0={lat_0} +lon_0={lon_0}"
-        river = river.to_crs(projected_crs)
-        projected_reaches = reaches[reaches["river_name"] == river_name].copy()
+        projected_river = river["geometry"].to_crs(projected_crs)
+        # projected_reaches = reaches[reaches["river_name"] == river["Name"]].copy()
+        # projected_reaches = projected_reaches.to_crs(projected_crs)
+
+        # for i, reach in projected_reaches.iterrows():
+        #     reach_start, reach_end = (
+        #         shapely.get_point(reach.geometry, 0),
+        #         shapely.get_point(reach.geometry, 1),
+        #     )
+
+        #     RKm.append(round(projected_river.project(reach_start) * 1e-3, 3))
+
+        # projected_reaches["RKm"] = RKm
+        # projected_reaches.fillna({"WidthMean": 30}, inplace=True)
+        # buffered_reaches = projected_reaches.copy()
+        # buffered_reaches["geometry"] = projected_reaches.geometry.buffer(
+        #     projected_reaches["WidthMean"] / 2 + 120
+        # )
+
+        # processed_reaches = gpd.GeoDataFrame(
+        #     pd.concat(
+        #         [processed_reaches, projected_reaches.to_crs(4326)], ignore_index=True
+        #     ),
+        #     geometry="geometry",
+        #     crs=4326,
+        # )
+        # processed_buffered_reaches = gpd.GeoDataFrame(
+        #     pd.concat(
+        #         [processed_buffered_reaches, buffered_reaches.to_crs(4326)],
+        #         ignore_index=True,
+        #     ),
+        #     geometry="geometry",
+        #     crs=4326,
+        # )
+
+    # for river_name in river_names:
+    #     RKm = []
+    #     koppen = []
+
+    #     river = rivers[rivers["Name"] == river_name].copy()
+    #     lat_0, lon_0 = (
+    #         river["geometry"].convex_hull.centroid.y.values[0],
+    #         river["geometry"].convex_hull.centroid.x.values[0],
+    #     )
+    #     projected_crs = f"+proj=aeqd +lat_0={lat_0} +lon_0={lon_0}"
+    #     river = river.to_crs(projected_crs)
+    #     projected_reaches = reaches[reaches["river_name"] == river_name].copy()
+    #     projected_reaches = projected_reaches.to_crs(projected_crs)
+
+    #     for i, reach in projected_reaches.iterrows():
+    #         reach_start, reach_end = (
+    #             shapely.get_point(reach.geometry, 0),
+    #             shapely.get_point(reach.geometry, 1),
+    #         )
+
+    #         RKm.append(round(river.project(reach_start).values[0] * 1e-3, 3))
+
+    #     projected_reaches["RKm"] = RKm
+    #     projected_reaches.fillna({"WidthMean": 30}, inplace=True)
+    #     buffered_reaches = projected_reaches.copy()
+    #     buffered_reaches["geometry"] = projected_reaches.geometry.buffer(
+    #         projected_reaches["WidthMean"] / 2 + 120
+    #     )
+
+    #     processed_reaches = gpd.GeoDataFrame(
+    #         pd.concat(
+    #             [processed_reaches, projected_reaches.to_crs(4326)], ignore_index=True
+    #         ),
+    #         geometry="geometry",
+    #         crs=4326,
+    #     )
+    #     processed_buffered_reaches = gpd.GeoDataFrame(
+    #         pd.concat(
+    #             [processed_buffered_reaches, buffered_reaches.to_crs(4326)],
+    #             ignore_index=True,
+    #         ),
+    #         geometry="geometry",
+    #         crs=4326,
+    #     )
+
+    # # Extract Köppen class for each reach based on centroid and add to reaches_gdf
+    # koppen_class = []
+    # reprojected_reaches = processed_reaches.to_crs(koppen_raster.crs)
+    # for i in range(len(reprojected_reaches)):
+    #     row = reprojected_reaches.iloc[i]
+    #     x = row.geometry.centroid.x
+    #     y = row.geometry.centroid.y
+    #     row, col = koppen_raster.index(x, y)
+    #     koppen_class.append(koppen_raster.read(1)[row, col])
+
+    # processed_reaches["koppen"] = koppen_class
+    # processed_buffered_reaches["koppen"] = koppen_class
+
+    # # sort the processed_reaches by RKm and river_name
+    # processed_reaches.sort_values(
+    #     by=["river_name", "RKm"], ascending=[True, True], inplace=True
+    # )
+    # processed_buffered_reaches.sort_values(
+    #     by=["river_name", "RKm"], ascending=[True, True], inplace=True
+    # )
+    # # assign unique reach id (Name) to the reaches
+    # # unique id = river_name [join with _] + "_" + rank of rkm
+    # processed_reaches["Name"] = (
+    #     # join the spaces in the river name with "_" and add the rank of the reach
+    #     processed_reaches["river_name"].str.replace(" ", "_")
+    #     + "_"
+    #     + (processed_reaches.groupby("river_name").cumcount() + 1).astype(str)
+    # )
+
+    # processed_buffered_reaches["Name"] = (
+    #     processed_buffered_reaches["river_name"].str.replace(" ", "_")
+    #     + "_"
+    #     + (processed_buffered_reaches.groupby("river_name").cumcount() + 1).astype(str)
+    # )
+    # # print(processed_reaches["Name"])
+
+    return processed_reaches, processed_buffered_reaches
+
+
+def prep_reaches(config_path, koppen_path):
+
+    config_dict = read_config(Path(config_path))
+
+    proj_dir = Path(config_dict["project"]["project_dir"])
+
+    log = Logger(
+        project_title=config_dict["project"]["name"],
+        logger_format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        log_dir=Path(proj_dir / "logs"),
+    ).get_logger()
+
+    db_type = config_dict["database"]["type"].lower()
+    db = db_connect(config_path, logger=log, db_type=db_type)
+
+    # geopackage_path = config_dict["data"]["gis_geopackage"]
+    regions_gdf = fetch_region_gdf(db)
+    rivers_gdf = fetch_river_gdf(db)
+    reaches_gdf = fetch_reach_gdf(db, geometry_type="geometry", select_unbuffered_only=True)
+
+    # sort regions by name
+    regions_gdf.sort_values("region_id", inplace=True)
+    # sort rivers by region and then by river name
+    rivers_gdf.sort_values(["river_id"], inplace=True)
+    # sort reaches by region and then by river name and reach_id
+    reaches_gdf.sort_values(["river_id", "reach_id"], inplace=True)
+
+    rivers_gdf['geometry'] = rivers_gdf['geometry'].apply(lambda x: linemerge(x) if x.geom_type == 'MultiLineString' else x)
+    reaches_gdf['geometry'] = reaches_gdf['geometry'].apply(lambda x: linemerge(x) if x.geom_type == 'MultiLineString' else x)
+
+
+    koppen_raster = rio.open(koppen_path)
+
+    # print(regions_gdf.head(2))
+    # print(rivers_gdf.head(2))
+    # print(reaches_gdf.head(2))
+
+    processed_reaches = pd.DataFrame()
+    processed_buffered_reaches = pd.DataFrame()
+
+    for i, river in rivers_gdf.iterrows():
+        RKm = []
+        koppen = []
+
+        lat_0, lon_0 = (
+            river["geometry"].convex_hull.centroid.y,
+            river["geometry"].convex_hull.centroid.x,
+        )
+
+        # convert river to geodataframe
+        river = gpd.GeoDataFrame(
+            [river], geometry="geometry", crs=rivers_gdf.crs
+        )
+
+        projected_crs = f"+proj=aeqd +lat_0={lat_0} +lon_0={lon_0}"
+        projected_river = river["geometry"].to_crs(projected_crs)
+
+        # print(river.head())
+
+        projected_reaches = reaches_gdf[reaches_gdf["river_id"] == river["river_id"].values[0]].copy()
         projected_reaches = projected_reaches.to_crs(projected_crs)
 
         for i, reach in projected_reaches.iterrows():
@@ -386,7 +575,7 @@ def process_sword_reaches(reaches, rivers, koppen_path):
                 shapely.get_point(reach.geometry, 1),
             )
 
-            RKm.append(round(river.project(reach_start).values[0] * 1e-3, 3))
+            RKm.append(round(projected_river.project(reach_start).values[0] * 1e-3, 3))
 
         projected_reaches["RKm"] = RKm
         projected_reaches.fillna({"WidthMean": 30}, inplace=True)
@@ -411,52 +600,46 @@ def process_sword_reaches(reaches, rivers, koppen_path):
             crs=4326,
         )
 
-    # Extract Köppen class for each reach based on centroid and add to reaches_gdf
-    koppen_class = []
-    reprojected_reaches = processed_reaches.to_crs(koppen_raster.crs)
-    for i in range(len(reprojected_reaches)):
-        row = reprojected_reaches.iloc[i]
-        x = row.geometry.centroid.x
-        y = row.geometry.centroid.y
-        row, col = koppen_raster.index(x, y)
-        koppen_class.append(koppen_raster.read(1)[row, col])
+        # Extract Köppen class for each reach based on centroid and add to reaches_gdf
+        koppen_class = []
+        reprojected_reaches = processed_reaches.to_crs(koppen_raster.crs)
+        for i in range(len(reprojected_reaches)):
+            row = reprojected_reaches.iloc[i]
+            x = row.geometry.centroid.x
+            y = row.geometry.centroid.y
+            row, col = koppen_raster.index(x, y)
+            koppen_class.append(koppen_raster.read(1)[row, col])
 
-    processed_reaches["koppen"] = koppen_class
-    processed_buffered_reaches["koppen"] = koppen_class
+        processed_reaches["koppen"] = koppen_class
+        processed_buffered_reaches["koppen"] = koppen_class
 
-    # sort the processed_reaches by RKm and river_name
-    processed_reaches.sort_values(
-        by=["river_name", "RKm"], ascending=[True, True], inplace=True
-    )
-    processed_buffered_reaches.sort_values(
-        by=["river_name", "RKm"], ascending=[True, True], inplace=True
-    )
-    # assign unique reach id (Name) to the reaches
-    # unique id = river_name [join with _] + "_" + rank of rkm
-    processed_reaches["Name"] = (
-        # join the spaces in the river name with "_" and add the rank of the reach
-        processed_reaches["river_name"].str.replace(" ", "_")
-        + "_"
-        + (processed_reaches.groupby("river_name").cumcount() + 1).astype(str)
-    )
-    
-    processed_buffered_reaches["Name"] = (
-        processed_buffered_reaches["river_name"].str.replace(" ", "_")
-        + "_"
-        + (processed_buffered_reaches.groupby("river_name").cumcount() + 1).astype(str)
-    )
-    # print(processed_reaches["Name"])
+        srid = processed_buffered_reaches.crs.to_epsg()
 
-    return processed_reaches, processed_buffered_reaches
+        schema = db.schema
+        connection = db.connection
+        cursor = connection.cursor()
+
+        for i, buffered_reach in processed_buffered_reaches.iterrows():
+            query = f"""
+                UPDATE "{schema}"."Reaches"
+                SET "buffered_geometry" = 'SRID={srid};{buffered_reach['geometry'].wkt}', "RKm" = {buffered_reach['RKm']}, "ClimateClass" = {buffered_reach['koppen']}
+                WHERE "ReachID" = '{buffered_reach['reach_id']}'
+                """
+
+            cursor.execute(query)
+            connection.commit()
 
 
 # # Example usage:
 
-# gpkg = "data/gis/geopackages/thorr.gpkg"
+# gpkg = "/Users/gdarkwah/Library/CloudStorage/OneDrive-UW/01-Research/01-THORR/data/v1.1.0a1/gis/geopackages/thorr_v1.1.0a1_copy.gpkg"
 # rivers = gpd.read_file(gpkg, layer="Rivers")
 # reaches = gpd.read_file(gpkg, layer="Reaches")
 # koppen_path = "/Users/gdarkwah/Library/CloudStorage/OneDrive-UW/01-Research/01-THORR/data/gis/raw/Beck_KG_V1/Beck_KG_V1_present_0p083.tif"
 
 # reaches, buffered_reaches = process_sword_reaches(reaches, rivers, koppen_path)
-# reaches.to_file(gpkg, layer="Reaches", driver="GPKG", overwrite=True)
-# buffered_reaches.to_file(gpkg, layer="BufferedReaches", driver="GPKG", overwrite=True)
+# # reaches.to_file(gpkg, layer="Reaches", driver="GPKG", overwrite=True)
+# # buffered_reaches.to_file(gpkg, layer="BufferedReaches", driver="GPKG", overwrite=True)
+
+# # Commandline usage:
+# python -m thorr prep-reaches path/to/config.ini path/to/koppen.tif
