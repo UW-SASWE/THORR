@@ -113,6 +113,51 @@ def divideDates(startDate, endDate, how="yearly"):
 
         return dates
 
+    ## Legacy code for other time divisions ##
+    # elif how == "bi-weekly":
+    #     # divide the timeframe into bi-weekly periods
+    #     dates = []
+    #     currentDate = startDate_
+    #     while currentDate <= endDate_:
+    #         periodStart = currentDate
+    #         periodEnd = currentDate + datetime.timedelta(days=13)
+
+    #         if periodEnd > endDate_:
+    #             periodEnd = endDate_
+
+    #         dates.append(
+    #             [periodStart.strftime("%Y-%m-%d"), periodEnd.strftime("%Y-%m-%d")]
+    #         )
+    #         currentDate = periodEnd + datetime.timedelta(days=1)
+
+    #     return dates
+
+    # # get years from start and end dates
+    # # startYear = pd.to_datetime(startDate).year
+    # # endYear = pd.to_datetime(endDate).year
+    # startYear = startDate_.year
+    # endYear = endDate_.year
+
+    # # divide the timeframe into years
+    # dates = []
+    # for year in range(startYear, endYear + 1):
+    #     if year == startYear and year == endYear:
+    #         dates.append([startDate, endDate])
+    #     elif year == startYear:
+    #         dates.append([startDate, f"{year}-12-31"])
+    #     elif year == endYear:
+    #         # if the difference end date and start of the year is less than 30 days, then replace the end date of the previous append with the end date
+    #         # the purpose of this is to avoid having a date range of less than 30 days (especially at the beginning of the last year)
+    #         if (endDate_ - datetime.datetime(year, 1, 1)).days < 45:
+    #             dates[-1][1] = endDate
+    #         else:
+    #             dates.append([f"{year}-01-01", endDate])
+    #     else:
+    #         dates.append([f"{year}-01-01", f"{year}-12-31"])
+
+    # return date
+    ## Legacy code for other time divisions ##
+
 
 def prepL8(image):
     """
