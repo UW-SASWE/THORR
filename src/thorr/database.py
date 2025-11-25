@@ -61,7 +61,7 @@ class Connect:
                     port=db_config["database"]["port"],
                 )
 
-                database=db_config["database"]["database"]
+                database = db_config["database"]["database"]
                 cursor = self.connection.cursor()
 
                 # Create database if it doesn't exist
@@ -200,7 +200,6 @@ def mysql_setup(config_file):
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
     """
     cursor.execute(regions_query)
-
 
     # Create the Rivers table
     rivers_query = """
@@ -891,8 +890,6 @@ def postgresql_setup_new(config_file):
     pass
 
 
-
-
 # function to set up a fresh database
 def db_setup(config_file, upload_gis_=False):
     db_config = read_config(config_file)
@@ -1145,8 +1142,6 @@ def mysql_upload_gis(config_file, gpkg, gpkg_layers):
 
                 cursor.execute(query)
                 connection.commit()
-            
-
 
 
 def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
@@ -1175,8 +1170,6 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
             cursor.execute(query)
             connection.commit()
 
-    
-
     if "regions" in gpkg_layers:
 
         # print( gpkg, gpkg_layers)
@@ -1204,7 +1197,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
             #     SELECT '{river['GNIS_Name']}', {river['LengthKM']}, 'SRID={srid};{river['geometry'].wkt}'
             #     WHERE NOT EXISTS (SELECT * FROM "{schema}"."Rivers" WHERE "Name" = '{river['GNIS_Name']}')
             #     """
-            
+
             query = f"""
                 INSERT INTO "{schema}"."Rivers" ("Name", "geometry")
                 SELECT '{river['Name']}', 'SRID={srid};{river['geometry'].wkt}'
@@ -1381,6 +1374,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
                 cursor.execute(query)
                 connection.commit()
 
+
 def copy_dataframe(
     cur,
     df: pd.DataFrame,
@@ -1392,10 +1386,36 @@ def copy_dataframe(
 
     # Create a buffer
     buffer = StringIO()
-    df.to_csv(buffer, index=False, header=False, na_rep = 'NULL')
+    df.to_csv(buffer, index=False, header=False, na_rep="NULL")
     buffer.seek(0)
 
-    copy_sql = sql.SQL("COPY {} FROM STDIN WITH (FORMAT CSV, NULL 'NULL')").format(sql.Identifier(table_name))
+    copy_sql = sql.SQL("COPY {} FROM STDIN WITH (FORMAT CSV, NULL 'NULL')").format(
+        sql.Identifier(table_name)
+    )
+    # Load data into the table using copy method
+    with buffer as f:
+        with cur.copy(copy_sql) as copy:
+            while data := f.read(10):
+                copy.write(data)
+
+
+def copy_dataframe(
+    cur,
+    df: pd.DataFrame,
+    table_name: str,
+) -> None:
+    """Upload a dataframe to the database using the COPY command.
+    derived from https://stackoverflow.com/questions/78732362/how-to-upload-pandas-data-frames-fast-with-psycopg3
+    """
+
+    # Create a buffer
+    buffer = StringIO()
+    df.to_csv(buffer, index=False, header=False, na_rep="NULL")
+    buffer.seek(0)
+
+    copy_sql = sql.SQL("COPY {} FROM STDIN WITH (FORMAT CSV, NULL 'NULL')").format(
+        sql.Identifier(table_name)
+    )
     # Load data into the table using copy method
     with buffer as f:
         with cur.copy(copy_sql) as copy:
