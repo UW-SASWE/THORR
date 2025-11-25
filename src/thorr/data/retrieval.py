@@ -2368,6 +2368,7 @@ def retrieve(config_path, element_type="reaches"):
     config_dict = read_config(Path(config_path))
 
     proj_dir = Path(config_dict["project"]["project_dir"])
+    region = config_dict["project"]["region"]
     ee_credentials = {
         "service_account": config_dict["ee"]["service_account"],
         "private_key_path": config_dict["ee"]["private_key_path"],
