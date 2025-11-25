@@ -22,8 +22,31 @@ from thorr.utils import (
 )
 from thorr.database import Connect as db_connect
 
+REGIONS = {
+    "global": "Global",
+    "ucr": "Upper Colorado Region",
+    "glr": "Great Lakes Region",
+    "ohr": "Ohio Region",
+    "lcr": "Lower Colorado Region",
+    "pnr": "Pacific Northwest Region",
+    "umr": "Upper Mississippi Region",
+    "car": "Caribbean Region",
+    "tnr": "Tennessee Region",
+    "rgr": "Rio Grande Region",
+    "sag": "South Atlantic-Gulf Region",
+    "mar": "Mid Atlantic Region",
+    "tgr": "Texas-Gulf Region",
+    "srr": "Souris-Red-Rainy Region",
+    "akr": "Alaska Region",
+    "mir": "Missouri Region",
+    "ner": "New England Region",
+    "awr": "Arkansas-White-Red Region",
+    "cal": "California Region",
+    "lmr": "Lower Mississippi Region",
+}
 
-def divideDates(startDate, endDate):
+
+def divideDates(startDate, endDate, how="yearly"):
     """
     Divide the timeframe into years
 
