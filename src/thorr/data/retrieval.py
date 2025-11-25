@@ -2236,6 +2236,133 @@ def get_reach_data(
         print("All done!")
 
 
+## for research purposes only
+def get_station_buffer_data(
+    db,
+    db_type,
+    data_dir,
+    # connection,
+    ee_credentials,
+    # temperature_gauges_shp,
+    start_date,
+    end_date,
+    # ndwi_threshold=0.2,
+    # imageCollection="LANDSAT/LC08/C02/T1_L2",
+    region=None,
+    logger=None,
+    selected_reaches=None,  # Only for research purposes
+):
+    service_account = ee_credentials["service_account"]
+    credentials = ee.ServiceAccountCredentials(
+        service_account, ee_credentials["private_key_path"]
+    )
+    ee.Initialize(credentials)
+
+    reaches_gdf = fetch_reach_gdf(db, db_type, region=region)
+    reaches_gdf = reaches_gdf.to_crs(epsg=4326)
+
+    ## For research purposes only -- to limit the number of reaches to specific selected reaches
+    if selected_reaches is not None:
+        reaches_gdf = reaches_gdf[reaches_gdf["reach_id"].isin(selected_reaches)].copy()
+    ## End of research purposes only
+
+    # reaches = reaches_gdf["reach_name"].to_list()
+
+    rivers = reaches_gdf["river_id"].unique()
+
+    try:
+        with open(data_dir / "reaches" / "checkpoint.json", "r") as f:
+            checkpoint = json.load(f)
+    except Exception as e:
+        if logger is not None:
+            logger.error(f"Error: {e}")
+        else:
+            print(f"Error: {e}")
+
+        if logger is not None:
+            logger.info("Creating new checkpoint...")
+        else:
+            print("Creating new checkpoint...")
+        checkpoint = {"river_index": 0, "reach_index": 0}
+        # save checkpoint
+        json.dump(checkpoint, open(data_dir / "reaches" / "checkpoint.json", "w"))
+
+    repeated_tries = 0
+
+    while checkpoint["river_index"] < len(rivers):
+        try:
+            # extract temperature time series for each reach
+            runReachExtraction(
+                data_dir=data_dir,
+                rivers=rivers,
+                reaches_gdf=reaches_gdf,
+                start_date=start_date,
+                end_date=end_date,
+                checkpoint_path=data_dir / "reaches" / "checkpoint.json",
+                db=db,
+                db_type=db_type,
+                # connection=connection,
+                logger=logger,
+            )
+            repeated_tries = 0  # reset repeated_tries
+
+        except Exception as e:
+            if logger is not None:
+                logger.error(f"Error: {e}")
+            else:
+                print(f"Error: {e}")
+            # sleep for 0.5 - 3 minutes
+            s_time = randint(15, 45)
+            if logger is not None:
+                logger.info(f"Sleeping for {s_time} seconds...")
+            else:
+                print(f"Sleeping for {s_time} seconds...")
+            time.sleep(s_time)
+
+            if logger is not None:
+                logger.info("Restarting from checkpoint...")
+            else:
+                print("Restarting from checkpoint...")  # restart from checkpoint
+
+            repeated_tries += 1  # increment repeated_tries
+
+            # if repeated_tries > 3, increment river_index and reset reach_index
+            if repeated_tries > 5:
+                checkpoint["reach_index"] += 1
+                current_river = rivers[checkpoint["river_index"]]
+                if checkpoint["reach_index"] >= len(
+                    reaches_gdf[reaches_gdf["river_id"] == current_river][
+                        "reach_id"
+                    ].tolist()
+                ):
+                    checkpoint["reach_index"] = 0
+                    checkpoint["river_index"] += 1
+                repeated_tries = 0
+
+                # save checkpoint
+                json.dump(
+                    checkpoint, open(data_dir / "reaches" / "checkpoint.json", "w")
+                )
+
+        finally:
+            # save checkpoint
+            with open(data_dir / "reaches" / "checkpoint.json", "r") as f:
+                checkpoint = json.load(f)
+
+    if checkpoint["river_index"] >= len(rivers):
+        checkpoint["river_index"] = 0
+        checkpoint["reach_index"] = 0
+        json.dump(checkpoint, open(data_dir / "reaches" / "checkpoint.json", "w"))
+
+    if logger is not None:
+        logger.info("All done!")
+    else:
+        print("All done!")
+
+
+## end of research purposes only
+
+
 def retrieve(config_path, element_type="reaches"):
 
     config_dict = read_config(Path(config_path))
