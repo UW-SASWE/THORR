@@ -13,7 +13,13 @@ from random import randint
 import json
 import datetime
 
-from thorr.utils import read_config, Logger, validate_start_end_dates
+from thorr.utils import (
+    read_config,
+    Logger,
+    validate_start_end_dates,
+    fetch_reach_gdf,
+    fetch_reservoir_gdf,
+)
 from thorr.database import Connect as db_connect
 
 
