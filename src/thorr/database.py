@@ -683,7 +683,7 @@ def postgresql_setup(config_file):
     TABLESPACE pg_default;
 
     ALTER TABLE IF EXISTS {schema}."ReachHLSL30"
-        OWNER to postgres;
+        OWNER to {user};
 
     COMMENT ON TABLE {schema}."ReachHLSL30"
         IS 'Landsat band data from the Harmonized Landsat and Sentinel dataset (https://lpdaac.usgs.gov/documents/1698/HLS_User_Guide_V2.pdf) obtained from the water pixels.';
@@ -877,7 +877,7 @@ def postgresql_setup(config_file):
     TABLESPACE pg_default;
 
     ALTER TABLE IF EXISTS {schema}."ReachHLSS30"
-        OWNER to postgres;
+        OWNER to {user};
 
     COMMENT ON TABLE {schema}."ReachHLSS30"
         IS 'Sentinel band data from the Harmonized Landsat and Sentinel dataset (https://lpdaac.usgs.gov/documents/1698/HLS_User_Guide_V2.pdf) obtained from the water pixels.';
