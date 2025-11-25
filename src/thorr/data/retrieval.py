@@ -531,7 +531,245 @@ def extractL4TempSeries(
             )
         else:
             print(f"{e}")
-        return None
+            print(f"Error extracting L4/5/7 data for dates {startDate} to {endDate}")
+        dataSeries = None
+
+    return dataSeries
+
+
+def extractHLSL30BandData(
+    element,
+    startDate,
+    endDate,
+    # ndwi_threshold=0.2,
+    imageCollection="NASA/HLS/HLSL30/v002",
+    logger=None,
+    element_type="reach",
+):
+
+    hlsl30 = (
+        ee.ImageCollection(imageCollection)
+        .filterDate(startDate, endDate)
+        .filterBounds(element)
+    )
+
+    def extractData(date):
+        date = ee.Date(date)
+
+        processed_hlsl30 = hlsl30.filterDate(date, date.advance(1, "day"))
+        hlsl30_mosaic = processed_hlsl30.mosaic()
+
+        qa_mask = hlsl30_mosaic.select("Fmask").bitwiseAnd(int("11111", 2)).eq(0)
+        waterMask = hlsl30_mosaic.select("Fmask").bitwiseAnd(int("100000", 2)).neq(0)
+        nonWaterMask = hlsl30_mosaic.select("Fmask").bitwiseAnd(int("100000", 2)).eq(0)
+
+        hlsl30_water = (
+            processed_hlsl30.reduce(ee.Reducer.mean())
+            .updateMask(qa_mask)
+            .updateMask(waterMask)
+            .set("system:time_start", date)
+        ).clip(element.geometry())
+
+        band_data = {
+            "B1": {"b1_mean": None, "b1_median": None, "b1_std": None},
+            "B2": {"b2_mean": None, "b2_median": None, "b2_std": None},
+            "B3": {"b3_mean": None, "b3_median": None, "b3_std": None},
+            "B4": {"b4_mean": None, "b4_median": None, "b4_std": None},
+            "B5": {"b5_mean": None, "b5_median": None, "b5_std": None},
+            "B6": {"b6_mean": None, "b6_median": None, "b6_std": None},
+            "B7": {"b7_mean": None, "b7_median": None, "b7_std": None},
+            "B9": {"b9_mean": None, "b9_median": None, "b9_std": None},
+            "B10": {"b10_mean": None, "b10_median": None, "b10_std": None},
+            "B11": {"b11_mean": None, "b11_median": None, "b11_std": None},
+        }
+
+        for band in band_data.keys():
+            band_data[band][f"{band.lower()}_mean"] = hlsl30_water.select(
+                f"{band.upper()}_mean"
+            ).reduceRegion(
+                reducer=ee.Reducer.mean(),
+                geometry=element.geometry(),
+                scale=30,
+            )
+            band_data[band][f"{band.lower()}_median"] = hlsl30_water.select(
+                f"{band.upper()}_mean"
+            ).reduceRegion(
+                reducer=ee.Reducer.median(),
+                geometry=element.geometry(),
+                scale=30,
+            )
+            band_data[band][f"{band.lower()}_std"] = hlsl30_water.select(
+                f"{band.upper()}_mean"
+            ).reduceRegion(
+                reducer=ee.Reducer.stdDev(),
+                geometry=element.geometry(),
+                scale=30,
+            )
+
+        return ee.Feature(
+            None,
+            {
+                "date": date.format("YYYY-MM-dd"),
+                **band_data["B1"],
+                **band_data["B2"],
+                **band_data["B3"],
+                **band_data["B4"],
+                **band_data["B5"],
+                **band_data["B6"],
+                **band_data["B7"],
+                **band_data["B9"],
+                **band_data["B10"],
+                **band_data["B11"],
+            },
+        )
+
+    try:
+        dates = ee.List(
+            hlsl30.map(
+                lambda image: ee.Feature(
+                    None, {"date": image.date().format("YYYY-MM-dd")}
+                )
+            )
+            .distinct("date")
+            .aggregate_array("date")
+        )
+        dataSeries = ee.FeatureCollection(dates.map(extractData))
+        # return dataSeries
+    # except Exception as e:
+    #     print(e, startDate, endDate)
+    except Exception as e:
+        # print(e, startDate, endDate)
+        if logger is not None:
+            logger.error(f"{e}")
+            logger.info(
+                f"Error extracting HLS L30 data for dates {startDate} to {endDate}"
+            )
+        else:
+            print(f"{e}")
+            print(f"Error extracting HLS L30 data for dates {startDate} to {endDate}")
+        dataSeries = None
+
+    return dataSeries
+
+
+def extractHLSS30BandData(
+    element,
+    startDate,
+    endDate,
+    # ndwi_threshold=0.2,
+    imageCollection="NASA/HLS/HLSS30/v002",
+    logger=None,
+    element_type="reach",
+):
+    hlss30 = (
+        ee.ImageCollection(imageCollection)
+        .filterDate(startDate, endDate)
+        .filterBounds(element)
+    )
+
+    def extractData(date):
+        date = ee.Date(date)
+
+        processed_hlss30 = hlss30.filterDate(date, date.advance(1, "day"))
+        hlss30_mosaic = processed_hlss30.mosaic()
+
+        qa_mask = hlss30_mosaic.select("Fmask").bitwiseAnd(int("11111", 2)).eq(0)
+        waterMask = hlss30_mosaic.select("Fmask").bitwiseAnd(int("100000", 2)).neq(0)
+        nonWaterMask = hlss30_mosaic.select("Fmask").bitwiseAnd(int("100000", 2)).eq(0)
+
+        hlss30_water = (
+            processed_hlss30.reduce(ee.Reducer.mean())
+            .updateMask(qa_mask)
+            .updateMask(waterMask)
+            .set("system:time_start", date)
+        ).clip(element.geometry())
+
+        band_data = {
+            "B1": {"b1_mean": None, "b1_median": None, "b1_std": None},
+            "B2": {"b2_mean": None, "b2_median": None, "b2_std": None},
+            "B3": {"b3_mean": None, "b3_median": None, "b3_std": None},
+            "B4": {"b4_mean": None, "b4_median": None, "b4_std": None},
+            "B5": {"b5_mean": None, "b5_median": None, "b5_std": None},
+            "B6": {"b6_mean": None, "b6_median": None, "b6_std": None},
+            "B7": {"b7_mean": None, "b7_median": None, "b7_std": None},
+            "B8": {"b8_mean": None, "b8_median": None, "b8_std": None},
+            "B8A": {"b8a_mean": None, "b8a_median": None, "b8a_std": None},
+            "B9": {"b9_mean": None, "b9_median": None, "b9_std": None},
+            "B10": {"b10_mean": None, "b10_median": None, "b10_std": None},
+            "B11": {"b11_mean": None, "b11_median": None, "b11_std": None},
+            "B12": {"b12_mean": None, "b12_median": None, "b12_std": None},
+        }
+
+        for band in band_data.keys():
+            band_data[band][f"{band.lower()}_mean"] = hlss30_water.select(
+                f"{band.upper()}_mean"
+            ).reduceRegion(
+                reducer=ee.Reducer.mean(),
+                geometry=element.geometry(),
+                scale=30,
+            )
+            band_data[band][f"{band.lower()}_median"] = hlss30_water.select(
+                f"{band.upper()}_mean"
+            ).reduceRegion(
+                reducer=ee.Reducer.median(),
+                geometry=element.geometry(),
+                scale=30,
+            )
+            band_data[band][f"{band.lower()}_std"] = hlss30_water.select(
+                f"{band.upper()}_mean"
+            ).reduceRegion(
+                reducer=ee.Reducer.stdDev(),
+                geometry=element.geometry(),
+                scale=30,
+            )
+
+        return ee.Feature(
+            None,
+            {
+                "date": date.format("YYYY-MM-dd"),
+                **band_data["B1"],
+                **band_data["B2"],
+                **band_data["B3"],
+                **band_data["B4"],
+                **band_data["B5"],
+                **band_data["B6"],
+                **band_data["B7"],
+                **band_data["B8"],
+                **band_data["B8A"],
+                **band_data["B9"],
+                **band_data["B10"],
+                **band_data["B11"],
+                **band_data["B12"],
+            },
+        )
+
+    try:
+        dates = ee.List(
+            hlss30.map(
+                lambda image: ee.Feature(
+                    None, {"date": image.date().format("YYYY-MM-dd")}
+                )
+            )
+            .distinct("date")
+            .aggregate_array("date")
+        )
+        dataSeries = ee.FeatureCollection(dates.map(extractData))
+        # return dataSeries
+    # except Exception as e:
+    #     print(e, startDate, endDate)
+    except Exception as e:
+        # print(e, startDate, endDate)
+        if logger is not None:
+            logger.error(f"{e}")
+            logger.info(
+                f"Error extracting HLS S30 data for dates {startDate} to {endDate}"
+            )
+        else:
+            print(f"{e}")
+            print(f"Error extracting HLS S30 data for dates {startDate} to {endDate}")
+        dataSeries = None
+
+    return dataSeries
 
 
 def ee_to_df(featureCollection):
