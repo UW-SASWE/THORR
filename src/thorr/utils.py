@@ -13,6 +13,30 @@ from logging.handlers import TimedRotatingFileHandler
 import datetime
 
 
+REGIONS = {
+    # "global": "Global",
+    "akr": "Alaska Region",
+    "awr": "Arkansas-White-Red Region",
+    "cal": "California Region",
+    "car": "Caribbean Region",
+    "glr": "Great Lakes Region",
+    "lcr": "Lower Colorado Region",
+    "lmr": "Lower Mississippi Region",
+    "mar": "Mid Atlantic Region",
+    "mir": "Missouri Region",
+    "ner": "New England Region",
+    "ohr": "Ohio Region",
+    "pnr": "Pacific Northwest Region",
+    "rgr": "Rio Grande Region",
+    "srr": "Souris-Red-Rainy Region",
+    "sag": "South Atlantic-Gulf Region",
+    "tnr": "Tennessee Region",
+    "tgr": "Texas-Gulf Region",
+    "ucr": "Upper Colorado Region",
+    "umr": "Upper Mississippi Region",
+}
+
+
 def create_config_file(proj_dir, config_filepath: Path, name=None, region=None) -> None:
     if not name:
         name = proj_dir.split("/")[-1]
