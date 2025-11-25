@@ -553,35 +553,35 @@ def postgresql_setup(config_file):
     """
     cursor.execute(reaches_query)
 
-    # create the Nodes table
-    nodes_query = f"""
-    CREATE TABLE IF NOT EXISTS "{schema}"."Nodes"
-    (
-        "NodeID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-        "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
-        "ReachID" integer,
-        "ClimateClass" smallint,
-        "WidthMin" double precision,
-        "WidthMean" double precision,
-        "WidthMax" double precision,
-        "RKm" double precision,
-        "geometry" geometry NOT NULL,
-        "buffered_geometry" geometry,
-        CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
-        CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
-        CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
-            REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE CASCADE
-            NOT VALID
-    )
+    # # create the Nodes table
+    # nodes_query = f"""
+    # CREATE TABLE IF NOT EXISTS "{schema}"."Nodes"
+    # (
+    #     "NodeID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+    #     "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    #     "ReachID" integer,
+    #     "ClimateClass" smallint,
+    #     "WidthMin" double precision,
+    #     "WidthMean" double precision,
+    #     "WidthMax" double precision,
+    #     "RKm" double precision,
+    #     "geometry" geometry NOT NULL,
+    #     "buffered_geometry" geometry,
+    #     CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
+    #     CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
+    #     CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
+    #         REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
+    #         ON UPDATE CASCADE
+    #         ON DELETE CASCADE
+    #         NOT VALID
+    # )
 
-    TABLESPACE pg_default;
+    # TABLESPACE pg_default;
 
-    ALTER TABLE IF EXISTS "{schema}"."Reaches"
-        OWNER to {user};
-    """
-    cursor.execute(reaches_query)
+    # ALTER TABLE IF EXISTS "{schema}"."Reaches"
+    #     OWNER to {user};
+    # """
+    # cursor.execute(nodes_query)
 
     # Create the DamData table
     dam_data_query = f"""
