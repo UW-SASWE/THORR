@@ -1249,7 +1249,6 @@ def reachwiseExtraction(
         # waterTempSeries = geemap.ee_to_pandas(waterTempSeries)
         # landTempSeries = geemap.ee_to_pandas(landTempSeries)
 
-        # print("Breakpoint damwise 1")
         match imageCollection:
             case "LANDSAT/LC09/C02/T1_L2" | "LANDSAT/LC08/C02/T1_L2":
                 dataSeries = extractTempSeries(
@@ -1267,6 +1266,28 @@ def reachwiseExtraction(
                 | "LANDSAT/LE07/C02/T1_L2"
             ):
                 dataSeries = extractL4TempSeries(
+                    reach,
+                    startDate_,
+                    endDate_,
+                    # ndwi_threshold,
+                    imageCollection,
+                    logger,
+                    "reach",
+                )
+            case "NASA/HLS/HLSL30/v002":
+                # print('extracting HLSL30 data')
+                dataSeries = extractHLSL30BandData(
+                    reach,
+                    startDate_,
+                    endDate_,
+                    # ndwi_threshold,
+                    imageCollection,
+                    logger,
+                    "reach",
+                )
+            case "NASA/HLS/HLSS30/v002":
+                # print('extracting HLSS30 data')
+                dataSeries = extractHLSS30BandData(
                     reach,
                     startDate_,
                     endDate_,
