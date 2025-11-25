@@ -1554,16 +1554,180 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
         # for i, reach in reaches_gdf.iterrows():
         #     # Iinsert reach data into the table if the entry doesn't already exist
+
         for i, reach in reaches_gdf.iterrows():
 
             query = f"""
-                INSERT INTO "{schema}"."Reaches" ("Name", "RiverID", "ClimateClass", "WidthMin", "WidthMean", "WidthMax", "RKm", "geometry")
-                SELECT '{reach['Name']}', (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = '{reach['river_name']}'), {reach['koppen']}, CAST(NULLIF('{str(reach['WidthMin'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMean'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMax'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['RKm'])}','NaN') AS double precision), 'SRID={srid};{reach['geometry'].wkt}'
-                WHERE NOT EXISTS (SELECT * FROM {schema}."Reaches" WHERE "Name" = '{reach['Name']}')
+                INSERT INTO 
+                    "{schema}"."Reaches" (
+                        "Name",
+                        "RiverID",
+                        "ClimateClass",
+                        "WidthMin",
+                        "WidthMean",
+                        "WidthMax",
+                        "RKm",
+                        "sword_reach_id",
+                        -- "sword_x",
+                        -- "sword_y",
+                        -- "sword_reach_len",
+                        -- "sword_n_nodes",
+                        -- "sword_wse",
+                        -- "sword_wse_var",
+                        -- "sword_width",
+                        -- "sword_width_var",
+                        -- "sword_facc",
+                        -- "sword_n_chan_max",
+                        -- "sword_n_chan_mod",
+                        -- "sword_obstr_type",
+                        -- "sword_grod_id",
+                        -- "sword_hfalls_id",
+                        -- "sword_slope",
+                        -- "sword_dist_out",
+                        -- "sword_lakeflag",
+                        -- "sword_max_width",
+                        -- "sword_n_rch_up",
+                        -- "sword_n_rch_dn",
+                        -- "sword_rch_id_up",
+                        -- "sword_rch_id_dn",
+                        -- "sword_swot_orbit",
+                        -- "sword_swot_obs",
+                        -- "sword_type",
+                        -- "sword_river_name",
+                        -- "sword_edit_flag",
+                        -- "sword_trib_flag",
+                        -- "sword_path_freq",
+                        -- "sword_path_order",
+                        -- "sword_path_segs",
+                        -- "sword_main_side",
+                        -- "sword_strm_order",
+                        -- "sword_end_reach",
+                        -- "sword_network",
+                        "geometry"
+                    )
+                SELECT
+                    '{int(reach['reach_id'])}',
+                    (
+                    SELECT
+                        "RiverID" 
+                    FROM
+                        "{schema}"."Rivers" 
+                    WHERE
+                        "Name" = CAST(
+                            NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)
+                        )
+                        AND NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL
+                        AND "RegionID" = (
+                            SELECT
+                                "RegionID"
+                            FROM 
+                                "{schema}"."Regions"
+                            WHERE
+                                "Name" = '{reach['region']}'
+                        )
+                    ),
+                    CAST(NULLIF('{str(reach['koppen'])}', 'nan') AS smallint),
+                    CAST(NULLIF('{str(reach['WidthMin'])}','nan') AS double precision),
+                    -- CAST(NULLIF('{str(reach['WidthMean'])}','nan') AS double precision),
+                    CAST(NULLIF('{str(reach['width'])}','nan') AS double precision),
+                    -- CAST(NULLIF('{str(reach['WidthMax'])}','nan') AS double precision),
+                    CAST(NULLIF('{str(reach['max_width'])}','nan') AS double precision),
+                    CAST(NULLIF('{str(reach['RKm'])}','nan') AS double precision),
+                    CAST(NULLIF('{str(int(reach['reach_id']))}','nan') AS bigint),
+                    -- {reach['x']},
+                    -- {reach['y']},
+                    -- {reach['reach_len']},
+                    -- {reach['n_nodes']},
+                    -- {reach['wse']}, 
+                    -- {reach['wse_var']},
+                    -- {reach['width']},
+                    -- {reach['width_var']},
+                    -- {reach['facc']},
+                    -- {reach['n_chan_max']},
+                    -- {reach['n_chan_mod']},
+                    -- {reach['obstr_type']},
+                    -- {reach['grod_id']},
+                    -- {reach['hfalls_id']},
+                    -- {reach['slope']},
+                    -- {reach['dist_out']},
+                    -- {reach['lakeflag']},
+                    -- {reach['max_width']},
+                    -- {reach['n_rch_up']},
+                    -- {reach['n_rch_dn']},
+                    -- CAST(NULLIF('{{{" ".join(str(reach['rch_id_up']).split()).replace(" ", ",")}}}', '{{None}}') AS bigint[]),
+                    -- CAST(NULLIF('{{{" ".join(str(reach['rch_id_dn']).split()).replace(" ", ",")}}}', '{{None}}') AS bigint[]),
+                    -- CAST(NULLIF('{{{" ".join(str(reach['swot_orbit']).split()).replace(" ", ",")}}}', '{{None}}') AS smallint[]),
+                    -- {reach['swot_obs']}, {reach['type']}, CAST(NULLIF('{str(reach['river_name'].replace("'", "''"))}','NODATA') AS VARCHAR(254)),
+                    -- CAST(NULLIF('{str(reach['edit_flag'])}','NaN') AS smallint),
+                    -- {reach['trib_flag']},
+                    -- {reach['path_freq']},
+                    -- {reach['path_order']}, 
+                    -- {reach['path_segs']},
+                    -- {reach['main_side']},
+                    -- {reach['strm_order']},
+                    -- {reach['end_reach']},
+                    -- {reach['network']},
+                    'SRID={srid};{reach['geometry'].wkt}'
+                WHERE NOT EXISTS (
+                    SELECT 
+                        *
+                    FROM
+                        {schema}."Reaches"
+                    WHERE
+                        "Name" = '{reach['Name']}'
+                    )
+                AND EXISTS (
+                    SELECT
+                        "RiverID" 
+                    FROM
+                        "{schema}"."Rivers" 
+                    WHERE
+                        "Name" = CAST(
+                            NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)
+                        )
+                        AND NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL
+                        AND "RegionID" = (
+                            SELECT
+                                "RegionID"
+                            FROM 
+                                "{schema}"."Regions"
+                            WHERE
+                                "Name" = '{reach['region']}'
+                        )
+                    )
                 """
 
             cursor.execute(query)
             connection.commit()
+
+        # # Update the riverID column if the river exists in the Rivers table
+        # for i, reach in reaches_gdf.iterrows():
+        #     query2 = f"""
+        #     UPDATE "{schema}"."Reaches"
+        #     SET
+        #         "RiverID" = (
+        #         SELECT
+        #             "RiverID"
+        #         FROM
+        #             "{schema}"."Rivers"
+        #         WHERE
+        #             "Name" = CAST(
+        #                 NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)
+        #             )
+        #             AND NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL
+        #             AND "RegionID" = (
+        #                 SELECT
+        #                     "RegionID"
+        #                 FROM
+        #                     "{schema}"."Regions"
+        #                 WHERE
+        #                     "Name" = '{reach['region']}'
+        #             )
+        #         )
+        #     """
+
+        #     cursor.execute(query2)
+        #     connection.commit()
 
         if "buffered_reaches" in gpkg_layers:
             buffered_reaches_gdf = gpd.read_file(
