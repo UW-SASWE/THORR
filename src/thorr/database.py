@@ -61,7 +61,7 @@ class Connect:
                     port=db_config["database"]["port"],
                 )
 
-                database=db_config["database"]["database"]
+                database = db_config["database"]["database"]
                 cursor = self.connection.cursor()
 
                 # Create database if it doesn't exist
@@ -194,13 +194,14 @@ def mysql_setup(config_file):
     CREATE TABLE IF NOT EXISTS `Regions` (
         `RegionID` SMALLINT NOT NULL AUTO_INCREMENT,
         `Name` varchar(255) NOT NULL,
+        `country` varchar(255) DEFAULT NULL,
+        `country_code` varchar(2) DEFAULT NULL,
         `geometry` geometry NOT NULL /*!80003 SRID 4326 */,
         PRIMARY KEY (`RegionID`),
         UNIQUE KEY `RegionID_UNIQUE` (`RegionID`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3
     """
     cursor.execute(regions_query)
-
 
     # Create the Rivers table
     rivers_query = """
@@ -485,18 +486,57 @@ def postgresql_setup(config_file):
 
     # create the Reaches table
     reaches_query = f"""
-    CREATE TABLE IF NOT EXISTS "{schema}"."Reaches"
-    (
-        "ReachID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-        "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
-        "RiverID" smallint,
-        "ClimateClass" smallint,
-        "WidthMin" double precision,
-        "WidthMean" double precision,
-        "WidthMax" double precision,
-        "RKm" double precision,
-        "geometry" geometry NOT NULL,
-        "buffered_geometry" geometry,
+    CREATE TABLE IF NOT EXISTS "{schema}"."Reaches" (
+        "ReachID" INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (
+            INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1
+        ),
+        "Name" CHARACTER VARYING(255) COLLATE PG_CATALOG."default" NOT NULL,
+        "RiverID" SMALLINT,
+        "ClimateClass" SMALLINT,
+        "WidthMin" DOUBLE PRECISION,
+        "WidthMean" DOUBLE PRECISION,
+        "WidthMax" DOUBLE PRECISION,
+        "RKm" DOUBLE PRECISION,
+        -- "sword_x" DOUBLE PRECISION,
+        -- "sword_y" DOUBLE PRECISION,
+        "sword_reach_id" BIGINT,
+        -- "sword_reach_len" DOUBLE PRECISION,
+        -- "sword_n_nodes" DOUBLE PRECISION,
+        -- "sword_wse" DOUBLE PRECISION,
+        -- "sword_wse_var" DOUBLE PRECISION,
+        -- "sword_width" DOUBLE PRECISION,
+        -- "sword_width_var" DOUBLE PRECISION,
+        -- "sword_facc" DOUBLE PRECISION,
+        -- "sword_n_chan_max" SMALLINT,
+        -- "sword_n_chan_mod" SMALLINT,
+        -- "sword_obstr_type" SMALLINT,
+        -- "sword_grod_id" INTEGER,
+        -- "sword_hfalls_id" DOUBLE PRECISION,
+        -- "sword_slope" DOUBLE PRECISION,
+        -- "sword_dist_out" DOUBLE PRECISION,
+        -- "sword_lakeflag" SMALLINT,
+        -- "sword_max_width" DOUBLE PRECISION,
+        -- "sword_n_rch_up" SMALLINT,
+        -- "sword_n_rch_dn" SMALLINT,
+        -- "sword_rch_id_up" BIGINT,
+        -- "sword_rch_id_dn" BIGINT,
+        -- "sword_swot_orbit" SMALLINT,
+        -- "sword_swot_obs" DOUBLE PRECISION,
+        -- "sword_type" DOUBLE PRECISION,
+        -- "sword_river_name" VARCHAR(254),
+        -- "sword_edit_flag" SMALLINT DEFAULT 0,
+        -- "sword_trib_flag" SMALLINT,
+        -- "sword_path_freq" SMALLINT,
+        -- "sword_path_order" SMALLINT,
+        -- "sword_path_segs" SMALLINT,
+        -- "sword_main_side" SMALLINT,
+        -- "sword_strm_order" SMALLINT,
+        -- "sword_end_reach" SMALLINT,
+        -- "sword_network" INTEGER,
+        -- "region" VARCHAR(254),
+        -- "region_id" SMALLINT,
+        "buffered_geometry" GEOMETRY,
+        "geometry" GEOMETRY NOT NULL,
         CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
         CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
         CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
@@ -513,322 +553,35 @@ def postgresql_setup(config_file):
     """
     cursor.execute(reaches_query)
 
-    # create the Nodes table
-    nodes_query = f"""
-    CREATE TABLE IF NOT EXISTS "{schema}"."Nodes"
-    (
-        "NodeID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-        "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
-        "ReachID" integer,
-        "ClimateClass" smallint,
-        "WidthMin" double precision,
-        "WidthMean" double precision,
-        "WidthMax" double precision,
-        "RKm" double precision,
-        "geometry" geometry NOT NULL,
-        "buffered_geometry" geometry,
-        CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
-        CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
-        CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
-            REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE CASCADE
-            NOT VALID
-    )
-
-    TABLESPACE pg_default;
-
-    ALTER TABLE IF EXISTS "{schema}"."Reaches"
-        OWNER to {user};
-    """
-    cursor.execute(reaches_query)
-
-    # Create the DamData table
-    dam_data_query = f"""
-    CREATE TABLE IF NOT EXISTS "{schema}"."DamData"
-    (
-        "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-        "Date" date NOT NULL,
-        "DamID" smallint NOT NULL,
-        "WaterTempC" double precision NOT NULL,
-        "Mission" character varying(4) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
-        CONSTRAINT "DamData_pkey" PRIMARY KEY ("ID"),
-        CONSTRAINT "DamDataID_UNIQUE" UNIQUE ("ID"),
-        CONSTRAINT "Fk_water_temp_dam" FOREIGN KEY ("DamID")
-            REFERENCES "{schema}"."Dams" ("DamID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE CASCADE
-            NOT VALID
-    )
-
-    TABLESPACE pg_default;
-
-    ALTER TABLE IF EXISTS "{schema}"."DamData"
-        OWNER to {user};
-    """
-    cursor.execute(dam_data_query)
-
-    # Create the ReachData table
-    query = f"""
-    CREATE TABLE IF NOT EXISTS "{schema}"."ReachData"
-    (
-        "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-        "Date" date NOT NULL,
-        "ReachID" smallint NOT NULL,
-        "LandTempC" double precision,
-        "WaterTempC" double precision,
-        "NDVI" double precision,
-        "Mission" character varying(4) COLLATE pg_catalog."default",
-        "EstTempC" double precision,
-        CONSTRAINT "ReachData_pkey" PRIMARY KEY ("ID"),
-        CONSTRAINT "ReachDataID_UNIQUE" UNIQUE ("ID"),
-        CONSTRAINT "Fk_data_reach" FOREIGN KEY ("ReachID")
-            REFERENCES "{schema}"."Reaches" ("ReachID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE CASCADE
-            NOT VALID
-    )
-
-    TABLESPACE pg_default;
-
-    ALTER TABLE IF EXISTS "{schema}"."ReachData"
-        OWNER to {user};
-    """
-    cursor.execute(query)
-
-    # enable all triggers
-    cursor.execute("SET session_replication_role = 'origin'")
-
-    connection.commit()
-
-    pass
-
-
-# function to set up postgresql database
-def postgresql_setup_new(config_file):
-    db = Connect(config_file, db_type="postgresql")
-    user = db.user
-    schema = db.schema
-    connection = db.connection
-    cursor = connection.cursor()
-
-    # enable postgis extension
-    cursor.execute("CREATE EXTENSION IF NOT EXISTS postgis")
-
-    # Create database if it doesn't exist
-    cursor.execute(
-        f"""CREATE SCHEMA IF NOT EXISTS {schema}
-    AUTHORIZATION {user};"""
-    )
-
-    # disable all triggers
-    cursor.execute("SET session_replication_role = 'replica'")
-
-    # # Create the Basins table
-    # basins_query = f"""
-    # CREATE TABLE IF NOT EXISTS "{schema}"."Basins"
+    # # create the Nodes table
+    # nodes_query = f"""
+    # CREATE TABLE IF NOT EXISTS "{schema}"."Nodes"
     # (
-    #     "BasinID" smallint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 32767 CACHE 1 ),
+    #     "NodeID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     #     "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    #     "DrainageAreaSqKm" double precision,
-    #     "MajorRiverID" smallint,
+    #     "ReachID" integer,
+    #     "ClimateClass" smallint,
+    #     "WidthMin" double precision,
+    #     "WidthMean" double precision,
+    #     "WidthMax" double precision,
+    #     "RKm" double precision,
     #     "geometry" geometry NOT NULL,
-    #     CONSTRAINT "Basins_pkey" PRIMARY KEY ("BasinID"),
-    #     CONSTRAINT "BasinID_UNIQUE" UNIQUE ("BasinID")
-    # )
-
-    # TABLESPACE pg_default;
-
-    # ALTER TABLE IF EXISTS "{schema}"."Basins"
-    #     OWNER to {user};
-
-    # COMMENT ON COLUMN "{schema}"."Basins"."DrainageAreaSqKm"
-    #     IS 'Drainage area of the Basin in square-kilometers';
-    # """
-    # cursor.execute(basins_query)
-
-    # create a regions table
-    regions_query = f"""
-    CREATE TABLE IF NOT EXISTS "{schema}"."Regions"
-    (
-        region_id smallint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 32767 CACHE 1 ),
-        name character varying(255) COLLATE pg_catalog."default" NOT NULL,
-        geometry geometry NOT NULL,
-        CONSTRAINT regions_pkey PRIMARY KEY (region_id)
-    )
-
-    TABLESPACE pg_default;
-
-    ALTER TABLE IF EXISTS "{schema}"."Regions"
-        OWNER to {user};
-    """
-    cursor.execute(regions_query)
-
-    # Create the Rivers table
-    rivers_query = f"""
-    CREATE TABLE IF NOT EXISTS {schema}.rivers
-    (
-        river_id smallint NOT NULL,
-        name character varying(255) COLLATE pg_catalog."default",
-        length_km double precision,
-        region_id smallint,
-        geometry geometry NOT NULL,
-        CONSTRAINT rivers_pkey PRIMARY KEY (river_id),
-        CONSTRAINT fkey_region FOREIGN KEY (region_id)
-            REFERENCES {schema}.regions (region_id) MATCH SIMPLE
-            ON UPDATE NO ACTION
-            ON DELETE NO ACTION
-    )
-
-    TABLESPACE pg_default;
-
-    ALTER TABLE IF EXISTS {schema}.rivers
-        OWNER to {user};
-
-    COMMENT ON COLUMN {schema}.rivers.length_km
-        IS 'estimated length of the river in kilometers';
-
-    COMMENT ON COLUMN {schema}.rivers.region_id
-        IS 'id for the Region in which this river lies';
-    """
-    cursor.execute(rivers_query)
-
-    # # add foreign key constraint to basin
-    # print(
-    #     f"""
-    #     IF NOT EXISTS (SELECT *
-    #         FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
-    #         WHERE "constraint_name" = 'Fk_MajorRiver' AND "constraint_schema" = '{schema}')
-    #     ALTER TABLE "{schema}"."Basins"
-    #         ADD CONSTRAINT "Fk_MajorRiver" FOREIGN KEY ("MajorRiverID")
+    #     "buffered_geometry" geometry,
+    #     CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
+    #     CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
+    #     CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
     #         REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
     #         ON UPDATE CASCADE
-    #         ON DELETE SET NULL
-    #         NOT VALID
-    # """
-    # )
-
-    # cursor.execute(
-    #     f"""
-    #     ALTER TABLE "{schema}"."Basins"
-    #         DROP CONSTRAINT IF EXISTS "Fk_MajorRiver";
-
-    #     ALTER TABLE "{schema}"."Basins"
-    #         ADD CONSTRAINT "Fk_MajorRiver" FOREIGN KEY ("MajorRiverID")
-    #         REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
-    #         ON UPDATE CASCADE
-    #         ON DELETE SET NULL
-    #         NOT VALID;
-    # """
-    # )
-
-    # # Create the Dams table
-    # dams_query = f"""
-    # CREATE TABLE IF NOT EXISTS "{schema}"."Dams"
-    # (
-    #     "DamID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-    #     "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    #     "Reservoir" character varying(255) COLLATE pg_catalog."default",
-    #     "AltName" character varying(255) COLLATE pg_catalog."default",
-    #     "RiverID" smallint,
-    #     "RegionID" smallint,
-    #     "Country" character varying(255) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
-    #     "Year" integer,
-    #     "AreaSqKm" double precision,
-    #     "CapacityMCM" double precision,
-    #     "DepthM" double precision,
-    #     "ElevationMASL" integer,
-    #     "MainUse" character varying(255) COLLATE pg_catalog."default" DEFAULT NULL::character varying,
-    #     "LONG_DD" double precision,
-    #     "LAT_DD" double precision,
-    #     "DamGeometry" geometry NOT NULL,
-    #     "ReservoirGeometry" geometry,
-    #     CONSTRAINT "Dams_pkey" PRIMARY KEY ("DamID"),
-    #     CONSTRAINT "DamID_UNIQUE" UNIQUE ("DamID"),
-    #     CONSTRAINT "Fk_region_dams" FOREIGN KEY ("RegionID")
-    #         REFERENCES "{schema}"."Regions" ("RegionID") MATCH SIMPLE
-    #         ON UPDATE CASCADE
-    #         ON DELETE SET NULL
-    #         NOT VALID,
-    #     CONSTRAINT "Fk_river_dams" FOREIGN KEY ("RiverID")
-    #         REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
-    #         ON UPDATE NO ACTION
-    #         ON DELETE NO ACTION
+    #         ON DELETE CASCADE
     #         NOT VALID
     # )
 
     # TABLESPACE pg_default;
 
-    # ALTER TABLE IF EXISTS "{schema}"."Dams"
+    # ALTER TABLE IF EXISTS "{schema}"."Reaches"
     #     OWNER to {user};
-
-    # COMMENT ON COLUMN "{schema}"."Dams"."DamGeometry"
-    #     IS 'Point geometry for the dam';
-
-    # COMMENT ON COLUMN "{schema}"."Dams"."ReservoirGeometry"
-    #     IS 'Polygon geometry for the reservoir';
     # """
-    # cursor.execute(dams_query)
-
-    # create the Reaches table
-    reaches_query = f"""
-    CREATE TABLE IF NOT EXISTS "{schema}"."Reaches"
-    (
-        "ReachID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-        "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
-        "RiverID" smallint,
-        "ClimateClass" smallint,
-        "WidthMin" double precision,
-        "WidthMean" double precision,
-        "WidthMax" double precision,
-        "RKm" double precision,
-        "geometry" geometry NOT NULL,
-        "buffered_geometry" geometry,
-        CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
-        CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
-        CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
-            REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE CASCADE
-            NOT VALID
-    )
-
-    TABLESPACE pg_default;
-
-    ALTER TABLE IF EXISTS "{schema}"."Reaches"
-        OWNER to {user};
-    """
-    cursor.execute(reaches_query)
-
-    # create the Nodes table
-    nodes_query = f"""
-    CREATE TABLE IF NOT EXISTS "{schema}"."Nodes"
-    (
-        "NodeID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-        "Name" character varying(255) COLLATE pg_catalog."default" NOT NULL,
-        "ReachID" integer,
-        "ClimateClass" smallint,
-        "WidthMin" double precision,
-        "WidthMean" double precision,
-        "WidthMax" double precision,
-        "RKm" double precision,
-        "geometry" geometry NOT NULL,
-        "buffered_geometry" geometry,
-        CONSTRAINT "Reaches_pkey" PRIMARY KEY ("ReachID"),
-        CONSTRAINT "ReachID_UNIQUE" UNIQUE ("ReachID"),
-        CONSTRAINT "Fk_river" FOREIGN KEY ("RiverID")
-            REFERENCES "{schema}"."Rivers" ("RiverID") MATCH SIMPLE
-            ON UPDATE CASCADE
-            ON DELETE CASCADE
-            NOT VALID
-    )
-
-    TABLESPACE pg_default;
-
-    ALTER TABLE IF EXISTS "{schema}"."Reaches"
-        OWNER to {user};
-    """
-    cursor.execute(reaches_query)
+    # cursor.execute(nodes_query)
 
     # Create the DamData table
     dam_data_query = f"""
@@ -859,9 +612,9 @@ def postgresql_setup_new(config_file):
     query = f"""
     CREATE TABLE IF NOT EXISTS "{schema}"."ReachData"
     (
-        "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+        "ID" bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
         "Date" date NOT NULL,
-        "ReachID" smallint NOT NULL,
+        "ReachID" integer NOT NULL,
         "LandTempC" double precision,
         "WaterTempC" double precision,
         "NDVI" double precision,
@@ -883,14 +636,430 @@ def postgresql_setup_new(config_file):
     """
     cursor.execute(query)
 
+    # create ReachHLSL30 table
+    reach_hlsl30_query = f"""
+    CREATE TABLE IF NOT EXISTS {schema}."ReachHLSL30"
+    (
+        "ID" bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
+        "Date" date NOT NULL,
+        "ReachID" integer NOT NULL,
+        b01_mean double precision,
+        b01_median double precision,
+        b01_std double precision,
+        b02_mean double precision,
+        b02_median double precision,
+        b02_std double precision,
+        b03_mean double precision,
+        b03_median double precision,
+        b03_std double precision,
+        b04_mean double precision,
+        b04_median double precision,
+        b04_std double precision,
+        b05_mean double precision,
+        b05_median double precision,
+        b05_std double precision,
+        b06_mean double precision,
+        b06_median double precision,
+        b06_std double precision,
+        b07_mean double precision,
+        b07_median double precision,
+        b07_std double precision,
+        b09_mean double precision,
+        b09_median double precision,
+        b09_std double precision,
+        b10_mean double precision,
+        b10_median double precision,
+        b10_std double precision,
+        b11_mean double precision,
+        b11_median double precision,
+        b11_std double precision,
+        CONSTRAINT "ReachHLSL30_pkey" PRIMARY KEY ("ID"),
+        CONSTRAINT "FK_ReachHLSL_ReachID" FOREIGN KEY ("ReachID")
+            REFERENCES {schema}."Reaches" ("ReachID") MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS {schema}."ReachHLSL30"
+        OWNER to {user};
+
+    COMMENT ON TABLE {schema}."ReachHLSL30"
+        IS 'Landsat band data from the Harmonized Landsat and Sentinel dataset (https://lpdaac.usgs.gov/documents/1698/HLS_User_Guide_V2.pdf) obtained from the water pixels.';
+
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b01_mean
+        IS 'Landsat Coastal Aerosol
+    sample mean
+    Wavelength: 0.43 - 0.45 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b01_median
+        IS 'Landsat Coastal Aerosol
+    sample median
+    Wavelength: 0.43 - 0.45 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b01_std
+        IS 'Landsat Coastal Aerosol
+    sample standard deviation
+    Wavelength: 0.43 - 0.45 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b02_mean
+        IS 'Landsat Blue
+    sample mean
+    Wavelength: 0.45 - 0.51 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b02_median
+        IS 'Landsat Blue
+    sample median
+    Wavelength: 0.45 - 0.51 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b02_std
+        IS 'Landsat Blue
+    sample standard deviation
+    Wavelength: 0.45 - 0.51 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b03_mean
+        IS 'Landsat Green
+    sample mean
+    Wavelength: 0.53 - 0.59 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b03_median
+        IS 'Landsat Green
+    sample median
+    Wavelength: 0.53 - 0.59 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b03_std
+        IS 'Landsat Green
+    sample standard deviation
+    Wavelength: 0.53 - 0.59 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b04_mean
+        IS 'Landsat Red
+    sample mean
+    Wavelength: 0.64 - 0.67 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b04_median
+        IS 'Landsat Red
+    sample median
+    Wavelength: 0.64 - 0.67 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b04_std
+        IS 'Landsat Red
+    sample standard deviation
+    Wavelength: 0.64 - 0.67 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b05_mean
+        IS 'Landsat Near Infrared (NIR)
+    sample mean
+    Wavelength: 0.85 - 0.88 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b05_median
+        IS 'Landsat Near Infrared (NIR)
+    sample median
+    Wavelength: 0.85 - 0.88 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b05_std
+        IS 'Landsat Near Infrared (NIR)
+    sample standard deviation
+    Wavelength: 0.85 - 0.88 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b06_mean
+        IS 'Landsat Shortwave Infrared 1 (SWIR 1)
+    sample mean
+    Wavelength: 1.57 - 1.65 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b06_median
+        IS 'Landsat Shortwave Infrared 1 (SWIR 1)
+    sample median
+    Wavelength: 1.57 - 1.65 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b06_std
+        IS 'Landsat Shortwave Infrared 1 (SWIR 1)
+    sample standard deviation
+    Wavelength: 1.57 - 1.65 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b07_mean
+        IS 'Landsat Shortwave Infrared 2 (SWIR 2)
+    sample mean
+    Wavelength: 2.11 - 2.29 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b07_median
+        IS 'Landsat Shortwave Infrared 2 (SWIR 2)
+    sample median
+    Wavelength: 2.11 - 2.29 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b07_std
+        IS 'Landsat Shortwave Infrared 2 (SWIR 2)
+    sample standard deviation
+    Wavelength: 2.11 - 2.29 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b09_mean
+        IS 'Landsat Cirrus
+    sample mean
+    Wavelength: 1.36 - 1.38 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b09_median
+        IS 'Landsat Cirrus
+    sample median
+    Wavelength: 1.36 - 1.38 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b09_std
+        IS 'Landsat Cirrus
+    sample standard deviation
+    Wavelength: 1.36 - 1.38 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b10_mean
+        IS 'Landsat Thermal Infrared (TIRS) 1
+    sample mean
+    Wavelength: 10.60 - 11.19 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b10_median
+        IS 'Landsat Thermal Infrared (TIRS) 1
+    sample median
+    Wavelength: 10.60 - 11.19 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b10_std
+        IS 'Landsat Thermal Infrared (TIRS) 1
+    sample standard deviation
+    Wavelength: 10.60 - 11.19 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b11_mean
+        IS 'Landsat Thermal Infrared (TIRS) 2
+    sample mean
+    Wavelength: 11.50 - 12.51 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b11_median
+        IS 'Landsat Thermal Infrared (TIRS) 2
+    sample median
+    Wavelength: 11.50 - 12.51 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSL30".b11_std
+        IS 'Landsat Thermal Infrared (TIRS) 2
+    sample standard deviation
+    Wavelength: 11.50 - 12.51 micrometers';
+    """
+
+    cursor.execute(reach_hlsl30_query)
+
+    # create ReachHLSS30 table
+    reach_hlss30_query = f"""
+    CREATE TABLE IF NOT EXISTS {schema}."ReachHLSS30"
+    (
+        "ID" bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
+        "Date" date NOT NULL,
+        "ReachID" integer NOT NULL,
+        b01_mean double precision,
+        b01_median double precision,
+        b01_std double precision,
+        b02_mean double precision,
+        b02_median double precision,
+        b02_std double precision,
+        b03_mean double precision,
+        b03_median double precision,
+        b03_std double precision,
+        b04_mean double precision,
+        b04_median double precision,
+        b04_std double precision,
+        b05_mean double precision,
+        b05_median double precision,
+        b05_std double precision,
+        b06_mean double precision,
+        b06_median double precision,
+        b06_std double precision,
+        b07_mean double precision,
+        b07_median double precision,
+        b07_std double precision,
+        b08_mean double precision,
+        b08_median double precision,
+        b08_std double precision,
+        b8a_mean double precision,
+        b8a_median double precision,
+        b8a_std double precision,
+        b11_mean double precision,
+        b11_median double precision,
+        b11_std double precision,
+        b12_mean double precision,
+        b12_median double precision,
+        b12_std double precision,
+        b09_mean double precision,
+        b09_median double precision,
+        b09_std double precision,
+        b10_mean double precision,
+        b10_median double precision,
+        b10_std double precision,
+        CONSTRAINT "ReachHLSS30_pkey" PRIMARY KEY ("ID"),
+        CONSTRAINT "FK_ReachHLSS30_ReachID" FOREIGN KEY ("ReachID")
+            REFERENCES {schema}."Reaches" ("ReachID") MATCH SIMPLE
+            ON UPDATE CASCADE
+            ON DELETE CASCADE
+    )
+
+    TABLESPACE pg_default;
+
+    ALTER TABLE IF EXISTS {schema}."ReachHLSS30"
+        OWNER to {user};
+
+    COMMENT ON TABLE {schema}."ReachHLSS30"
+        IS 'Sentinel band data from the Harmonized Landsat and Sentinel dataset (https://lpdaac.usgs.gov/documents/1698/HLS_User_Guide_V2.pdf) obtained from the water pixels.';
+
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b01_mean
+        IS 'Sentinel Coastal Aerosol
+    sample mean
+    Wavelength: 0.43 - 0.45 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b01_median
+        IS 'Sentinel Coastal Aerosol
+    sample median
+    Wavelength: 0.43 - 0.45 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b01_std
+        IS 'Sentinel Coastal Aerosol
+    sample standard deviation
+    Wavelength: 0.43 - 0.45 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b02_mean
+        IS 'Sentinel Blue
+    sample mean
+    Wavelength: 0.45 - 0.51 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b02_median
+        IS 'Sentinel Blue
+    sample median
+    Wavelength: 0.45 - 0.51 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b02_std
+        IS 'Sentinel Blue
+    sample standard deviation
+    Wavelength: 0.45 - 0.51 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b03_mean
+        IS 'Sentinel Green
+    sample mean
+    Wavelength: 0.53 - 0.59 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b03_median
+        IS 'Sentinel Green
+    sample median
+    Wavelength: 0.53 - 0.59 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b03_std
+        IS 'Sentinel Green
+    sample standard deviation
+    Wavelength: 0.53 - 0.59 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b04_mean
+        IS 'Sentinel Red
+    sample mean
+    Wavelength: 0.64 - 0.67 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b04_median
+        IS 'Sentinel Red
+    sample median
+    Wavelength: 0.64 - 0.67 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b04_std
+        IS 'Sentinel Red
+    sample standard deviation
+    Wavelength: 0.64 - 0.67 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b05_mean
+        IS 'Sentinel Red Edge 1
+    sample mean
+    Wavelength: 0.69 - 0.71 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b05_median
+        IS 'Sentinel Red Edge 1
+    sample median
+    Wavelength: 0.69 - 0.71 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b05_std
+        IS 'Sentinel Red Edge 1
+    sample standard deviation
+    Wavelength: 0.69 - 0.71 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b06_mean
+        IS 'Sentinel Red Edge 2
+    sample mean
+    Wavelength: 0.73 - 0.75 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b06_median
+        IS 'Sentinel Red Edge 2
+    sample median
+    Wavelength: 0.73 - 0.75 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b06_std
+        IS 'Sentinel Red Edge 2
+    sample standard deviation
+    Wavelength: 0.73 - 0.75 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b07_mean
+        IS 'Sentinel Red Edge 3
+    sample mean
+    Wavelength: 0.77 - 0.79 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b07_median
+        IS 'Sentinel Red Edge 3
+    sample median
+    Wavelength: 0.77 - 0.79 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b07_std
+        IS 'Sentinel Red Edge 3
+    sample standard deviation
+    Wavelength: 0.77 - 0.79 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b08_mean
+        IS 'Sentinel NIR Broad
+    sample mean
+    Wavelength: 0.78 - 0.88 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b08_median
+        IS 'Sentinel NIR Broad
+    sample median
+    Wavelength: 0.78 - 0.88 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b08_std
+        IS 'Sentinel NIR Broad
+    sample standard deviation
+    Wavelength: 0.78 - 0.88 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b8a_mean
+        IS 'Sentinel NIR Narrow
+    sample mean
+    Wavelength: 0.85 - 0.88 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b8a_median
+        IS 'Sentinel NIR Narrow
+    sample median
+    Wavelength: 0.85 - 0.88 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b8a_std
+        IS 'Sentinel NIR Narrow
+    sample standard deviation
+    Wavelength: 0.85 - 0.88 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b11_mean
+        IS 'Sentinel SWIR 1
+    sample mean
+    Wavelength: 1.57 - 1.65 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b11_median
+        IS 'Sentinel SWIR 1
+    sample median
+    Wavelength: 1.57 - 1.65 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b11_std
+        IS 'Sentinel SWIR 1
+    sample standard deviation
+    Wavelength: 1.57 - 1.65 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b12_mean
+        IS 'Sentinel SWIR 2
+    sample mean
+    Wavelength: 2.11 - 2.29 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b12_median
+        IS 'Sentinel SWIR 2
+    sample median
+    Wavelength: 2.11 - 2.29 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b12_std
+        IS 'Sentinel SWIR 2
+    sample standard deviation
+    Wavelength: 2.11 - 2.29 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b09_mean
+        IS 'Sentinel Water Vapor
+    sample mean
+    Wavelength: 0.93 - 0.95 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b09_median
+        IS 'Sentinel Water Vapor
+    sample median
+    Wavelength: 0.93 - 0.95 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b09_std
+        IS 'Sentinel Water Vapor
+    sample standard deviation
+    Wavelength: 0.93 - 0.95 micrometers';
+
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b10_mean
+        IS 'Sentinel Cirrus
+    sample mean
+    Wavelength: 1.36 - 1.38 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b10_median
+        IS 'Sentinel Cirrus
+    sample median
+    Wavelength: 1.36 - 1.38 micrometers';
+    COMMENT ON COLUMN {schema}."ReachHLSS30".b10_std
+        IS 'Sentinel Cirrus
+    sample standard deviation
+    Wavelength: 1.36 - 1.38 micrometers';
+    """
+
+    cursor.execute(reach_hlss30_query)
+
     # enable all triggers
     cursor.execute("SET session_replication_role = 'origin'")
 
     connection.commit()
 
     pass
-
-
 
 
 # function to set up a fresh database
@@ -1145,8 +1314,6 @@ def mysql_upload_gis(config_file, gpkg, gpkg_layers):
 
                 cursor.execute(query)
                 connection.commit()
-            
-
 
 
 def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
@@ -1162,6 +1329,8 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
         # print( gpkg, gpkg_layers)
         basins_gdf = gpd.read_file(gpkg, layer=gpkg_layers["basins"])
+        # sort basins by name
+        basins_gdf.sort_values("Name", inplace=True)
         # print(basins_gdf)
         srid = basins_gdf.crs.to_epsg()
 
@@ -1175,13 +1344,12 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
             cursor.execute(query)
             connection.commit()
 
-    
-
     if "regions" in gpkg_layers:
 
         # print( gpkg, gpkg_layers)
         regions_gdf = gpd.read_file(gpkg, layer=gpkg_layers["regions"])
-        # print(basins_gdf)
+        # sort regions by name
+        regions_gdf.sort_values("Name", inplace=True)
         srid = regions_gdf.crs.to_epsg()
 
         for i, region in regions_gdf.iterrows():
@@ -1196,6 +1364,8 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
     if "rivers" in gpkg_layers:
         rivers_gdf = gpd.read_file(gpkg, layer=gpkg_layers["rivers"])
+        # sort rivers by region and then by river name
+        rivers_gdf.sort_values(["region", "river_name"], inplace=True)
         srid = rivers_gdf.crs.to_epsg()
 
         for i, river in rivers_gdf.iterrows():
@@ -1204,24 +1374,41 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
             #     SELECT '{river['GNIS_Name']}', {river['LengthKM']}, 'SRID={srid};{river['geometry'].wkt}'
             #     WHERE NOT EXISTS (SELECT * FROM "{schema}"."Rivers" WHERE "Name" = '{river['GNIS_Name']}')
             #     """
-            
+
             query = f"""
-                INSERT INTO "{schema}"."Rivers" ("Name", "geometry")
-                SELECT '{river['Name']}', 'SRID={srid};{river['geometry'].wkt}'
-                WHERE NOT EXISTS (SELECT * FROM "{schema}"."Rivers" WHERE "Name" = '{river['Name']}')
+                INSERT INTO "{schema}"."Rivers" (
+                    "Name",
+                    "RegionID",
+                    "geometry"
+                    )
+                SELECT
+                    '{river['river_name'].replace("'", "''")}',
+                    (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['region']}'),
+                    'SRID={srid};{river['geometry'].wkt}'
+                WHERE NOT EXISTS (
+                    SELECT 
+                        *
+                    FROM 
+                        "{schema}"."Rivers" 
+                    WHERE 
+                        "Name" = CAST(NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255))
+                        AND "RegionID" = (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['region']}'))
+                    AND
+                        NULLIF('{river['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL
                 """
 
             cursor.execute(query)
             connection.commit()
 
-            query2 = f"""
-            UPDATE "{schema}"."Rivers"
-            SET "RegionID" = (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['Region']}')
-            WHERE "Name" = '{river['Name']}'
-            """
+            # # Update the RegionID column if the region exists in the regions table
+            # query2 = f"""
+            # UPDATE "{schema}"."Rivers"
+            # SET "RegionID" = (SELECT "RegionID" FROM "{schema}"."Regions" WHERE "Name" = '{river['Region']}')
+            # WHERE "Name" = '{river['river_name'].replace("'", "''")}'
+            # """
 
-            cursor.execute(query2)
-            connection.commit()
+            # cursor.execute(query2)
+            # connection.commit()
 
         # # Update the MajorRiverID column if the river exists in the Rivers table
         # if "basins" in gpkg_layers:
@@ -1307,7 +1494,11 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
             query = f"""
                 INSERT INTO "{schema}"."Dams" ("Name", "Reservoir", "AltName", "Country", "Year", "AreaSqKm", "CapacityMCM", "DepthM", "ElevationMASL", "MainUse", "LONG_DD", "LAT_DD", "DamGeometry")
                 SELECT '{str(dam['DAM_NAME']).replace("'", "''")}', NULLIF('{str(dam['RES_NAME']).replace("'", "''")}', ''), NULLIF('{str(dam['ALT_NAME'])}',''), '{dam['COUNTRY']}', NULLIF({null_or_value(dam['YEAR'])}, NULL), NULLIF({null_or_value(dam['AREA_SKM'])}, NULL), NULLIF({null_or_value(dam['CAP_MCM'])}, NULL), NULLIF({null_or_value(dam['DEPTH_M'])}, NULL), NULLIF({null_or_value(dam['ELEV_MASL'])}, NULL),  '{dam['MAIN_USE']}', {dam['LONG_DD']}, {dam['LAT_DD']}, 'SRID={srid};{dam['geometry'].wkt}'
-                WHERE NOT EXISTS (SELECT * FROM "{schema}"."Dams" WHERE "Name" = '{str(dam['DAM_NAME']).replace("'", "''")}');
+                WHERE NOT EXISTS (
+                    SELECT
+                        *
+                    FROM "{schema}"."Dams" 
+                    WHERE "Name" = '{str(dam['DAM_NAME']).replace("'", "''")}');
                 """
 
             cursor.execute(query)
@@ -1350,20 +1541,193 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
     if "reaches" in gpkg_layers:
         reaches_gdf = gpd.read_file(gpkg, layer=gpkg_layers["reaches"])
+        # sort reaches by region and then by river name and reach_id
+        reaches_gdf.sort_values(["region", "river_name", "reach_id"], inplace=True)
+
         srid = reaches_gdf.crs.to_epsg()
+
+        columns = reaches_gdf.columns.tolist()
+        for col_name in ["WidthMin", "WidthMean", "WidthMax", "RKm", "koppen"]:
+            # add empty columns if they don't exist
+            if col_name not in columns:
+                reaches_gdf[col_name] = np.nan
 
         # for i, reach in reaches_gdf.iterrows():
         #     # Iinsert reach data into the table if the entry doesn't already exist
+
         for i, reach in reaches_gdf.iterrows():
 
             query = f"""
-                INSERT INTO "{schema}"."Reaches" ("Name", "RiverID", "ClimateClass", "WidthMin", "WidthMean", "WidthMax", "RKm", "geometry")
-                SELECT '{reach['Name']}', (SELECT "RiverID" FROM {schema}."Rivers" WHERE "Name" = '{reach['river_name']}'), {reach['koppen']}, CAST(NULLIF('{str(reach['WidthMin'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMean'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['WidthMax'])}','NaN') AS double precision), CAST(NULLIF('{str(reach['RKm'])}','NaN') AS double precision), 'SRID={srid};{reach['geometry'].wkt}'
-                WHERE NOT EXISTS (SELECT * FROM {schema}."Reaches" WHERE "Name" = '{reach['Name']}')
+                INSERT INTO 
+                    "{schema}"."Reaches" (
+                        "Name",
+                        "RiverID",
+                        "ClimateClass",
+                        "WidthMin",
+                        "WidthMean",
+                        "WidthMax",
+                        "RKm",
+                        "sword_reach_id",
+                        -- "sword_x",
+                        -- "sword_y",
+                        -- "sword_reach_len",
+                        -- "sword_n_nodes",
+                        -- "sword_wse",
+                        -- "sword_wse_var",
+                        -- "sword_width",
+                        -- "sword_width_var",
+                        -- "sword_facc",
+                        -- "sword_n_chan_max",
+                        -- "sword_n_chan_mod",
+                        -- "sword_obstr_type",
+                        -- "sword_grod_id",
+                        -- "sword_hfalls_id",
+                        -- "sword_slope",
+                        -- "sword_dist_out",
+                        -- "sword_lakeflag",
+                        -- "sword_max_width",
+                        -- "sword_n_rch_up",
+                        -- "sword_n_rch_dn",
+                        -- "sword_rch_id_up",
+                        -- "sword_rch_id_dn",
+                        -- "sword_swot_orbit",
+                        -- "sword_swot_obs",
+                        -- "sword_type",
+                        -- "sword_river_name",
+                        -- "sword_edit_flag",
+                        -- "sword_trib_flag",
+                        -- "sword_path_freq",
+                        -- "sword_path_order",
+                        -- "sword_path_segs",
+                        -- "sword_main_side",
+                        -- "sword_strm_order",
+                        -- "sword_end_reach",
+                        -- "sword_network",
+                        "geometry"
+                    )
+                SELECT
+                    '{int(reach['reach_id'])}',
+                    (
+                    SELECT
+                        "RiverID" 
+                    FROM
+                        "{schema}"."Rivers" 
+                    WHERE
+                        "Name" = CAST(
+                            NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)
+                        )
+                        AND NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL
+                        AND "RegionID" = (
+                            SELECT
+                                "RegionID"
+                            FROM 
+                                "{schema}"."Regions"
+                            WHERE
+                                "Name" = '{reach['region']}'
+                        )
+                    ),
+                    CAST(NULLIF('{str(reach['koppen'])}', 'nan') AS smallint),
+                    CAST(NULLIF('{str(reach['WidthMin'])}','nan') AS double precision),
+                    -- CAST(NULLIF('{str(reach['WidthMean'])}','nan') AS double precision),
+                    CAST(NULLIF('{str(reach['width'])}','nan') AS double precision),
+                    -- CAST(NULLIF('{str(reach['WidthMax'])}','nan') AS double precision),
+                    CAST(NULLIF('{str(reach['max_width'])}','nan') AS double precision),
+                    CAST(NULLIF('{str(reach['RKm'])}','nan') AS double precision),
+                    CAST(NULLIF('{str(int(reach['reach_id']))}','nan') AS bigint),
+                    -- {reach['x']},
+                    -- {reach['y']},
+                    -- {reach['reach_len']},
+                    -- {reach['n_nodes']},
+                    -- {reach['wse']}, 
+                    -- {reach['wse_var']},
+                    -- {reach['width']},
+                    -- {reach['width_var']},
+                    -- {reach['facc']},
+                    -- {reach['n_chan_max']},
+                    -- {reach['n_chan_mod']},
+                    -- {reach['obstr_type']},
+                    -- {reach['grod_id']},
+                    -- {reach['hfalls_id']},
+                    -- {reach['slope']},
+                    -- {reach['dist_out']},
+                    -- {reach['lakeflag']},
+                    -- {reach['max_width']},
+                    -- {reach['n_rch_up']},
+                    -- {reach['n_rch_dn']},
+                    -- CAST(NULLIF('{{{" ".join(str(reach['rch_id_up']).split()).replace(" ", ",")}}}', '{{None}}') AS bigint[]),
+                    -- CAST(NULLIF('{{{" ".join(str(reach['rch_id_dn']).split()).replace(" ", ",")}}}', '{{None}}') AS bigint[]),
+                    -- CAST(NULLIF('{{{" ".join(str(reach['swot_orbit']).split()).replace(" ", ",")}}}', '{{None}}') AS smallint[]),
+                    -- {reach['swot_obs']}, {reach['type']}, CAST(NULLIF('{str(reach['river_name'].replace("'", "''"))}','NODATA') AS VARCHAR(254)),
+                    -- CAST(NULLIF('{str(reach['edit_flag'])}','NaN') AS smallint),
+                    -- {reach['trib_flag']},
+                    -- {reach['path_freq']},
+                    -- {reach['path_order']}, 
+                    -- {reach['path_segs']},
+                    -- {reach['main_side']},
+                    -- {reach['strm_order']},
+                    -- {reach['end_reach']},
+                    -- {reach['network']},
+                    'SRID={srid};{reach['geometry'].wkt}'
+                WHERE NOT EXISTS (
+                    SELECT 
+                        *
+                    FROM
+                        {schema}."Reaches"
+                    WHERE
+                        "Name" = '{reach['Name']}'
+                    )
+                AND EXISTS (
+                    SELECT
+                        "RiverID" 
+                    FROM
+                        "{schema}"."Rivers" 
+                    WHERE
+                        "Name" = CAST(
+                            NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)
+                        )
+                        AND NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL
+                        AND "RegionID" = (
+                            SELECT
+                                "RegionID"
+                            FROM 
+                                "{schema}"."Regions"
+                            WHERE
+                                "Name" = '{reach['region']}'
+                        )
+                    )
                 """
 
             cursor.execute(query)
             connection.commit()
+
+        # # Update the riverID column if the river exists in the Rivers table
+        # for i, reach in reaches_gdf.iterrows():
+        #     query2 = f"""
+        #     UPDATE "{schema}"."Reaches"
+        #     SET
+        #         "RiverID" = (
+        #         SELECT
+        #             "RiverID"
+        #         FROM
+        #             "{schema}"."Rivers"
+        #         WHERE
+        #             "Name" = CAST(
+        #                 NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') AS character varying(255)
+        #             )
+        #             AND NULLIF('{reach['river_name'].replace("'", "''")}', 'NODATA') IS NOT NULL
+        #             AND "RegionID" = (
+        #                 SELECT
+        #                     "RegionID"
+        #                 FROM
+        #                     "{schema}"."Regions"
+        #                 WHERE
+        #                     "Name" = '{reach['region']}'
+        #             )
+        #         )
+        #     """
+
+        #     cursor.execute(query2)
+        #     connection.commit()
 
         if "buffered_reaches" in gpkg_layers:
             buffered_reaches_gdf = gpd.read_file(
@@ -1381,6 +1745,7 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
                 cursor.execute(query)
                 connection.commit()
 
+
 def copy_dataframe(
     cur,
     df: pd.DataFrame,
@@ -1392,10 +1757,36 @@ def copy_dataframe(
 
     # Create a buffer
     buffer = StringIO()
-    df.to_csv(buffer, index=False, header=False, na_rep = 'NULL')
+    df.to_csv(buffer, index=False, header=False, na_rep="NULL")
     buffer.seek(0)
 
-    copy_sql = sql.SQL("COPY {} FROM STDIN WITH (FORMAT CSV, NULL 'NULL')").format(sql.Identifier(table_name))
+    copy_sql = sql.SQL("COPY {} FROM STDIN WITH (FORMAT CSV, NULL 'NULL')").format(
+        sql.Identifier(table_name)
+    )
+    # Load data into the table using copy method
+    with buffer as f:
+        with cur.copy(copy_sql) as copy:
+            while data := f.read(10):
+                copy.write(data)
+
+
+def copy_dataframe(
+    cur,
+    df: pd.DataFrame,
+    table_name: str,
+) -> None:
+    """Upload a dataframe to the database using the COPY command.
+    derived from https://stackoverflow.com/questions/78732362/how-to-upload-pandas-data-frames-fast-with-psycopg3
+    """
+
+    # Create a buffer
+    buffer = StringIO()
+    df.to_csv(buffer, index=False, header=False, na_rep="NULL")
+    buffer.seek(0)
+
+    copy_sql = sql.SQL("COPY {} FROM STDIN WITH (FORMAT CSV, NULL 'NULL')").format(
+        sql.Identifier(table_name)
+    )
     # Load data into the table using copy method
     with buffer as f:
         with cur.copy(copy_sql) as copy:
@@ -1405,6 +1796,7 @@ def copy_dataframe(
 
 def upload_gis(config_file, gpkg, gpkg_layers, db_type="mysql"):
     print("Uploading GIS data to database...")
+    gpkg_layers = {k: v for k, v in gpkg_layers.items() if v}  # remove empty layer keys
     if db_type == "mysql":
         mysql_upload_gis(
             config_file,
