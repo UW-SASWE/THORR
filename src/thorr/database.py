@@ -1329,6 +1329,8 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
         # print( gpkg, gpkg_layers)
         basins_gdf = gpd.read_file(gpkg, layer=gpkg_layers["basins"])
+        # sort basins by name
+        basins_gdf.sort_values("Name", inplace=True)
         # print(basins_gdf)
         srid = basins_gdf.crs.to_epsg()
 
@@ -1346,7 +1348,8 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
         # print( gpkg, gpkg_layers)
         regions_gdf = gpd.read_file(gpkg, layer=gpkg_layers["regions"])
-        # print(basins_gdf)
+        # sort regions by name
+        regions_gdf.sort_values("Name", inplace=True)
         srid = regions_gdf.crs.to_epsg()
 
         for i, region in regions_gdf.iterrows():
@@ -1361,6 +1364,8 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
     if "rivers" in gpkg_layers:
         rivers_gdf = gpd.read_file(gpkg, layer=gpkg_layers["rivers"])
+        # sort rivers by region and then by river name
+        rivers_gdf.sort_values(["region", "river_name"], inplace=True)
         srid = rivers_gdf.crs.to_epsg()
 
         for i, river in rivers_gdf.iterrows():
