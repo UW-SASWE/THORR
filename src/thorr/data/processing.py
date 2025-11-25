@@ -632,11 +632,14 @@ def prep_reaches(config_path, koppen_path):
 
 # # Example usage:
 
-# gpkg = "data/gis/geopackages/thorr.gpkg"
+# gpkg = "/Users/gdarkwah/Library/CloudStorage/OneDrive-UW/01-Research/01-THORR/data/v1.1.0a1/gis/geopackages/thorr_v1.1.0a1_copy.gpkg"
 # rivers = gpd.read_file(gpkg, layer="Rivers")
 # reaches = gpd.read_file(gpkg, layer="Reaches")
 # koppen_path = "/Users/gdarkwah/Library/CloudStorage/OneDrive-UW/01-Research/01-THORR/data/gis/raw/Beck_KG_V1/Beck_KG_V1_present_0p083.tif"
 
 # reaches, buffered_reaches = process_sword_reaches(reaches, rivers, koppen_path)
-# reaches.to_file(gpkg, layer="Reaches", driver="GPKG", overwrite=True)
-# buffered_reaches.to_file(gpkg, layer="BufferedReaches", driver="GPKG", overwrite=True)
+# # reaches.to_file(gpkg, layer="Reaches", driver="GPKG", overwrite=True)
+# # buffered_reaches.to_file(gpkg, layer="BufferedReaches", driver="GPKG", overwrite=True)
+
+# # Commandline usage:
+# python -m thorr prep-reaches path/to/config.ini path/to/koppen.tif
