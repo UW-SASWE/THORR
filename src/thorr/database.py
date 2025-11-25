@@ -612,9 +612,9 @@ def postgresql_setup(config_file):
     query = f"""
     CREATE TABLE IF NOT EXISTS "{schema}"."ReachData"
     (
-        "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+        "ID" bigint NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 9223372036854775807 CACHE 1 ),
         "Date" date NOT NULL,
-        "ReachID" smallint NOT NULL,
+        "ReachID" integer NOT NULL,
         "LandTempC" double precision,
         "WaterTempC" double precision,
         "NDVI" double precision,
