@@ -1541,6 +1541,9 @@ def postgresql_upload_gis(config_file, gpkg, gpkg_layers):
 
     if "reaches" in gpkg_layers:
         reaches_gdf = gpd.read_file(gpkg, layer=gpkg_layers["reaches"])
+        # sort reaches by region and then by river name and reach_id
+        reaches_gdf.sort_values(["region", "river_name", "reach_id"], inplace=True)
+
         srid = reaches_gdf.crs.to_epsg()
 
         # for i, reach in reaches_gdf.iterrows():
