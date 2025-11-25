@@ -907,32 +907,75 @@ def entryToDB(
     elif db_type == "postgresql":
         schema = db.schema
 
-        if table_name == "DamData":
-            data = data.fillna("NULL")
+        # if table_name == "DamData":
+        #     data = data.fillna("NULL")
 
-            for i, row in data.iterrows():
-                query = f"""
-                INSERT INTO {schema}."{table_name}" ("Date", "DamID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
-                SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
-                WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "DamID" = {element_id})
-                """
+        #     for i, row in data.iterrows():
+        #         query = f"""
+        #         INSERT INTO {schema}."{table_name}" ("Date", "DamID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
+        #         SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
+        #         WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "DamID" = {element_id})
+        #         """
 
-                # print(query)
-                cursor.execute(query)
-                connection.commit()
-        elif table_name == "ReachData":
-            data = data.fillna("NULL")
+        #         # print(query)
+        #         cursor.execute(query)
+        #         connection.commit()
+        # elif table_name == "ReachData":
+        #     data = data.fillna("NULL")
 
-            for i, row in data.iterrows():
-                query = f"""
-                INSERT INTO {schema}."{table_name}" ("Date", "ReachID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
-                SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
-                WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "ReachID" = {element_id})
-                """
+        #     for i, row in data.iterrows():
+        #         query = f"""
+        #         INSERT INTO {schema}."{table_name}" ("Date", "ReachID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
+        #         SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
+        #         WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "ReachID" = {element_id})
+        #         """
 
-                # print(query)
-                cursor.execute(query)
-                connection.commit()
+        #         # print(query)
+        #         cursor.execute(query)
+        #         connection.commit()
+
+        match table_name:
+            case "DamData":
+                data = data.fillna("NULL")
+
+                for i, row in data.iterrows():
+                    query = f"""
+                    INSERT INTO {schema}."{table_name}" ("Date", "DamID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
+                    SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
+                    WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "DamID" = {element_id})
+                    """
+
+                    # print(query)
+                    cursor.execute(query)
+                    connection.commit()
+
+            case "ReachData":
+                data = data.fillna("NULL")
+
+                for i, row in data.iterrows():
+                    query = f"""
+                    INSERT INTO {schema}."{table_name}" ("Date", "ReachID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
+                    SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"], entry_key['Mission']]])}, '{row[entry_key['Mission']]}'
+                    WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "ReachID" = {element_id})
+                    """
+
+                    # print(query)
+                    cursor.execute(query)
+                    connection.commit()
+
+            case "ReachHLSS30" | "ReachHLSL30":
+                data = data.fillna("NULL")
+
+                for i, row in data.iterrows():
+                    query = f"""
+                    INSERT INTO {schema}."{table_name}" ("Date", "ReachID", {', '.join(['"'+str(key)+'"' for key in entry_key.keys() if key!='Date'])})
+                    SELECT CAST('{row[entry_key['Date']]}' AS date), '{element_id}', {', '.join([str(row[value]) for value in entry_key.values() if value not in [entry_key["Date"]]])}
+                    WHERE NOT EXISTS (SELECT * FROM {schema}."{table_name}" WHERE "Date" = CAST('{row[entry_key['Date']]}' AS date) AND "ReachID" = {element_id})
+                    """
+
+                    # print(query)
+                    cursor.execute(query)
+                    connection.commit()
 
 
 def damwiseExtraction(
