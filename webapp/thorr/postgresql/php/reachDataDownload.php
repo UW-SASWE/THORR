@@ -600,6 +600,119 @@ if ($_POST['DataType'] == "water-temperature") {
         ORDER BY
             "Date";
         QUERY;
+    } elseif ($_POST['TimeScale'] == "monthly") {
+        $sql = <<<QUERY
+        SELECT
+            EST."Date"::DATE AS "Date",
+            ROUND((EST.WaterTemperature - LTM.WaterTemperature), 2) AS "Deviation"
+        FROM
+            (
+                SELECT
+                    TO_DATE(
+                        CONCAT(
+                            EXTRACT(
+                                YEAR
+                                FROM
+                                    CURRENT_DATE
+                            ),
+                            '-',
+                            EXTRACT(
+                                MONTH
+                                FROM
+                                    "Date"
+                            ),
+                            '-',
+                            LPAD('01', 2, '00')
+                        ),
+                        'YYYY-MM-DD'
+                    )::DATE AS "Date",
+                    ROUND(AVG("EstTempC")::NUMERIC, 2) AS WaterTemperature
+                FROM
+                    "$schema"."ReachData"
+                WHERE
+                    "ReachID" = {$_POST['ReachID']}
+                    AND "EstTempC" IS NOT NULL
+                GROUP BY
+                    TO_DATE(
+                        CONCAT(
+                            EXTRACT(
+                                YEAR
+                                FROM
+                                    CURRENT_DATE
+                            ),
+                            '-',
+                            EXTRACT(
+                                MONTH
+                                FROM
+                                    "Date"
+                            ),
+                            '-',
+                            LPAD('01', 2, '00')
+                        ),
+                        'YYYY-MM-DD'
+                    )
+                ORDER BY
+                    "Date"
+            ) AS EST
+            LEFT JOIN (
+                SELECT
+                    TO_DATE(
+                        CONCAT(
+                            EXTRACT(
+                                YEAR
+                                FROM
+                                    CURRENT_DATE
+                            ),
+                            '-',
+                            EXTRACT(
+                                MONTH
+                                FROM
+                                    "Date"
+                            ),
+                            '-',
+                            LPAD('01', 2, '00')
+                        ),
+                        'YYYY-MM-DD'
+                    )::DATE AS "Date",
+                    ROUND(AVG("EstTempC")::NUMERIC, 2) AS WaterTemperature
+                FROM
+                    "$schema"."ReachData"
+                WHERE
+                    "ReachID" = {$_POST['ReachID']}
+                    AND "EstTempC" IS NOT NULL
+                GROUP BY
+                    TO_DATE(
+                        CONCAT(
+                            EXTRACT(
+                                YEAR
+                                FROM
+                                    CURRENT_DATE
+                            ),
+                            '-',
+                            EXTRACT(
+                                MONTH
+                                FROM
+                                    "Date"
+                            ),
+                            '-',
+                            LPAD('01', 2, '00')
+                        ),
+                        'YYYY-MM-DD'
+                    )
+                ORDER BY
+                    "Date"
+            ) AS LTM ON (EXTRACT(
+                                MONTH
+                                FROM
+                                    LTM."Date"
+                            ) = EXTRACT(
+                                MONTH
+                                FROM
+                                    EST."Date"
+                            ))
+        ORDER BY
+            "Date";
+        QUERY;
     } elseif ($_POST['TimeScale'] == "bi-weekly") {
         $sql = <<<QUERY
         SELECT
