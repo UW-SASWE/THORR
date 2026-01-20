@@ -50,7 +50,7 @@ if ($_POST['ReachID']) {
                 ST_ASGEOJSON("Reaches"."geometry") AS "geometry"
         FROM
             "$schema"."Rivers"
-        INNER JOIN "$schema"."Basins" USING ("BasinID")
+        INNER JOIN "$schema"."Regions" USING ("RegionID")
         INNER JOIN "$schema"."Reaches" USING ("RiverID")
         WHERE
             "RiverID" = {$_POST['RiverID']}) AS T
@@ -76,10 +76,10 @@ if ($_POST['ReachID']) {
                 ST_ASGEOJSON("Reaches"."geometry") AS geometry
         FROM
             "$schema"."Rivers"
-        INNER JOIN "$schema"."Basins" USING ("BasinID")
+        INNER JOIN "$schema"."Regions" USING ("RegionID")
         INNER JOIN "$schema"."Reaches" USING ("RiverID")
         WHERE
-            "BasinID" = {$_POST['BasinID']}) AS T
+            "RegionID" = {$_POST['BasinID']}) AS T
             INNER JOIN
         (SELECT 
             "ReachID", ROUND(AVG("EstTempC")::numeric, 2) AS "EstTempC"
