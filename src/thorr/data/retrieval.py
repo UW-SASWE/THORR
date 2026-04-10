@@ -1636,6 +1636,7 @@ def get_reach_data(
     # ndwi_threshold=0.2,
     # imageCollection="LANDSAT/LC08/C02/T1_L2",
     logger=None,
+    project_name=None,
 ):
     service_account = ee_credentials["service_account"]
     credentials = ee.ServiceAccountCredentials(
@@ -1653,6 +1654,28 @@ def get_reach_data(
     try:
         with open(data_dir / "reaches" / "checkpoint.json", "r") as f:
             checkpoint = json.load(f)
+        if (
+            checkpoint["project_name"] != project_name
+            or checkpoint["start_date"] != start_date
+            or checkpoint["end_date"] != end_date
+        ):
+            if logger is not None:
+                logger.info(
+                    "Project name or start/end date changed. Creating new checkpoint..."
+                )
+            else:
+                print(
+                    "Project name or start/end date changed. Creating new checkpoint..."
+                )
+            checkpoint = {
+                "project_name": project_name,
+                "start_date": start_date,
+                "end_date": end_date,
+                "river_index": 0,
+                "reach_index": 0,
+            }
+            # save checkpoint
+            json.dump(checkpoint, open(data_dir / "reaches" / "checkpoint.json", "w"))
     except Exception as e:
         if logger is not None:
             logger.error(f"Error: {e}")
@@ -1663,7 +1686,13 @@ def get_reach_data(
             logger.info("Creating new checkpoint...")
         else:
             print("Creating new checkpoint...")
-        checkpoint = {"river_index": 0, "reach_index": 0}
+        checkpoint = {
+            "project_name": project_name,
+            "start_date": start_date,
+            "end_date": end_date,
+            "river_index": 0,
+            "reach_index": 0,
+        }
         # save checkpoint
         json.dump(checkpoint, open(data_dir / "reaches" / "checkpoint.json", "w"))
 
@@ -1789,15 +1818,31 @@ def retrieve(config_path, element_type="reaches"):
     # validate start and end dates
     start_date, end_date = validate_start_end_dates(start_date, end_date, logger=log)
 
+    project_name = config_dict["project"]["name"]
+
     if element_type == "reaches":
         get_reach_data(
-            db, db_type, data_dir, ee_credentials, start_date, end_date, logger=log
+            db,
+            db_type,
+            data_dir,
+            ee_credentials,
+            start_date,
+            end_date,
+            logger=log,
+            project_name=project_name,
         )
         # print("Retrieving reaches data")
         # pass
     elif element_type == "reservoirs":
         get_reservoir_data(
-            db, db_type, data_dir, ee_credentials, start_date, end_date, logger=log
+            db,
+            db_type,
+            data_dir,
+            ee_credentials,
+            start_date,
+            end_date,
+            logger=log,
+            project_name=project_name,
         )
         # print("Retrieving reservoirs data")
 

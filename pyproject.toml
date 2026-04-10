@@ -60,6 +60,7 @@ exclude = [
   "/.env",
   "/.vscode",
   "/tests",
+  "/misc"
 ]
 
 [tool.hatch.version]
