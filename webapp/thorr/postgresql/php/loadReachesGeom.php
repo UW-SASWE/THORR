@@ -45,6 +45,7 @@ if (isset($_POST['offset']) || isset($_POST['row_count'])) {
                 "EstTempC" IS NOT NULL
             GROUP BY "ReachID") AS latestEstimate ON latestEstimate."Date" = "$schema"."ReachData"."Date"
                 AND latestEstimate."ReachID" = "$schema"."ReachData"."ReachID"
+        ORDER BY R."ReachID"
         OFFSET
             {$_POST['offset']}
         LIMIT
